@@ -33,6 +33,22 @@ struct e32_section_header
     uint32_t sh_entsize;
 };
 
+struct e64_section_header
+{
+    uint32_t sh_name;
+    string   name;
+    uint32_t sh_type;
+    uint64_t sh_flags;
+    uint64_t sh_addr;
+    uint64_t sh_offset;
+    uint64_t sh_size;
+    uint32_t sh_link;
+    uint32_t sh_info;
+    uint64_t sh_addralign;
+    uint64_t sh_entsize;
+};
+
+
 struct e32_program_header
 {
     uint32_t p_type;
@@ -84,6 +100,8 @@ void readLittleEndian(uint16_t*,uint8_t *,int);
 void readLittleEndian(uint32_t*,uint8_t *,int);
 void readLittleEndian(uint64_t*,uint8_t *,int);
 struct e_ident readElfIdent(ifstream&);
-void readElf32Header(ifstream&);
+void readElf32Header(ifstream&); //doldur bunu
 e64_header readElf64Header(ifstream&);
+struct e32_section_header read32Section(ifstream&, uint32_t, uint16_t);
+struct e64_section_header read64Section(ifstream&, uint64_t, uint16_t);
 string readFile(string);
