@@ -68,9 +68,9 @@ struct e64_header readElf64Header(ifstream& fd)
     return header;
 }
 
-struct e64_section_header read64Section(ifstream& fd, uint64_t offset, uint16_t shstr_offset)
+struct e64_section_header read64Section(ifstream& fd, uint64_t offset, uint64_t shstr_offset)
 {
-    fd.seekg(offset);
+    fd.seekg(offset, ios::beg);
     uint8_t buffer[64];
     char c;
     struct e64_section_header secHeader;
@@ -87,15 +87,19 @@ struct e64_section_header read64Section(ifstream& fd, uint64_t offset, uint16_t 
     readLittleEndian(&(secHeader.sh_entsize), buffer, 56);
     
     secHeader.name = "";
-    fd.seekg(secHeader.sh_name);
-    do
+    if(secHeader.sh_name != 0)
     {
-        fd.read(&c,1);
-        secHeader.name += c;
-    }while(c != '\0');
+        fd.seekg(secHeader.sh_name + shstr_offset , ios::beg);
+        do
+        {
+            fd.read(&c,1);
+            secHeader.name += c;
+        }while(c != '\0');
+    }
+    return secHeader;
 }
 
-struct e32_section_header read32Section(ifstream& fd, uint32_t offset, uint16_t shstr_offset)
+struct e32_section_header read32Section(ifstream& fd, uint32_t offset, uint32_t shstr_offset)
 {
     fd.seekg(offset);
     uint8_t buffer[40];
@@ -114,13 +118,15 @@ struct e32_section_header read32Section(ifstream& fd, uint32_t offset, uint16_t 
     readLittleEndian(&(secHeader.sh_entsize), buffer, 36);
     
     secHeader.name = "";
-    fd.seekg(secHeader.sh_name);
-    do
+    if(secHeader.sh_name != 0)
     {
-        fd.read(&c, 1);
-        secHeader.name += c;
-    }while(c != '\0');
-
+        fd.seekg(secHeader.sh_name + shstr_offset, ios::beg);
+        do
+        {
+            fd.read(&c, 1);
+            secHeader.name += c;
+        }while(c != '\0');
+    }
     return secHeader;
 }
 
@@ -156,26 +162,28 @@ void readElf(ifstream& fd)
         uint64_t offset;
         struct e64_header elf_header;
         elf_header = readElf64Header(fd);
+        struct e64_section_header strTable = read64Section(fd,(elf_header.e_shstrndx*elf_header.e_shentsize)+elf_header.e_shoff,0);
+        elf_header.strtab = strTable.sh_offset;
         vector<struct e64_section_header> sHeaders;
         offset = elf_header.e_shoff;
         for(int i=0; i < elf_header.e_shnum; i++)
         {
             printf("Trying to read, offset: %lu\n", offset);
-            struct e64_section_header header = read64Section(fd, offset, elf_header.e_shstrndx);
-            sHeaders.push_back(header);
+            struct e64_section_header secHeader = read64Section(fd, offset, elf_header.strtab);
+            sHeaders.push_back(secHeader);
             offset += elf_header.e_shentsize;
             printf("readed a section header, contents:\n");
-            printf("Address of name: %lu\n", header.sh_name);
-            //printf("Name: %s\n", header.name);
-            printf("Type: %u\n", header.sh_type);
-            printf("Flags: %lu\n", header.sh_flags);
-            printf("Address: %lu\n", header.sh_addr);
-            printf("Offset: %lu\n", header.sh_offset);
-            printf("Size: %lu\n", header.sh_size);
-            printf("Link: %u\n", header.sh_link);
-            printf("Info: %d\n", header.sh_info);
-            printf("Address Align: %lu\n", header.sh_addralign);
-            printf("Entry size: %lu\n", header.sh_entsize);
+            printf("Address of name: %lu\n", secHeader.sh_name);
+            printf("Name: %s\n", secHeader.name.c_str());
+            printf("Type: %u\n", secHeader.sh_type);
+            printf("Flags: %lu\n", secHeader.sh_flags);
+            printf("Address: %lu\n", secHeader.sh_addr);
+            printf("Offset: %lu\n", secHeader.sh_offset);
+            printf("Size: %lu\n", secHeader.sh_size);
+            printf("Link: %u\n", secHeader.sh_link);
+            printf("Info: %d\n", secHeader.sh_info);
+            printf("Address Align: %lu\n", secHeader.sh_addralign);
+            printf("Entry size: %lu\n", secHeader.sh_entsize);
             printf("End of header\n\n");
         }
        /* for(struct e64_section_header header : sHeaders)
