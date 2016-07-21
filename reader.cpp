@@ -1,5 +1,6 @@
 #include "reader.h"
 #include <vector>
+#include <list>
 
 const vector<uint8_t> ELF_H = {0x7F,0x45,0x4C,0x46};
 
@@ -130,6 +131,42 @@ struct e32_section_header read32Section(ifstream& fd, uint32_t offset, uint32_t 
     return secHeader;
 }
 
+void readStringTable(ifstream& fd, uint64_t offset, uint64_t size)
+{
+    unsigned int i;
+    uint64_t adr = 0L;
+    string temp;
+    fd.seekg(offset,ios::beg);
+    vector<uint8_t> buffer(size);
+    std::list<std::pair<uint64_t, std::string> > strtab;
+    
+    fd.read((char *)&buffer[0], size);
+    for(i = 0; i < buffer.size(); i++)
+    {
+        if(buffer[i] == '\0')
+        {
+            //append string to list
+            strtab.push_back(make_pair(adr,temp));
+            temp = "";
+            adr = i + 1;
+        }
+        else
+        {
+            temp += buffer[i];
+        }
+    }
+    return;
+}
+
+void readSectionContent(ifstream& fd, uint64_t offset, uint64_t size)
+{
+    unsigned int i;
+    fd.seekg(offset,ios::beg);
+    vector<uint8_t> buffer(size);
+    fd.read((char *)&buffer[0],size);
+    return;
+}
+
 void readElf32Header(ifstream& fd)
 {
     struct e32_header header;
@@ -185,24 +222,14 @@ void readElf(ifstream& fd)
             printf("Address Align: %lu\n", secHeader.sh_addralign);
             printf("Entry size: %lu\n", secHeader.sh_entsize);
             printf("End of header\n\n");
+            if(secHeader.sh_type == 3)
+            {
+                readStringTable(fd,secHeader.sh_offset,secHeader.sh_size);
+            }
+            else
+                readSectionContent(fd,secHeader.sh_offset,secHeader.sh_size);
+
         }
-       /* for(struct e64_section_header header : sHeaders)
-        {
-            printf("Address of name: %lu\n", header.sh_name);
-            //printf("Name: %s\n", header.name);
-            printf("Type: %d\n", header.sh_type);
-            printf("Flags: %lu\n", header.sh_flags);
-            printf("Address: %lu\n", header.sh_addr);
-            printf("Offset: %lu\n", header.sh_offset);
-            printf("Size: %lu\n", header.sh_size);
-            printf("Link: %d\n", header.sh_link);
-            printf("Info: %d\n", header.sh_info);
-            printf("Address Align: %lu\n", header.sh_addralign);
-            printf("Entry size: %lu\n", header.sh_entsize);
-            printf("End of parse\n");
-        }*/
-
-
     }
     else
         printf("error");
