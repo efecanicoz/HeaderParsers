@@ -1,10 +1,9 @@
+#include "elf.h"
 #include "reader.h"
-#include <vector>
-#include <list>
 
 const vector<uint8_t> ELF_H = {0x7F,0x45,0x4C,0x46};
 
-struct e_ident readElfIdent(ifstream& fd)
+/*struct e_ident readElfIdent(ifstream& fd)
 {
     struct e_ident id;
     fd.read((char *)id.ei_magic,4);
@@ -16,7 +15,7 @@ struct e_ident readElfIdent(ifstream& fd)
     fd.read((char *)id.ei_pad,7);
     
     return id;
-}
+}*/
 
 void readLittleEndian(uint8_t *to, uint8_t from[], int offset)
 {
@@ -45,7 +44,7 @@ void readLittleEndian(uint64_t *to, uint8_t from[], int offset)
         (static_cast<uint64_t>(from[offset+6]) << 48) |
         (static_cast<uint64_t>(from[offset+7]) << 56) ; 
 }
-
+/*
 struct e64_header readElf64Header(ifstream& fd)
 {
     struct e64_header header;
@@ -170,26 +169,16 @@ void readSectionContent(ifstream& fd, uint64_t offset, uint64_t size)
 void readElf32Header(ifstream& fd)
 {
     struct e32_header header;
-/*    fd.read((char *)header.e_type,2);
-    fd.read((char *)header.e_machine,2); 
-    fd.read((char *)header.e_version,4); 
-    fd.read((char *)header.e_entry,4); 
-    fd.read((char *)header.e_phoff,4); 
-    fd.read((char *)header.e_shoff,4); 
-    fd.read((char *)header.e_flags,4); 
-    fd.read((char *)header.e_ehsize,2); 
-    fd.read((char *)header.e_phentsize,2); 
-    fd.read((char *)header.e_phnum,2); 
-    fd.read((char *)header.e_shentsize,2); 
-    fd.read((char *)header.e_shnum,2); 
-    fd.read((char *)header.e_shstrndx,2);
-*/
     return;
 }
-
+*/
 void readElf(ifstream& fd)
 {
-    struct e_ident identifier = readElfIdent(fd);
+    Elf64 bucket(fd);
+    bucket.readIdent();
+    bucket.readHeader();
+    bucket.readSectionHeaders();
+    /*struct e_ident identifier = readElfIdent(fd);
     if(identifier.ei_class == 1)
     {
         readElf32Header(fd);
@@ -233,7 +222,7 @@ void readElf(ifstream& fd)
     }
     else
         printf("error");
-    
+    */
 
 
     return;

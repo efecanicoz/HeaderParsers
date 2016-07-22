@@ -1,13 +1,18 @@
+#ifndef READER
+#define READER
+
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <sstream>
 #include <cstdio>
 #include <cstdint>
+#include <vector>
+#include <list>
 
 using namespace std;
 
-struct e_ident
+/*struct e_ident
 {
     uint8_t ei_magic[4];
     uint8_t ei_class;
@@ -16,7 +21,7 @@ struct e_ident
     uint8_t ei_osabi;
     uint8_t ei_abiversion;
     uint8_t ei_pad[7];
-};
+};*/
 
 struct e32_section_header
 {
@@ -107,3 +112,4 @@ e64_header readElf64Header(ifstream&);
 struct e32_section_header read32Section(ifstream&, uint32_t, uint32_t);
 struct e64_section_header read64Section(ifstream&, uint64_t, uint64_t);
 string readFile(string);
+#endif
