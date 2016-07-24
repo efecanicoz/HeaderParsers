@@ -1,6 +1,9 @@
 #ifndef READER
-  #include "reader.h"
+    #include "reader.h"
 #endif
+#ifndef ELF64
+
+#define ELF64
 #include <cstdint>
 #include <vector>
 #include <list>
@@ -33,7 +36,10 @@ class Elf64SH
         uint32_t sh_info;
         uint64_t sh_addralign;
         uint64_t sh_entsize;
-       Elf64SH();
+        std::vector<uint8_t> content;
+        std::vector<std::pair<uint64_t,std::string>> strtab;
+        Elf64SH();
+        ~Elf64SH();
 };
 
 
@@ -63,4 +69,6 @@ class Elf64
         void readIdent();
         void readSectionHeader(uint64_t, uint64_t);
         void readSectionHeaders();
+        std::vector<std::string> getSectionNames();
 };
+#endif

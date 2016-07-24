@@ -5,10 +5,17 @@ Elf64::Elf64(std::ifstream& desc) : fd(desc)
     
 }
 
+Elf64SH::~Elf64SH()
+{
+
+}
+
 Elf64SH::Elf64SH()
 {
     this->name = "";
 }
+
+
 
 void Elf64::readIdent()
 {
@@ -64,13 +71,46 @@ void Elf64::readSectionHeader(uint64_t offset, uint64_t strtab)
     readLittleEndian(&(header.sh_entsize), buffer, 56);
     
     header.name = "";
-    //isimleri koyacan
+    //reading name
     fd.seekg(strtab+header.sh_name,ios::beg);
     do
     {
         fd.read(&c,1);
         header.name += c;
     }while(c != '\0');
+
+    //reading content
+    if(header.sh_type == 3)//if type is SHT_STRTAB
+    {
+        unsigned int i;
+        uint64_t addr = 0L;
+        string temp;
+        std::vector<uint8_t> buffer(header.sh_size);
+//        header.strtab = new std::vector<std::pair<uint64_t,std::string>>;
+
+        this->fd.seekg(header.sh_offset,ios::beg);
+        this->fd.read((char *)&buffer[0],header.sh_size);
+        for(i = 0; i < buffer.size(); i++)
+        {
+            if(buffer[i] == '\0')
+            {
+                //header.strtab.push_back(make_pair(addr,temp));
+                temp = "";
+                addr = i + 1;//should i store absolute address ?
+            }
+            else
+            {
+                temp += buffer[i];
+            }
+        }
+    }
+    else//if type is not string table
+    {
+        unsigned int i;
+        this->fd.seekg(offset,ios::beg);
+//        header.content = new vector<uint8_t>(header.sh_size);
+        //this->fd.read((char *)&header.content[0], header.sh_size);
+    }
     this->sHeaders.push_back(header);
 }
 
@@ -88,8 +128,17 @@ void Elf64::readSectionHeaders()
         readSectionHeader(offset,strtab);
         offset += this->e_shentsize;
     }
-    //strtab'dan sonra yazan 8 baytlık değeri fonksiyonlara gönderecen.    
-    
- 
+    //strtab'dan sonra yazan 8 baytlık değeri fonksiyonlara gönderecen. 
+
 }
 
+std::vector<std::string> Elf64::getSectionNames()
+{
+    uint32_t i;
+    std::vector<std::string> nameList;
+    for(i = 0; i < this->sHeaders.size(); i++)
+    {
+        nameList.push_back(this->sHeaders[i].name);
+    }
+    return nameList;
+}

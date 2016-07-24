@@ -10,6 +10,10 @@
 #include <vector>
 #include <list>
 
+#ifndef ELF64
+    #include "elf.h"
+#endif
+
 using namespace std;
 
 /*struct e_ident
