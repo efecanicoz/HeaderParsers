@@ -69,7 +69,7 @@ void readSectionContent(ifstream& fd, uint64_t offset, uint64_t size)
 
 */
 
-void readElf(ifstream& fd)
+void readElf(string fd)
 {
     Elf64 bucket(fd);
     bucket.readIdent();
@@ -141,9 +141,10 @@ string readFile(const string path)
     {
         printf("%x %x\n",buffer[i],ELF_H[i]);
     }
-    fd.seekg(0);
+    fd.close();
+    //fd.seekg(0);
     if(buffer == ELF_H)
-        readElf(fd);
+        readElf(path);
     else
         printf("üzüldük");
     string a = "elf";

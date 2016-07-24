@@ -47,7 +47,7 @@ class Elf64
 {
     public:
         struct e_ident id;
-        std::ifstream& fd;
+        std::ifstream fd;
         uint16_t e_type;
         uint16_t e_machine;
         uint32_t e_version;
@@ -65,6 +65,7 @@ class Elf64
         std::vector<Elf64SH> sHeaders;
 
         Elf64(std::ifstream&);
+        Elf64(std::string);
         void readHeader();
         void readIdent();
         void readSectionHeader(uint64_t, uint64_t);

@@ -1,8 +1,14 @@
 #include "elf.h"
 
-Elf64::Elf64(std::ifstream& desc) : fd(desc)
+/*Elf64::Elf64(std::ifstream& desc) : fd(desc)
 {
     
+}*/
+
+Elf64::Elf64(std::string path)
+{
+//    ifstream desc(path, ios::in|ios::binary);
+    this->fd.open(path,ios::in|ios::binary);
 }
 
 Elf64SH::~Elf64SH()
