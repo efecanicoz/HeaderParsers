@@ -1,4 +1,4 @@
-#include "elf.h"
+#include "elf64.h"
 
 /*Elf64::Elf64(std::ifstream& desc) : fd(desc)
 {
@@ -7,7 +7,7 @@
 
 Elf64::Elf64(std::string path)
 {
-    this->fd.open(path,ios::in|ios::binary);
+    this->fd.open(path,std::ios::in|std::ios::binary);
 }
 
 Elf64SH::~Elf64SH()
@@ -63,7 +63,7 @@ void Elf64::readSectionHeader(uint64_t offset, uint64_t strtab)
     char c;
     Elf64SH header;
 
-    this->fd.seekg(offset,ios::beg);
+    this->fd.seekg(offset,std::ios::beg);
     this->fd.read((char *)buffer, 64);
     readLittleEndian(&(header.sh_name), buffer, 0);
     readLittleEndian(&(header.sh_type), buffer, 4);
@@ -78,7 +78,7 @@ void Elf64::readSectionHeader(uint64_t offset, uint64_t strtab)
     
     header.name = "";
     //reading name
-    fd.seekg(strtab+header.sh_name,ios::beg);
+    fd.seekg(strtab+header.sh_name,std::ios::beg);
     do
     {
         fd.read(&c,1);
@@ -86,7 +86,7 @@ void Elf64::readSectionHeader(uint64_t offset, uint64_t strtab)
     }while(c != '\0');
 
     unsigned int i;
-    this->fd.seekg(offset,ios::beg);
+    this->fd.seekg(offset,std::ios::beg);
     header.content.resize(header.sh_size);
     this->fd.read((char *)&header.content[0], header.sh_size);
     this->sHeaders.push_back(header);
@@ -98,7 +98,7 @@ void Elf64::readSectionHeaders()
     uint16_t i;
     uint64_t offset = this->e_shoff;
     uint64_t strtab = (this->e_shstrndx*this->e_shentsize) + this->e_shoff + 24; 
-    this->fd.seekg(strtab,ios::beg);
+    this->fd.seekg(strtab,std::ios::beg);
     this->fd.read((char *)buf,8);
     readLittleEndian(&strtab,buf,0);
     for(i = 0; i < this->e_shnum; i++)

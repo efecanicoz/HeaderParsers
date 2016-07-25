@@ -1,7 +1,6 @@
-#include "elf.h"
 #include "reader.h"
 
-const vector<uint8_t> ELF_H = {0x7F,0x45,0x4C,0x46};
+const std::vector<uint8_t> ELF_H = {0x7F,0x45,0x4C,0x46};
 
 void readLittleEndian(uint8_t *to, uint8_t from[], int offset)
 {
@@ -36,7 +35,7 @@ void readLittleEndian(uint64_t *to, uint8_t from[], int offset)
     unsigned int i;
     uint64_t adr = 0L;
     string temp;
-    fd.seekg(offset,ios::beg);
+    fd.seekg(offset,std::ios::beg);
     vector<uint8_t> buffer(size);
     std::list<std::pair<uint64_t, std::string> > strtab;
     
@@ -61,7 +60,7 @@ void readLittleEndian(uint64_t *to, uint8_t from[], int offset)
 void readSectionContent(ifstream& fd, uint64_t offset, uint64_t size)
 {
     unsigned int i;
-    fd.seekg(offset,ios::beg);
+    fd.seekg(offset,std::ios::beg);
     vector<uint8_t> buffer(size);
     fd.read((char *)&buffer[0],size);
     return;
@@ -69,7 +68,21 @@ void readSectionContent(ifstream& fd, uint64_t offset, uint64_t size)
 
 */
 
-void readElf(string fd)
+void readElf32(std::string fd)
+{
+    Elf32 bucket(fd);
+    bucket.readIdent();
+    bucket.readHeader();
+    bucket.readSectionHeaders();
+    std::vector<std::string> secNames = bucket.getSectionNames();
+    int i;
+    for(i = 0; i < secNames.size(); i++)
+    {
+        std::cout << secNames[i];
+    }
+}
+
+void readElf64(std::string fd)
 {
     Elf64 bucket(fd);
     bucket.readIdent();
@@ -79,7 +92,7 @@ void readElf(string fd)
     int i;
     for(i = 0; i < secNames.size(); i++)
     {
-        cout << secNames[i];
+        std::cout << secNames[i];
     }
     /*struct e_ident identifier = readElfIdent(fd);
     if(identifier.ei_class == 1)
@@ -89,7 +102,7 @@ void readElf(string fd)
     else if(identifier.ei_class == 2)
     {
         uint64_t offset;
-        struct e64_header elf_header;
+    struct e64_header elf_header;
         elf_header = readElf64Header(fd);
         struct e64_section_header strTable = read64Section(fd,(elf_header.e_shstrndx*elf_header.e_shentsize)+elf_header.e_shoff,0);
         elf_header.strtab = strTable.sh_offset;
@@ -131,23 +144,30 @@ void readElf(string fd)
     return;
 }
 
-string readFile(const string path)
+std::string readFile(const std::string path)
 {
-    vector<uint8_t> buffer(4);
+    std::vector<uint8_t> buffer(4);
     
-    ifstream fd(path, ios::in|ios::binary);
+    std::ifstream fd(path, std::ios::in|std::ios::binary);
     fd.read((char *)&buffer[0],4);
     for(int i = 0; i < 4; i++)
     {
         printf("%x %x\n",buffer[i],ELF_H[i]);
     }
-    fd.close();
     //fd.seekg(0);
     if(buffer == ELF_H)
-        readElf(path);
+    {
+        uint8_t ei_class;
+        fd.read((char *)&ei_class,1);
+        fd.close();
+        if(ei_class == 1)
+            readElf32(path);
+        else if(ei_class == 2)
+            readElf64(path);
+    }
     else
         printf("üzüldük");
-    string a = "elf";
+    std::string a = "elf";
 
     return a;
 }

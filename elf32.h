@@ -1,48 +1,38 @@
 #ifndef READER
     #include "reader.h"
 #endif
-#ifndef ELF64
+#ifndef ELF32
 
-#define ELF64
+#define ELF32
 #include <cstdint>
 #include <vector>
 #include <list>
 #include <iostream>
 #include <fstream>
 
-struct e_ident
-{
-    uint8_t ei_magic[4];
-    uint8_t ei_class;
-    uint8_t ei_data;
-    uint8_t ei_version;
-    uint8_t ei_osabi;
-    uint8_t ei_abiversion;
-    uint8_t ei_pad[7];
-};
+//data uzunluklarını düzenle 64bit için geçerliler şu an..
 
-
-class Elf64SH
+class Elf32SH
 {
     public:
         uint32_t sh_name;
         std::string   name;
         uint32_t sh_type;
-        uint64_t sh_flags;
-        uint64_t sh_addr;
-        uint64_t sh_offset;
-        uint64_t sh_size;
+        uint32_t sh_flags;
+        uint32_t sh_addr;
+        uint32_t sh_offset;
+        uint32_t sh_size;
         uint32_t sh_link;
         uint32_t sh_info;
-        uint64_t sh_addralign;
-        uint64_t sh_entsize;
+        uint32_t sh_addralign;
+        uint32_t sh_entsize;
         std::vector<uint8_t> content;
-        Elf64SH();
-        ~Elf64SH();
+        Elf32SH();
+        ~Elf32SH();
 };
 
 
-class Elf64
+class Elf32
 {
     public:
         struct e_ident id;
@@ -50,9 +40,9 @@ class Elf64
         uint16_t e_type;
         uint16_t e_machine;
         uint32_t e_version;
-        uint64_t e_entry;
-        uint64_t e_phoff;
-        uint64_t e_shoff;
+        uint32_t e_entry;
+        uint32_t e_phoff;
+        uint32_t e_shoff;
         uint32_t e_flags;
         uint16_t e_ehsize;
         uint16_t e_phentsize;
@@ -60,14 +50,13 @@ class Elf64
         uint16_t e_shentsize;
         uint16_t e_shnum;
         uint16_t e_shstrndx;
-        uint64_t strtab;
-        std::vector<Elf64SH> sHeaders;
+        uint32_t strtab;
+        std::vector<Elf32SH> sHeaders;
 
-        Elf64(std::ifstream&);
-        Elf64(std::string);
+        Elf32(std::string);
         void readHeader();
         void readIdent();
-        void readSectionHeader(uint64_t, uint64_t);
+        void readSectionHeader(uint32_t, uint32_t);
         void readSectionHeaders();
         std::vector<std::string> getSectionNames();
         std::vector<uint8_t> getSectionContent(std::string);
