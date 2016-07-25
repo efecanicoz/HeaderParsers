@@ -50,7 +50,11 @@ class Elf64
         uint16_t e_shstrndx;
         uint64_t strtab;
         std::vector<Elf64SH> sHeaders;
-
+        void read(uint8_t*,uint8_t*,uint8_t);
+        void read(uint16_t*,uint8_t*,uint8_t);
+        void read(uint32_t*,uint8_t*,uint8_t);
+        void read(uint64_t*,uint8_t*,uint8_t);
+ 
         Elf64(std::ifstream&);
         Elf64(std::string);
         void readHeader();

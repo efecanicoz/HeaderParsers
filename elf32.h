@@ -52,7 +52,11 @@ class Elf32
         uint16_t e_shstrndx;
         uint32_t strtab;
         std::vector<Elf32SH> sHeaders;
-
+        void read(uint8_t*,uint8_t*,uint8_t);
+        void read(uint16_t*,uint8_t*,uint8_t);
+        void read(uint32_t*,uint8_t*,uint8_t);
+        void read(uint64_t*,uint8_t*,uint8_t);
+ 
         Elf32(std::string);
         void readHeader();
         void readIdent();

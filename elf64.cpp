@@ -36,6 +36,47 @@ void Elf64::readIdent()
     return; 
 }
 
+void Elf64::read(uint8_t* to, uint8_t* from, uint8_t offset)
+{
+    if(this->id.ei_data == 1)//lsb
+        readLittleEndian(to,from,offset);
+    else if(this->id.ei_data == 2)//msb
+        readBigEndian(to,from,offset);
+    else
+        ;//TODO: throw something to user
+}
+
+void Elf64::read(uint16_t* to, uint8_t* from, uint8_t offset)
+{
+    if(this->id.ei_data == 1)//lsb
+        readLittleEndian(to,from,offset);
+    else if(this->id.ei_data == 2)//msb
+        readBigEndian(to,from,offset);
+    else
+        ;//TODO: throw something to user
+}
+
+void Elf64::read(uint32_t* to, uint8_t* from, uint8_t offset)
+{
+    if(this->id.ei_data == 1)//lsb
+        readLittleEndian(to,from,offset);
+    else if(this->id.ei_data == 2)//msb
+        readBigEndian(to,from,offset);
+    else
+        ;//TODO: throw something to user
+}
+
+void Elf64::read(uint64_t* to, uint8_t* from, uint8_t offset)
+{
+    if(this->id.ei_data == 1)//lsb
+        readLittleEndian(to,from,offset);
+    else if(this->id.ei_data == 2)//msb
+        readBigEndian(to,from,offset);
+    else
+        ;//TODO: throw something to user
+}
+
+
 void Elf64::readHeader()
 {
     uint8_t buffer[48];

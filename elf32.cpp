@@ -30,8 +30,47 @@ void Elf32::readIdent()
     this->fd.read((char *)&this->id.ei_osabi,1);
     this->fd.read((char *)&this->id.ei_abiversion,1);
     this->fd.read((char *)this->id.ei_pad,7);
-    
     return; 
+}
+
+void Elf32::read(uint8_t* to, uint8_t* from, uint8_t offset)
+{
+    if(this->id.ei_data == 1)//lsb
+        readLittleEndian(to,from,offset);
+    else if(this->id.ei_data == 2)//msb
+        readBigEndian(to,from,offset);
+    else
+        ;//TODO: throw something to user
+}
+
+void Elf32::read(uint16_t* to, uint8_t* from, uint8_t offset)
+{
+    if(this->id.ei_data == 1)//lsb
+        readLittleEndian(to,from,offset);
+    else if(this->id.ei_data == 2)//msb
+        readBigEndian(to,from,offset);
+    else
+        ;//TODO: throw something to user
+}
+
+void Elf32::read(uint32_t* to, uint8_t* from, uint8_t offset)
+{
+    if(this->id.ei_data == 1)//lsb
+        readLittleEndian(to,from,offset);
+    else if(this->id.ei_data == 2)//msb
+        readBigEndian(to,from,offset);
+    else
+        ;//TODO: throw something to user
+}
+
+void Elf32::read(uint64_t* to, uint8_t* from, uint8_t offset)
+{
+    if(this->id.ei_data == 1)//lsb
+        readLittleEndian(to,from,offset);
+    else if(this->id.ei_data == 2)//msb
+        readBigEndian(to,from,offset);
+    else
+        ;//TODO: throw something to user
 }
 
 void Elf32::readHeader()
