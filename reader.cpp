@@ -144,7 +144,7 @@ void readElf64(std::string fd)
     return;
 }
 
-std::string readFile(const std::string path)
+void readFile(const std::string path)
 {
     std::vector<uint8_t> buffer(4);
     
@@ -167,7 +167,6 @@ std::string readFile(const std::string path)
     }
     else
         printf("üzüldük");
-    std::string a = "elf";
 
-    return a;
+    return;
 }

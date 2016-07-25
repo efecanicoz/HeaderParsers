@@ -25,7 +25,7 @@ void readLittleEndian(uint8_t*,uint8_t *,int);
 void readLittleEndian(uint16_t*,uint8_t *,int);
 void readLittleEndian(uint32_t*,uint8_t *,int);
 void readLittleEndian(uint64_t*,uint8_t *,int);
-std::string readFile(std::string);
+void readFile(std::string);
 void readElf32(std::string);
 void readElf64(std::string);
 
