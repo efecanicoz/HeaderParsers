@@ -37,7 +37,6 @@ class Elf64SH
         uint64_t sh_addralign;
         uint64_t sh_entsize;
         std::vector<uint8_t> content;
-        std::vector<std::pair<uint64_t,std::string>> strtab;
         Elf64SH();
         ~Elf64SH();
 };
@@ -71,5 +70,6 @@ class Elf64
         void readSectionHeader(uint64_t, uint64_t);
         void readSectionHeaders();
         std::vector<std::string> getSectionNames();
+        std::vector<uint8_t> getSectionContent(std::string);
 };
 #endif

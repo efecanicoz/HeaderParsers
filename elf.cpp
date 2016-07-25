@@ -7,13 +7,13 @@
 
 Elf64::Elf64(std::string path)
 {
-//    ifstream desc(path, ios::in|ios::binary);
     this->fd.open(path,ios::in|ios::binary);
 }
 
 Elf64SH::~Elf64SH()
 {
-
+    //no need to this, cpp handles this itself
+    //this->content.~vector<uint8_t>();
 }
 
 Elf64SH::Elf64SH()
@@ -85,38 +85,10 @@ void Elf64::readSectionHeader(uint64_t offset, uint64_t strtab)
         header.name += c;
     }while(c != '\0');
 
-    //reading content
-    if(header.sh_type == 3)//if type is SHT_STRTAB
-    {
-        unsigned int i;
-        uint64_t addr = 0L;
-        string temp;
-        std::vector<uint8_t> buffer(header.sh_size);
-//        header.strtab = new std::vector<std::pair<uint64_t,std::string>>;
-
-        this->fd.seekg(header.sh_offset,ios::beg);
-        this->fd.read((char *)&buffer[0],header.sh_size);
-        for(i = 0; i < buffer.size(); i++)
-        {
-            if(buffer[i] == '\0')
-            {
-                //header.strtab.push_back(make_pair(addr,temp));
-                temp = "";
-                addr = i + 1;//should i store absolute address ?
-            }
-            else
-            {
-                temp += buffer[i];
-            }
-        }
-    }
-    else//if type is not string table
-    {
-        unsigned int i;
-        this->fd.seekg(offset,ios::beg);
-//        header.content = new vector<uint8_t>(header.sh_size);
-        //this->fd.read((char *)&header.content[0], header.sh_size);
-    }
+    unsigned int i;
+    this->fd.seekg(offset,ios::beg);
+    header.content.resize(header.sh_size);
+    this->fd.read((char *)&header.content[0], header.sh_size);
     this->sHeaders.push_back(header);
 }
 
@@ -147,4 +119,18 @@ std::vector<std::string> Elf64::getSectionNames()
         nameList.push_back(this->sHeaders[i].name);
     }
     return nameList;
+}
+
+//returns null if cant find desired name, but that statement should never be executed
+std::vector<uint8_t> Elf64::getSectionContent(std::string needle)
+{
+    uint32_t i;
+    for(i = 0; i < this->sHeaders.size(); i++)
+    {
+        if(!this->sHeaders[i].name.compare(needle))
+        {
+            return this->sHeaders[i].content;
+        }
+    }
+    return std::vector<uint8_t>();
 }
