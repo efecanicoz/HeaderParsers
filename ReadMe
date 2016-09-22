@@ -1,0 +1,2 @@
+Compile with ISO C++ 2011 standard
+Example : g++ -std=c++11 main.cpp
