@@ -15,10 +15,10 @@ class Exe64CH {
     uint32_t Machine;
     uint32_t NumberOfSections;
     uint64_t TimeDateStamp;
-    uint64_t  PointerToSymbolTable;
-    uint64_t  NumberOfSymbols;
-    uint32_t  SizeOfOptionalHeader;
-    uint32_t  Characteristics;
+    uint64_t PointerToSymbolTable;
+    uint64_t NumberOfSymbols;
+    uint32_t SizeOfOptionalHeader;
+    uint32_t Characteristics;
 };
 
 class Exe64

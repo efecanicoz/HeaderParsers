@@ -9,7 +9,9 @@ Exe64::Exe64(std::string path)
 
 void Exe64::readDosHeader()
 {
-    this->fd.read((char *)this->id.exe_magic,2);
+    
+    this->fd.read((char *)&this->id.exe_magic,1);
+    printf("Signature: %u\n", this->id.exe_magic);
     this->fd.read((char *)&this->id.exe_bytes_in_last_block,1);
     printf("bytes is last block: %u\n", this->id.exe_bytes_in_last_block);
     this->fd.read((char *)&this->id.exe_blocks_in_file,1);

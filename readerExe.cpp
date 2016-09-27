@@ -125,10 +125,7 @@ void readFile(const std::string path)
     
     std::ifstream fd(path, std::ios::in|std::ios::binary);
     fd.read((char *)&buffer[0],2);
-    for(int i = 0; i < 2; i++)
-    {
-        printf("%x %x\n",buffer[i],EXE_H[i]);
-    }
+    
     //fd.seekg(0);
     if(buffer == EXE_H)
     {

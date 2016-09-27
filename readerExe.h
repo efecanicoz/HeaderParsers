@@ -12,7 +12,7 @@
 
 
 struct exe_ident {
-	uint8_t exe_magic[2];
+	uint8_t exe_magic;
 	uint8_t exe_bytes_in_last_block;
   	uint8_t exe_blocks_in_file;
   	uint8_t exe_num_relocs;
