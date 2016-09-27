@@ -3,6 +3,6 @@
 
 int main()
 {
-   readFile("aestool.exe");
+   readFile("/Users/firatsezel/Desktop/aestool.exe");
    return 0;
 }

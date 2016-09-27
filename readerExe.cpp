@@ -62,6 +62,9 @@ void readExe64(std::string fd)
 {
     Exe64 bucket(fd);
     bucket.readDosHeader();
+    bucket.readPESignature();
+    bucket.readCoffHeader();
+    bucket.readSectionTable();
     /*bucket.readSectionHeaders();
     std::vector<std::string> secNames = bucket.getSectionNames();
     int i;

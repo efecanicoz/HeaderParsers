@@ -10,32 +10,29 @@
 #include <iostream>
 #include <fstream>
 
-/*Coff Header*/
-class Exe64CH {
-    uint32_t Machine;
-    uint32_t NumberOfSections;
-    uint64_t TimeDateStamp;
-    uint64_t PointerToSymbolTable;
-    uint64_t NumberOfSymbols;
-    uint32_t SizeOfOptionalHeader;
-    uint32_t Characteristics;
-};
+
 
 class Exe64
 {
     public:
         struct exe_ident id;
+        struct exe_coff  coff;
+        struct exe_section_table st;
         std::ifstream fd;
 /*Section eklenecek*/
         void read(uint8_t*,uint8_t*,uint8_t);
         void read(uint16_t*,uint8_t*,uint8_t);
         void read(uint32_t*,uint8_t*,uint8_t);
         void read(uint64_t*,uint8_t*,uint8_t);
+        void pointTobit(int offset);
  
         Exe64(std::ifstream&);
         Exe64(std::string);
         
         void readDosHeader();
- /*Section eklenecek*/      
+        void readPESignature();
+        void readCoffHeader();
+        void readSectionTable();
+ /*Section eklenecek*/
 };
 #endif
