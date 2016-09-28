@@ -72,9 +72,13 @@ void readLittleEndian(uint64_t*,uint8_t *,int);
 void readFile(std::string);
 void readExe64(std::string);
 
-
 #ifndef EXE64
     #include "exe64.h"
 #endif
+#ifndef EXE32
+    #include "exe32.h"
+#endif
+
+
 
 #endif

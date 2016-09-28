@@ -125,6 +125,9 @@ void readExe64(std::string fd)
 void readFile(const std::string path)
 {
     std::vector<uint8_t> buffer(2);
+    uint32_t exePeAddress;
+    uint16_t machine;
+    
     
     std::ifstream fd(path, std::ios::in|std::ios::binary);
     fd.read((char *)&buffer[0],2);
@@ -132,8 +135,21 @@ void readFile(const std::string path)
     //fd.seekg(0);
     if(buffer == EXE_H)
     {
-        /*32 bit eklenecek*/
-        readExe64(path);
+        fd.seekg(60, std::ios::beg);
+        fd.read((char *)&exePeAddress, 4);
+        
+        fd.seekg(exePeAddress + 4, std::ios::beg);
+        
+        fd.read((char *)&machine,2);
+        printf("Machine:: %u\n", machine);
+        
+        if(machine == 332){
+            //32 - bit
+        }else {
+            readExe64(path);
+        }
+        
+       
     }
     else
         printf("üzüldük");
