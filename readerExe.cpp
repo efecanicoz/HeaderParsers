@@ -68,11 +68,11 @@ void readExe32(std::string fd){
 
 void readExe64(std::string fd)
 {
-    Exe64 bucket32(fd);
-    bucket32.readDosHeader();
-    bucket32.readPESignature();
-    bucket32.readCoffHeader();
-    bucket32.readSectionTable();
+    Exe64 bucket(fd);
+    bucket.readDosHeader();
+    bucket.readPESignature();
+    bucket.readCoffHeader();
+    bucket.readSectionTable();
     /*bucket.readSectionHeaders();
     std::vector<std::string> secNames = bucket.getSectionNames();
     int i;
@@ -151,8 +151,10 @@ void readFile(const std::string path)
         fd.read((char *)&machine,2);
         printf("Machine:: %u\n", machine);
         
-        if(machine == 332){ readExe32(path);
-            printf("Exe dosyası 32 bitmiş");
+        if(machine == 332){
+            printf("Exe dosyası 32 bitmiş\n");
+            readExe32(path);
+            
         }else { readExe64(path); }
     }
     else

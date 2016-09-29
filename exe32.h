@@ -1,5 +1,5 @@
 //
-//  exe32.hpp
+//  exe32.h
 //  Exe
 //
 //  Created by İsmail Fırat Sezel on 28/09/16.
@@ -7,7 +7,7 @@
 //
 
 
-/*#ifndef READER
+#ifndef READER
 #include "readerExe.h"
 #endif
 #ifndef EXE32
@@ -19,16 +19,13 @@
 #include <iostream>
 #include <fstream>
 
-
-
 class Exe32
 {
 public:
     struct exe_ident id;
-    struct exe_coff  coff;
+    struct exe_coff coff;
     struct exe_section_table st;
     std::ifstream fd;
- 
     void read(uint8_t*,uint8_t*,uint8_t);
     void read(uint16_t*,uint8_t*,uint8_t);
     void read(uint32_t*,uint8_t*,uint8_t);
@@ -44,4 +41,4 @@ public:
     void readSectionTable();
 
 };
-#endif*/
+#endif

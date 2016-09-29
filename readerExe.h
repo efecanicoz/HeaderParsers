@@ -46,6 +46,7 @@ struct exe_coff {
     uint16_t Characteristics;
 };
 
+/*section Table Header*/
 struct exe_section_table {
     uint64_t Name;
     std::vector<uint8_t> contents;
@@ -71,6 +72,7 @@ void readLittleEndian(uint32_t*,uint8_t *,int);
 void readLittleEndian(uint64_t*,uint8_t *,int);
 void readFile(std::string);
 void readExe64(std::string);
+void readExe32(std::string);
 
 #ifndef EXE64
     #include "exe64.h"

@@ -6,7 +6,7 @@
 //  Copyright © 2016 İsmail Fırat Sezel. All rights reserved.
 //
 
-/*
+
 #include "exe32.h"
 
 Exe32::Exe32(std::string path)
@@ -111,4 +111,4 @@ void Exe32::read(uint64_t* to, uint8_t* from, uint8_t offset)
 
 void Exe32::pointTobit(int offset){
     
-}*/
+}
