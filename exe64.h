@@ -20,11 +20,7 @@ class Exe64
         struct exe_section_table st;
         std::ifstream fd;
 /*Section eklenecek*/
-        void read(uint8_t*,uint8_t*,uint8_t);
-        void read(uint16_t*,uint8_t*,uint8_t);
-        void read(uint32_t*,uint8_t*,uint8_t);
-        void read(uint64_t*,uint8_t*,uint8_t);
-        void pointTobit(int offset);
+    
  
         Exe64(std::ifstream&);
         Exe64(std::string);

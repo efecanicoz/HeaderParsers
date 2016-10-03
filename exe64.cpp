@@ -47,6 +47,9 @@ void Exe64::readPESignature(){
 }
 
 void Exe64::readCoffHeader(){
+    
+    
+    
     this->fd.seekg(this->id.exe_pe_address + 4, std::ios::beg);
     
     this->fd.read((char *)&this->coff.Machine,2);
@@ -79,29 +82,5 @@ void Exe64::readSectionTable(){
     return;
 }
 
-
-void Exe64::read(uint8_t* to, uint8_t* from, uint8_t offset)
-{
-    readLittleEndian(to,from,offset);
-}
-
-void Exe64::read(uint16_t* to, uint8_t* from, uint8_t offset)
-{  
-    readLittleEndian(to,from,offset);  
-}
-
-void Exe64::read(uint32_t* to, uint8_t* from, uint8_t offset)
-{  
-    readLittleEndian(to,from,offset);
-}
-
-void Exe64::read(uint64_t* to, uint8_t* from, uint8_t offset)
-{
-    readLittleEndian(to,from,offset);
-}
-
-void Exe64::pointTobit(int offset){
-    
-}
 
 
