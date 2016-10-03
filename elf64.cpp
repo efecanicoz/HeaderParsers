@@ -123,11 +123,12 @@ void Elf64::readSectionHeader(uint64_t offset, uint64_t strtab)
     do
     {
         fd.read(&c,1);
-        header.name += c;
+        if(c != '\0')
+			header.name += c;
     }while(c != '\0');
 
     unsigned int i;
-    this->fd.seekg(offset,std::ios::beg);
+    this->fd.seekg(header.sh_offset,std::ios::beg);
     header.content.resize(header.sh_size);
     this->fd.read((char *)&header.content[0], header.sh_size);
     this->sHeaders.push_back(header);

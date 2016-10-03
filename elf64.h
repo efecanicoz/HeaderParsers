@@ -14,7 +14,7 @@ class Elf64SH
 {
     public:
         uint32_t sh_name;
-        std::string   name;
+        std::string name;
         uint32_t sh_type;
         uint64_t sh_flags;
         uint64_t sh_addr;

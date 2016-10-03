@@ -112,6 +112,8 @@ void readElf32(std::string fd)
 
 void readElf64(std::string fd)
 {
+	std::vector<uint8_t> text_content;
+	std::string neym = ".text";
     Elf64 bucket(fd);
     bucket.readIdent();
     bucket.readHeader();
@@ -122,6 +124,15 @@ void readElf64(std::string fd)
     {
         std::cout << secNames[i];
     }
+    text_content = bucket.getSectionContent(neym);
+    
+    for(i = 0; i < text_content.size(); i++)
+    {
+		printf("%2x ", text_content[i]);
+		
+		if(i % 8 == 0)
+			printf("\n");
+	}
     /*struct e_ident identifier = readElfIdent(fd);
     if(identifier.ei_class == 1)
     {
