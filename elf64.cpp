@@ -176,3 +176,16 @@ std::vector<uint8_t> Elf64::getSectionContent(std::string needle)
     }
     return std::vector<uint8_t>();
 }
+
+uint64_t Elf64::getSectionAddress(std::string needle)
+{
+	uint32_t i;
+    for(i = 0; i < this->sHeaders.size(); i++)
+    {
+        if(!this->sHeaders[i].name.compare(needle))
+        {
+            return this->sHeaders[i].sh_addr;
+        }
+    }
+    return 0;
+}

@@ -63,5 +63,7 @@ class Elf64
         void readSectionHeaders();
         std::vector<std::string> getSectionNames();
         std::vector<uint8_t> getSectionContent(std::string);
+		uint64_t getSectionAddress(std::string);
+
 };
 #endif

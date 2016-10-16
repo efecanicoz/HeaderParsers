@@ -98,6 +98,12 @@ void readSectionContent(ifstream& fd, uint64_t offset, uint64_t size)
 
 void readElf32(std::string fd)
 {
+	
+	std::vector<uint8_t> text_content;
+	std::string neym = ".text";
+	uint32_t addr;
+	
+	
     Elf32 bucket(fd);
     bucket.readIdent();
     bucket.readHeader();
@@ -108,6 +114,20 @@ void readElf32(std::string fd)
     {
         std::cout << secNames[i];
     }
+    
+    text_content = bucket.getSectionContent(neym);
+    addr = bucket.getSectionAddress(neym);
+    
+    for(i = 0; i < text_content.size(); i++)
+    {
+		if(i % 8 == 0)
+		{
+			printf("\n");
+			printf("%8x: ", addr);
+		}
+		printf("%2x ", text_content[i]);
+		addr += 1;
+	}
 }
 
 void readElf64(std::string fd)
@@ -128,10 +148,11 @@ void readElf64(std::string fd)
     
     for(i = 0; i < text_content.size(); i++)
     {
-		printf("%2x ", text_content[i]);
 		
 		if(i % 8 == 0)
 			printf("\n");
+		printf("%2x ", text_content[i]);
+		
 	}
     /*struct e_ident identifier = readElfIdent(fd);
     if(identifier.ei_class == 1)
