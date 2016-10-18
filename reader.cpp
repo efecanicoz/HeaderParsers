@@ -132,6 +132,7 @@ void readElf32(std::string fd)
 
 void readElf64(std::string fd)
 {
+	Elf64SH result;
 	std::vector<uint8_t> text_content;
 	std::string neym = ".text";
     Elf64 bucket(fd);
@@ -144,16 +145,19 @@ void readElf64(std::string fd)
     {
         std::cout << secNames[i];
     }
-    text_content = bucket.getSectionContent(neym);
     
-    for(i = 0; i < text_content.size(); i++)
+    result = bucket.getSection(neym);
+
+    machine_to_opcode(result.content, result.sh_addr);
+
+    /*for(i = 0; i < text_content.size(); i++)
     {
 		
 		if(i % 8 == 0)
 			printf("\n");
 		printf("%2x ", text_content[i]);
 		
-	}
+	}*/
     /*struct e_ident identifier = readElfIdent(fd);
     if(identifier.ei_class == 1)
     {

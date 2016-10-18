@@ -10,6 +10,12 @@
 #include <vector>
 #include <list>
 
+
+#ifndef INSTRUCTION_H
+	#include "instruction.h"
+#endif
+
+
 struct e_ident
 {
     uint8_t ei_magic[4];
@@ -41,7 +47,4 @@ void readElf64(std::string);
 #ifndef ELF32
     #include "elf32.h"
 #endif
-
-
-
 #endif
