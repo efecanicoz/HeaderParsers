@@ -1,9 +1,5 @@
 #include "elf64.h"
 
-/*Elf64::Elf64(std::ifstream& desc) : fd(desc)
-{
-    
-}*/
 
 Elf64::Elf64(std::string path)
 {
@@ -119,10 +115,10 @@ void Elf64::readSectionHeader(uint64_t offset, uint64_t strtab)
     
     header.name = "";
     //reading name
-    fd.seekg(strtab+header.sh_name,std::ios::beg);
+    this->fd.seekg(strtab+header.sh_name,std::ios::beg);
     do
     {
-        fd.read(&c,1);
+        this->fd.read(&c,1);
         if(c != '\0')
 			header.name += c;
     }while(c != '\0');
@@ -175,6 +171,19 @@ std::vector<uint8_t> Elf64::getSectionContent(std::string needle)
         }
     }
     return std::vector<uint8_t>();
+}
+
+Elf64SH Elf64::getSection(std::string needle)
+{
+    uint32_t i;
+    for(i = 0; i < this->sHeaders.size(); i++)
+    {
+        if(!this->sHeaders[i].name.compare(needle))
+        {
+            return this->sHeaders[i];
+        }
+    }
+    return Elf64SH();
 }
 
 uint64_t Elf64::getSectionAddress(std::string needle)

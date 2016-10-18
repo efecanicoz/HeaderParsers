@@ -64,6 +64,8 @@ class Elf32
         void readSectionHeaders();
         std::vector<std::string> getSectionNames();
         std::vector<uint8_t> getSectionContent(std::string);
+        Elf32SH getSection(std::string);
         uint32_t getSectionAddress(std::string);
 };
+
 #endif

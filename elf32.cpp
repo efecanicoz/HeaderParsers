@@ -1,9 +1,5 @@
 #include "elf32.h"
 
-/*Elf32::Elf32(std::ifstream& desc) : fd(desc)
-{
-    
-}*/
 
 Elf32::Elf32(std::string path)
 {
@@ -115,10 +111,10 @@ void Elf32::readSectionHeader(uint32_t offset, uint32_t strtab)
     
     header.name = "";
     //reading name
-    fd.seekg(strtab+header.sh_name,std::ios::beg);
+    this->fd.seekg(strtab+header.sh_name,std::ios::beg);
     do
     {
-        fd.read(&c,1);
+        this->fd.read(&c,1);
         if(c != '\0')
 			header.name += c;
     }while(c != '\0');
@@ -171,6 +167,19 @@ std::vector<uint8_t> Elf32::getSectionContent(std::string needle)
         }
     }
     return std::vector<uint8_t>();
+}
+
+Elf32SH Elf32::getSection(std::string needle)
+{
+    uint32_t i;
+    for(i = 0; i < this->sHeaders.size(); i++)
+    {
+        if(!this->sHeaders[i].name.compare(needle))
+        {
+            return this->sHeaders[i];
+        }
+    }
+    return Elf32SH();
 }
 
 uint32_t Elf32::getSectionAddress(std::string needle)
