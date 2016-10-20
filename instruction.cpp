@@ -80,7 +80,6 @@ void Instruction::get_operand_value(uint8_t i)
 	std::string *operand;
 	std::string rest;
 	bool vex,reg,mem,imm;
-	uint8_t length;
 	vex = reg = mem = imm = false;
 
 	if(i == 1)
@@ -135,6 +134,35 @@ void Instruction::get_operand_value(uint8_t i)
 		break;
 	}
 
+	switch ((*operand)[0])
+	{
+	case 'E':
+	case 'G':
+	case 'B':
+	case 'R':
+		regSel = GPR;//gpr
+		break;
+	case 'C':
+		regSel = Control;
+		break;
+	case 'D':
+		regSel = Debug;
+		break;
+	case 'H':
+	case 'L':
+	case 'U':
+	case 'V':
+	case 'W':
+		regSel = YMM | XMM;
+		break;
+	case 'N':
+	case 'P':
+	case 'Q':
+		regSel = MMX;
+		break;
+	case 'S':
+		regSel = Segment;
+	}
 	rest = (*operand).substr(1);
 
 	if(rest == "a" || rest == "c" || rest == "v" || rest == "y" || rest == "z")
@@ -151,6 +179,7 @@ void Instruction::get_operand_value(uint8_t i)
 		length = 16;
 
 	//hangi registerları kullanıyo switch'i ekle
+
 	if(imm == true)
 	{
 		if(length == 1)
@@ -163,11 +192,52 @@ void Instruction::get_operand_value(uint8_t i)
 		uint8_t regVal = 0;
 		if(this->presence & (1 << REX))
 		{
-			regVal = (REX_R(this->rex) << 3) | reg;
+			regVal = (REX_R(this->rex) << 3) | MODRM_REG(this->modrm);
 		}
 		else
-			regVal = reg;
+			regVal = MODRM_REG(this->modrm);
 		//operand = register_table
+
+		if(regSel == GPR)
+		{
+			if(length == 1)
+				*operand = modrm_reg_map[0][regVal];
+			else if(length == 2)
+				*operand = modrm_reg_map[1][regVal];
+			else
+			{
+				if(!REX_W(this->rex))
+					*operand = modrm_reg_map[2][regVal];
+				else
+					*operand = modrm_reg_map[3][regVal];
+			}
+		}
+		else if(regSel == MMX)
+		{
+			*operand = modrm_reg_map[4][regVal];
+		}
+		else if(regSel == XMM)
+		{
+			*operand = modrm_reg_map[5][regVal];
+		}
+		else if(regSel == YMM)
+		{
+			*operand = modrm_reg_map[6][regVal];
+		}
+		else if(regSel == Segment)
+		{
+			*operand = modrm_reg_map[7][regVal];
+		}
+		else if(regSel == Control)
+		{
+			*operand = modrm_reg_map[8][regVal];
+		}
+		else if(regSel == Debug)
+		{
+			*operand = modrm_reg_map[9][regVal];
+		}
+		else
+			;//alert
 	}
 	else if(mem == true)
 	{
@@ -188,8 +258,9 @@ void Instruction::get_operand_value(uint8_t i)
 		{
 			if(rm == 0b00000100)
 			{
-				//get sib content
+				result = this->read_SIB();
 			}
+
 			if(mod == 1)
 			{
 				disp = this->desc->read_1byte();
@@ -200,22 +271,68 @@ void Instruction::get_operand_value(uint8_t i)
 			}
 			else if(mod == 0 || rm == 0b00000101)
 			{
+				/*TODO: 64bit ise rip + disp32
+				 * diğer modlarda + disp32*/
 				disp = this->desc->read_4byte();
 			}
+			*operand = result + "+" + std::to_string(disp);
 		}
-		*operand = result + "+" + std::to_string(disp);
+		else
+		{
+			memVal &= 0x0F;
+			if(regSel == GPR)
+			{
+				if(length == 1)
+					*operand = modrm_reg_map[0][memVal];
+				else if(length == 2)
+					*operand = modrm_reg_map[1][memVal];
+				else
+				{
+					if(!REX_W(this->rex))
+						*operand = modrm_reg_map[2][memVal];
+					else
+						*operand = modrm_reg_map[3][memVal];
+				}
+			}
+			else if(regSel == MMX)
+			{
+				*operand = modrm_reg_map[4][memVal];
+			}
+			else if(regSel == XMM)
+			{
+				*operand = modrm_reg_map[5][memVal];
+			}
+			else if(regSel == YMM)
+			{
+				*operand = modrm_reg_map[6][memVal];
+			}
+			else if(regSel == Segment)
+			{
+				*operand = modrm_reg_map[7][memVal];
+			}
+			else if(regSel == Control)
+			{
+				*operand = modrm_reg_map[8][memVal];
+			}
+			else if(regSel == Debug)
+			{
+				*operand = modrm_reg_map[9][memVal];
+			}
+			else
+				;//alert
+		}
+
 	}
 	else if(vex == true)
 	{
 		;//bilmiyoz
 	}
-
 }
 
 std::string Instruction::read_SIB()
 {
 	uint8_t base, index;
-	std::string result;
+	std::string result, scale, baseStr;
 	if(this->presence & (1 << SIB))
 	{
 		//sib is already read
@@ -225,15 +342,38 @@ std::string Instruction::read_SIB()
 		this->sib = this->desc->read_1byte();
 	}
 	this-> presence |= (1 << SIB);
-	base = MODRM_MOD(this->modrm) << 3 | SIB_BASE(this->sib);
 
 	if(this->presence & (1 << REX))
+	{
+		base = REX_B(this->rex) << 3 | SIB_BASE(this->sib);
 		index = REX_X(this->rex) << 3 | SIB_INDEX(this->sib);
+	}
 	else
+	{
+		base = SIB_BASE(this->sib);
 		index = SIB_INDEX(this->sib);
-	//result = sib_table[index];
+	}
+	scale = std::to_string(1 << SIB_SCALE(this->sib));
+
+
+	if(MODRM_MOD(this->modrm) == 0 && SIB_BASE(this->sib) == 5)
+	{
+		baseStr = std::to_string(this->desc->read_4byte());
+	}
+	else
+	{
+		baseStr = sib_byte_map[SIB_BASE(this->sib)];
+	}
+
 	if(index != 0b00000100)
-		;//result = result * 1 << SIB_SCALE(this->sib) + base_table[base];
+	{
+		if(scale != "1")
+			result = sib_byte_map[index] + " * " + scale  + " + " + baseStr;
+		else
+			result = sib_byte_map[index] + scale  + " + " + baseStr;
+	}
+	else
+		result = base;//sadece base
 	return result;
 }
 
@@ -330,6 +470,7 @@ void read_instruction(ArrayReader& descriptor)
 		}
 
 	}while(inst.done == false);
+
 }
 
 void machine_to_opcode(std::vector<uint8_t> &source, uint64_t start_address)

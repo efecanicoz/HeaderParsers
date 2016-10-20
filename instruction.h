@@ -11,6 +11,7 @@
 
 enum legacy_prefixes{OSO=0,ASO,CS,DS,ES,FS,GS,SS,LOCK,REPE,REPNE};
 enum presence{REX=0, VEX, XOP, ModRM, SIB};
+enum registers{GPR=1,Control=2,Debug=4,YMM=8,XMM=16,MMX=32,Segment=64};
 
 #define MODRM_MOD(modrm) ((modrm & 0xC0) >> 6)
 #define MODRM_REG(modrm) ((modrm & 0x38) >> 3)
@@ -34,7 +35,7 @@ class Instruction
 		uint8_t operand_count;
 		uint16_t legacy_prefix;
 		uint8_t presence;
-		uint8_t rex, sib, modrm;
+		uint8_t rex, sib, modrm, regSel,length;
 		bool done;
 		ArrayReader *desc;
 
