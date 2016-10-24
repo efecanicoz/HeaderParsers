@@ -34,7 +34,7 @@ uint16_t ArrayReader::read_2byte()
 		this->complete = true;
 		return 0;
 	}
-	readLittleEndian(&retVal, (uint8_t *)&this->array[this->counter], 2);
+	readLittleEndian(&retVal, (uint8_t *)&this->array[this->counter], 0);
 	counter = counter + 2;
 	return retVal;
 }
@@ -47,7 +47,7 @@ uint32_t ArrayReader::read_4byte()
 		this->complete = true;
 		return 0;
 	}
-	readLittleEndian(&retVal, (uint8_t *)&this->array[this->counter], 4);
+	readLittleEndian(&retVal, (uint8_t *)&this->array[this->counter], 0);
 	counter = counter + 4;
 	return retVal;
 }
@@ -60,7 +60,7 @@ uint64_t ArrayReader::read_8byte()
 		this->complete = true;
 		return 0;
 	}
-	readLittleEndian(&retVal, (uint8_t *)&this->array[this->counter], 8);
+	readLittleEndian(&retVal, (uint8_t *)&this->array[this->counter], 0);
 	counter = counter + 8;
 	return retVal;
 }
