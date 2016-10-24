@@ -25,6 +25,8 @@ public:
     struct exe_ident id;
     struct exe_coff coff;
     struct exe_section_table st;
+    std::vector<exe_section_table> buffer;
+    
     std::ifstream fd;
 
     Exe32(std::ifstream&);

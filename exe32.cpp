@@ -11,15 +11,15 @@
 
 Exe32::Exe32(std::string path)
 {
-    //this->st.contents = *new std::vector<uint8_t>();
+    //this->st.contents = std::vector<uint8_t>();
     this->fd.open(path,std::ios::in|std::ios::binary);
+    this->buffer = std::vector<exe_section_table>();
 }
 
 
 
 void Exe32::readDosHeader()
 {
-    
     uint8_t buffer[33];
     this->fd.read((char *)buffer, 33);
     readLittleEndian(&this->id.exe_magic, buffer, 0);
@@ -81,40 +81,57 @@ void Exe32::readCoffHeader(){
 
     printf("coff machine: %x\n", this->coff.Machine);
     printf("coff size of optional header: %u\n", this->coff.SizeOfOptionalHeader);
-
-}
-
-void Exe32::readSectionTable(){
-    this->fd.seekg(this->id.exe_pe_address + 24 + this->coff.SizeOfOptionalHeader, std::ios::beg);
-    uint8_t bufferSectionTable[24];
-    this->fd.read((char *)bufferSectionTable, 24);
-    
-    
-    readLittleEndian(&this->st.Name, bufferSectionTable, 0);
-    readLittleEndian(&this->st.VirtualSize, bufferSectionTable, 8);
-    readLittleEndian(&this->st.VirtualAddress, bufferSectionTable, 12);
-    readLittleEndian(&this->st.SizeofRawData, bufferSectionTable, 16);
-    readLittleEndian(&this->st.PointerToRawData, bufferSectionTable, 20);
-
-
- 
-    printf("section table name address: %llxx\n", this->st.Name);
-    printf("section table size of raw data: %x\n", this->st.SizeofRawData);
-    
-    this->st.contents.resize(this->st.SizeofRawData);
-    
-    this->fd.seekg(this->st.PointerToRawData, std::ios::beg);
-    
-    this->fd.read((char *)&this->st.contents[0],this->st.SizeofRawData);
-    
-    for(int i = 0 ; i < this->st.contents.size(); i++){
-        printf("%x ", this->st.contents[i]);
-        if(i % 8 == 0)
-            printf("\n");
-    }
-    
-    
     
     return;
 }
 
+void Exe32::readSectionTable(){
+    this->fd.seekg(this->id.exe_pe_address + 24 + this->coff.SizeOfOptionalHeader, std::ios::beg);
+    uint8_t bufferSectionTable[40];
+    
+    this->buffer.resize(this->coff.NumberOfSections);
+    
+    uint8_t i;
+    for(i = 0; i < this->coff.NumberOfSections; i++){
+        this->fd.read((char *)bufferSectionTable, 40);
+        
+        this->buffer[i].nameStr = "";
+        
+        readLittleEndian(&this->buffer[i].Name, bufferSectionTable, 0);
+        for(int j = 0; j < 8; j++){
+            if((char)(bufferSectionTable[j]) == '\0')
+                break;
+            this->buffer[i].nameStr += (char)(bufferSectionTable[j]);
+        }
+        
+        readLittleEndian(&this->buffer[i].VirtualSize, bufferSectionTable, 8);
+        readLittleEndian(&this->buffer[i].VirtualAddress, bufferSectionTable, 12);
+        readLittleEndian(&this->buffer[i].SizeofRawData, bufferSectionTable, 16);
+        readLittleEndian(&this->buffer[i].PointerToRawData, bufferSectionTable, 20);
+        readLittleEndian(&this->buffer[i].PointertoRelocations, bufferSectionTable, 24);
+        readLittleEndian(&this->buffer[i].PointertoLineNumbers, bufferSectionTable, 28);
+        readLittleEndian(&this->buffer[i].NumberofRelocations, bufferSectionTable, 32);
+        readLittleEndian(&this->buffer[i].NumberofLineNumbers, bufferSectionTable, 34);
+        readLittleEndian(&this->buffer[i].Characteristics, bufferSectionTable, 36);
+    }
+    
+    uint8_t k;
+    for(k = 0; k < this->coff.NumberOfSections; k++){
+        
+        this->buffer[i].contents.resize(this->buffer[i].SizeofRawData);
+        
+        //alinan content adresine gidiliyor ve conten cekiliyor
+        this->fd.seekg(this->buffer[i].PointerToRawData, std::ios::beg);
+        this->fd.read((char *)&this->buffer[i].contents[i],this->buffer[i].SizeofRawData);
+    }
+    
+    //contentin icerigi bastiriliyor
+    /*
+    for(int i = 0 ; i < this->buffer[0].contents.size(); i++){
+        printf("%x ", this->buffer[0].contents[i]);
+        if(i % 8 == 0)
+            printf("\n");
+    }*/
+    
+    return;
+}
