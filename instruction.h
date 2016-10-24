@@ -9,8 +9,8 @@
 #endif
 #include "opcode.h"
 
-enum legacy_prefixes{OSO=0,ASO,CS,DS,ES,FS,GS,SS,LOCK,REPE,REPNE};
-enum presence{REX=0, VEX, XOP, ModRM, SIB};
+enum legacy_prefixes{OSO=1,ASO=2,CS=4,DS=8,ES=16,FS=32,GS=64,SS=128,LOCK=256,REPE=512,REPNE=1024};
+enum presence{REX=1, VEX=2, XOP=4, ModRM=8, SIB=16};
 enum registers{GPR=1,Control=2,Debug=4,YMM=8,XMM=16,MMX=32,Segment=64};
 
 #define MODRM_MOD(modrm) ((modrm & 0xC0) >> 6)
