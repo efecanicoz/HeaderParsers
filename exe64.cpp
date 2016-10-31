@@ -8,6 +8,27 @@ Exe64::Exe64(std::string path)
 
 /*sectionlar eklenecek*/
 
+std::vector<uint8_t> Exe64::getSectionContent(std::string needle)
+{
+	uint32_t i;
+	for(i = 0; i < this->buffer.size(); i++)
+	{
+		if(this->buffer[i].nameStr == needle)
+			return this->buffer[i].contents;
+	}
+}
+
+
+std::vector<std::string> Exe64::getSectionNames()
+{
+	std::vector<std::string> temp = std::vector<std::string>();
+	uint32_t i;
+	for(i = 0; i < this->buffer.size(); i++)
+	{
+		temp.push_back(this->buffer[i].nameStr);
+	}
+	return temp;
+}
 void Exe64::readDosHeader()
 {
     uint8_t buffer[33];

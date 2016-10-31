@@ -7,6 +7,8 @@
     #include "reader.h"
 #endif
 
+#include "EInterface.h"
+
 #ifndef EXE_STRUCT
 #define EXE_STRUCT
 	struct exe_ident {
@@ -65,7 +67,7 @@
 #define EXE64
 
 
-class Exe64
+class Exe64 : public ExecutableFile
 {
     public:
         struct exe_ident id;
@@ -84,5 +86,8 @@ class Exe64
         void readCoffHeader();
         void readSectionTable();
  /*Section eklenecek*/
+ 
+		std::vector<uint8_t> getSectionContent(std::string);
+		std::vector<std::string> getSectionNames();
 };
 #endif

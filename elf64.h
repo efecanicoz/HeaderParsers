@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <vector>
 #include <list>
+#include "EInterface.h"
 
 class Elf64SH
 {
@@ -32,7 +33,7 @@ class Elf64SH
 };
 
 
-class Elf64
+class Elf64 : public ExecutableFile
 {
     public:
         struct e_ident id;

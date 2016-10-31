@@ -72,7 +72,7 @@
 #ifndef EXE32
 #define EXE32
 
-class Exe32 : public Executable
+class Exe32 : public ExecutableFile
 {
 	public:
 		struct exe_ident id;

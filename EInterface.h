@@ -1,7 +1,7 @@
 #ifndef EXEC_H
 #define EXEC_H
 
-class Executable
+class ExecutableFile
 {
 	public:
 		virtual std::vector<uint8_t> getSectionContent(std::string) = 0;

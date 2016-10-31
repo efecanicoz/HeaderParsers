@@ -33,7 +33,7 @@ class Elf32SH
 };
 
 
-class Elf32 : public Executable
+class Elf32 : public ExecutableFile
 {
     public:
         struct e_ident id;
