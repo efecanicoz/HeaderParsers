@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <vector>
+#include "reader.h"
 
 class ArrayReader
 {
@@ -26,8 +27,4 @@ class ArrayReader
 
 };
 
-
-#ifndef READER
-    #include "reader.h"
-#endif
 #endif

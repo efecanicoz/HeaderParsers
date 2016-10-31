@@ -17,8 +17,6 @@ Elf64SH::Elf64SH()
     this->name = "";
 }
 
-
-
 void Elf64::readIdent()
 {
     this->fd.read((char *)this->id.ei_magic,4);

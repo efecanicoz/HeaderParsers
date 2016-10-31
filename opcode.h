@@ -1,4 +1,5 @@
 /*TODO: Primary haritada bi sıkıntı var*/
+
 static const std::string primary_opcode_map32[] = {"ADD Eb Gb","ADD Ev Gv","ADD Gb Eb","ADD Gv Ev","ADD AL Ib","ADD EAX Iz","PUSH ES","POP ES",  "OR Eb Gb","OR Ev Gv","OR Gb Eb","OR Gv Ev","OR AL Ib","OR EAX Iz","PUSH CS","ESC secondary",
 													"ADC Eb Gb","ADC Ev Gv","ADC Gb Eb","ADC Gv Ev","ADC AL Ib","ADC EAX Iz","PUSH SS","POP SS", "SBB Eb Gb","SBB Ev Gv","SBB Gb Eb","SBB Gv Ev","SBB AL Ib","SBB EAX Iz","PUSH DS","POP DS",
 													"AND Eb Gb","AND Ev Gv","AND Gb Eb","AND Gv Ev","AND AL Ib","AND EAX Iz","SEG ES","DAA",     "SUB Eb Gb","SUB Ev Gv","SUB Gb Eb","SUB Gv Ev","SUB AL Ib","SUB EAX Iz","SEG CS","DAS",

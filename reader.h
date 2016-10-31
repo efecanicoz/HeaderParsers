@@ -1,20 +1,7 @@
 #ifndef READER
 #define READER
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include <cstdio>
 #include <cstdint>
-#include <vector>
-#include <list>
-
-
-#ifndef INSTRUCTION_H
-	#include "instruction.h"
-#endif
-
 
 struct e_ident
 {
@@ -36,15 +23,6 @@ void readLittleEndian(uint8_t*,uint8_t *,int);
 void readLittleEndian(uint16_t*,uint8_t *,int);
 void readLittleEndian(uint32_t*,uint8_t *,int);
 void readLittleEndian(uint64_t*,uint8_t *,int);
-void readFile(std::string);
-void readElf32(std::string);
-void readElf64(std::string);
 
 
-#ifndef ELF64
-    #include "elf64.h"
-#endif
-#ifndef ELF32
-    #include "elf32.h"
-#endif
 #endif

@@ -2,13 +2,15 @@
     #include "reader.h"
 #endif
 #ifndef ELF64
-
 #define ELF64
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <cstdio>
 #include <cstdint>
 #include <vector>
 #include <list>
-#include <iostream>
-#include <fstream>
 
 class Elf64SH
 {

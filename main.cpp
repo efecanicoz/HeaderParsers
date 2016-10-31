@@ -1,5 +1,4 @@
-#include <iostream>
-#include "reader.h"
+#include "fileReader.h"
 
 int main()
 {

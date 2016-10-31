@@ -2,7 +2,6 @@
     #include "reader.h"
 #endif
 #ifndef ELF32
-
 #define ELF32
 #include <cstdint>
 #include <vector>
@@ -62,7 +61,6 @@ class Elf32
         void readIdent();
         void readSectionHeader(uint32_t, uint32_t);
         void readSectionHeaders();
-        std::vector<std::string> getSectionNames();
         std::vector<uint8_t> getSectionContent(std::string);
         Elf32SH getSection(std::string);
         uint32_t getSectionAddress(std::string);
