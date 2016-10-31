@@ -82,8 +82,8 @@ void Instruction::get_operand_value(uint8_t i)
 	;/*TODO: buraları doldur*/
 	std::string *operand;
 	std::string rest;
-	bool vex,reg,mem,imm;
-	vex = reg = mem = imm = false;
+	bool vex,reg,mem,imm,sign;
+	vex = reg = mem = imm = sign = false;
 
 	if(i == 1)
 		operand = &this->operand1;
@@ -127,8 +127,9 @@ void Instruction::get_operand_value(uint8_t i)
 	case 'W':
 		mem = true;
 		break;
-	case 'I':
 	case 'J':
+		sign = true;
+	case 'I':
 	case 'L':
 	case 'O':
 		imm = true;
@@ -192,7 +193,16 @@ void Instruction::get_operand_value(uint8_t i)
 		if(length == 1)
 			*operand = std::to_string(desc->read_1byte());
 		else if(length == 4)
-			*operand = std::to_string(desc->read_4byte());
+		{
+			if(sign == true)
+			{
+				*operand = std::to_string((int32_t)desc->read_signed_4byte());
+			}
+			else
+			{
+				*operand = std::to_string((uint32_t)desc->read_4byte());
+			}
+		}
 	}
 	else if(reg == true)
 	{

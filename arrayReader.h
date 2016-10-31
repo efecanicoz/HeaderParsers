@@ -17,6 +17,7 @@ class ArrayReader
 		ArrayReader(std::vector<uint8_t> &,uint64_t);
 		uint8_t read_1byte();
 		uint16_t read_2byte();
+		int32_t read_signed_4byte();
 		uint32_t read_4byte();
 		uint64_t read_8byte();
 		uint64_t get_real_offset();

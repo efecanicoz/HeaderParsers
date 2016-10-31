@@ -39,6 +39,19 @@ uint16_t ArrayReader::read_2byte()
 	return retVal;
 }
 
+int32_t ArrayReader::read_signed_4byte()
+{
+	int32_t retVal;
+	if(this->counter + 4 > this->length)
+	{
+		this->complete = true;
+		return 0;
+	}
+	readLittleEndian((uint32_t *)&retVal, (uint8_t *)&this->array[this->counter], 0);
+	counter = counter + 4;
+	return retVal;
+}
+
 uint32_t ArrayReader::read_4byte()
 {
 	uint32_t retVal;
