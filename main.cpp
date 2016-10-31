@@ -3,6 +3,6 @@
 
 int main()
 {
-   readFile("nonsse");
+   readFile("deneme");
    return 0;
 }
