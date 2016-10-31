@@ -30,7 +30,8 @@ Elf64 readElf64(std::string fd)
 }
 
 
-void readExe32(std::string fd){
+void readExe32(std::string fd)
+{
     Exe32 bucket(fd);
     bucket.readDosHeader();
     bucket.readPESignature();

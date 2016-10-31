@@ -14,6 +14,7 @@
 #ifndef READER
     #include "reader.h"
 #endif
+#include "EInterface.h"
 
 #ifndef EXE_STRUCT
 #define EXE_STRUCT
@@ -69,11 +70,9 @@
 	};
 #endif
 #ifndef EXE32
-
 #define EXE32
 
-
-class Exe32
+class Exe32 : public Executable
 {
 	public:
 		struct exe_ident id;
@@ -90,6 +89,8 @@ class Exe32
 		void readPESignature();
 		void readCoffHeader();
 		void readSectionTable();
-
+		
+		std::vector<uint8_t> getSectionContent(std::string);
+		std::vector<std::string> getSectionNames();
 };
 #endif

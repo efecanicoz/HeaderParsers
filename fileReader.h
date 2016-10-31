@@ -26,13 +26,7 @@
 	#include "exe64.h"
 #endif
 
-class Executable
-{
-	virtual void init();
-	virtual void readSectionTable();
-	virtual std::vector<uint8_t> getSectionContent(std::string);
-	virtual std::vector<std::string> getSectionNames();
-};
+
 
 
 void readFile(std::string);

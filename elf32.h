@@ -9,6 +9,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "EInterface.h"
+
 //data uzunluklarını düzenle 64bit için geçerliler şu an..
 
 class Elf32SH
@@ -31,7 +33,7 @@ class Elf32SH
 };
 
 
-class Elf32
+class Elf32 : public Executable
 {
     public:
         struct e_ident id;
@@ -62,6 +64,7 @@ class Elf32
         void readSectionHeader(uint32_t, uint32_t);
         void readSectionHeaders();
         std::vector<uint8_t> getSectionContent(std::string);
+		std::vector<std::string> getSectionNames();
         Elf32SH getSection(std::string);
         uint32_t getSectionAddress(std::string);
 };

@@ -16,7 +16,27 @@ Exe32::Exe32(std::string path)
     this->buffer = std::vector<exe_section_table>();
 }
 
+std::vector<uint8_t> Exe32::getSectionContent(std::string needle)
+{
+	uint32_t i;
+	for(i = 0; i < this->buffer.size(); i++)
+	{
+		if(this->buffer[i].nameStr == needle)
+			return this->buffer[i].contents;
+	}
+}
 
+
+std::vector<std::string> Exe32::getSectionNames()
+{
+	std::vector<std::string> temp = std::vector<std::string>();
+	uint32_t i;
+	for(i = 0; i < this->buffer.size(); i++)
+	{
+		temp.push_back(this->buffer[i].nameStr);
+	}
+	return temp;
+}
 
 void Exe32::readDosHeader()
 {

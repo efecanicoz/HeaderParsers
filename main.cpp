@@ -1,7 +1,5 @@
-#include "fileReader.h"
 
-int main()
+int main(void)
 {
-   readFile("deneme");
    return 0;
 }
