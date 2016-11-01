@@ -42,6 +42,7 @@ class Instruction
 		void parse_opcode();
 		void get_operand_value(uint8_t );
 		std::string read_SIB();
+		std::string get_x87(uint8_t);
 		void read_ModRM();
 		Instruction();
 		Instruction(ArrayReader *);

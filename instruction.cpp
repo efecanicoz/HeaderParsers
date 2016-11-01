@@ -95,8 +95,12 @@ void Instruction::get_operand_value(uint8_t i)
 	else
 		return;
 
-	if(((*operand)[1] >='A' && (*operand)[1] <= 'Z'))
+	if(operand->length() < 2 || ((*operand)[1] >='A' && (*operand)[1] <= 'Z'))
 		return;
+	if(operand->length() > 3 && operand->find("mem") != std::string::npos)//x87 operand
+	{
+		mem = true;
+	}
 
 	switch((*operand)[0])
 	{
@@ -388,7 +392,7 @@ std::string Instruction::read_SIB()
 		if(scale != "1")
 			result = sib_byte_map[index] + " * " + scale  + " + " + baseStr;
 		else
-			result = sib_byte_map[index] + scale  + " + " + baseStr;
+			result = sib_byte_map[index]  + " + " + baseStr;
 	}
 	else
 		result = base;//sadece base
@@ -407,6 +411,25 @@ void Instruction::read_ModRM()
 		this->modrm = this->desc->read_1byte();
 		this->presence |= ModRM;
 	}
+}
+
+std::string Instruction::get_x87(uint8_t instruction_byte)
+{
+	uint8_t x87_opcode, x87_modRM;
+	this->read_ModRM();
+	x87_opcode = instruction_byte - 0xD8; //offset of x87 instructions
+	x87_modRM = (this->modrm & 0x3F) - 0xC0;//get r/m and reg fields of modrm and subtract offset
+	if(MODRM_MOD(this->modrm) == 11)//0x00-0xBF section
+	{
+		return x87_low_map[x87_opcode][MODRM_REG(this->modrm)];
+	}
+	else//0xC0 - 0xFF section
+	{
+		return x87_high_map[x87_opcode][x87_modRM];
+	}
+
+
+
 }
 
 void read_instruction(ArrayReader& descriptor)
@@ -446,6 +469,11 @@ void read_instruction(ArrayReader& descriptor)
 					opcode_map = secondary_opcode_map_f3;
 				else
 					opcode_map = secondary_opcode_map_none;
+			}
+			else if(inst.operand1 == "x87")
+			{
+				inst.raw_opcode = inst.get_x87(current_byte);
+				read = false;
 			}
 		}
 		else if(inst.opcode == "PRE")
