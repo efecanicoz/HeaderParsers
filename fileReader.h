@@ -30,8 +30,8 @@
 
 
 
-void readFile(std::string);
-Elf32 readElf32(std::string);
-Elf64 readElf64(std::string);
-void readExe64(std::string);
-void readExe32(std::string);
+ExecutableFile* readFile(std::string);
+ExecutableFile* readElf32(std::string);
+ExecutableFile* readElf64(std::string);
+ExecutableFile* readExe64(std::string);
+ExecutableFile* readExe32(std::string);

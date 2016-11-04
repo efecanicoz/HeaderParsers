@@ -3,23 +3,23 @@
 static const uint8_t ELF_H[4] = {0x7F,0x45,0x4C,0x46};
 static const uint8_t EXE_H[2] = {0x4D,0x5A};
 
-Elf32 readElf32(std::string fd)
+ExecutableFile* readElf32(std::string fd)
 {
-    Elf32 bucket(fd);
-    bucket.readIdent();
-    bucket.readHeader();
-    bucket.readSectionHeaders();
-    std::vector<std::string> secNames = bucket.getSectionNames();
+    Elf32* bucket = new Elf32(fd);
+    bucket->readIdent();
+    bucket->readHeader();
+    bucket->readSectionHeaders();
+    std::vector<std::string> secNames = bucket->getSectionNames();
     return bucket;
 }
 
-Elf64 readElf64(std::string fd)
+ExecutableFile* readElf64(std::string fd)
 {
-    Elf64 bucket(fd);
-    bucket.readIdent();
-    bucket.readHeader();
-    bucket.readSectionHeaders();
-    std::vector<std::string> secNames = bucket.getSectionNames();
+    Elf64* bucket = new Elf64(fd);
+    bucket->readIdent();
+    bucket->readHeader();
+    bucket->readSectionHeaders();
+    std::vector<std::string> secNames = bucket->getSectionNames();
 
     /*
     result = bucket.getSection(neym);
@@ -30,27 +30,27 @@ Elf64 readElf64(std::string fd)
 }
 
 
-ExecutableFile readExe32(std::string fd)
+ExecutableFile* readExe32(std::string fd)
 {
-    Exe32 bucket(fd);
-    bucket.readDosHeader();
-    bucket.readPESignature();
-    bucket.readCoffHeader();
-    bucket.readSectionTable();
+    Exe32* bucket = new Exe32(fd);
+    bucket->readDosHeader();
+    bucket->readPESignature();
+    bucket->readCoffHeader();
+    bucket->readSectionTable();
     return bucket;
 }
 
-ExecutableFile readExe64(std::string fd)
+ExecutableFile* readExe64(std::string fd)
 {
-    Exe64 bucket(fd);
-    bucket.readDosHeader();
-    bucket.readPESignature();
-    bucket.readCoffHeader();
-    bucket.readSectionTable();
+    Exe64* bucket = new Exe64(fd);
+    bucket->readDosHeader();
+    bucket->readPESignature();
+    bucket->readCoffHeader();
+    bucket->readSectionTable();
     return bucket;
 }
 
-ExecutableFile readFile(const std::string path)
+ExecutableFile* readFile(const std::string path)
 {
 
 	uint8_t buffer[4];
@@ -95,5 +95,5 @@ ExecutableFile readFile(const std::string path)
     else
         printf("üzüldük");
 
-    return;
+    return NULL;
 }
