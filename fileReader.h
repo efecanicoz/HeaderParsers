@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <vector>
 #include <list>
+#include "EInterface.h"
 
 /*#ifndef INSTRUCTION_H
 	#include "instruction.h"

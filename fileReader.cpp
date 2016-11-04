@@ -30,24 +30,24 @@ Elf64 readElf64(std::string fd)
 }
 
 
-void readExe32(std::string fd)
+ExecutableFile readExe32(std::string fd)
 {
     Exe32 bucket(fd);
     bucket.readDosHeader();
     bucket.readPESignature();
     bucket.readCoffHeader();
     bucket.readSectionTable();
-    return;
+    return bucket;
 }
 
-void readExe64(std::string fd)
+ExecutableFile readExe64(std::string fd)
 {
     Exe64 bucket(fd);
     bucket.readDosHeader();
     bucket.readPESignature();
     bucket.readCoffHeader();
     bucket.readSectionTable();
-    return;
+    return bucket;
 }
 
 void readFile(const std::string path)
