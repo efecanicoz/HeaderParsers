@@ -50,7 +50,7 @@ ExecutableFile readExe64(std::string fd)
     return bucket;
 }
 
-void readFile(const std::string path)
+ExecutableFile readFile(const std::string path)
 {
 
 	uint8_t buffer[4];
@@ -66,9 +66,9 @@ void readFile(const std::string path)
         fd.read((char *)&ei_class,1);
         fd.close();
         if(ei_class == 1)
-            readElf32(path);
+            return readElf32(path);
         else if(ei_class == 2)
-            readElf64(path);
+            return readElf64(path);
     }
     else if(buffer[0] == EXE_H[0] && buffer[1] == EXE_H[1])
     {
@@ -85,11 +85,11 @@ void readFile(const std::string path)
 
 		if(machine == 332)
 		{
-			readExe32(path);
+			return readExe32(path);
 		}
 		else
 		{
-			readExe64(path);
+			return readExe64(path);
 		}
     }
     else
