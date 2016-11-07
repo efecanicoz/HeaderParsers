@@ -1,6 +1,9 @@
 #ifndef EXEC_H
 #define EXEC_H
 
+#include <vector>
+#include <string>
+
 class ExecutableFile
 {
 	public:

@@ -281,22 +281,34 @@ void Instruction::get_operand_value(uint8_t i)
 			{
 				result = this->read_SIB();
 			}
+			else
+			{
+				result = modrm_rm_map[rm];
+			}
 
 			if(mod == 1)
 			{
 				disp = this->desc->read_1byte();
+				*operand = result + "+" + std::to_string(disp);
 			}
 			else if(mod == 2)
 			{
 				disp = this->desc->read_4byte();
+				*operand = result + "+" + std::to_string(disp);
 			}
-			else if(mod == 0 || rm == 0b00000101)
+			else if(mod == 0 && rm == 0b00000101)
 			{
 				/*TODO: 64bit ise rip + disp32
 				 * diğer modlarda + disp32*/
 				disp = this->desc->read_4byte();
+				*operand = result + "+" + std::to_string(disp);
 			}
-			*operand = result + "+" + std::to_string(disp);
+			else
+			{
+				*operand = result;
+			}
+			*operand = "[" + *operand + "]";
+
 		}
 		else
 		{
@@ -395,7 +407,7 @@ std::string Instruction::read_SIB()
 			result = sib_byte_map[index]  + " + " + baseStr;
 	}
 	else
-		result = base;//sadece base
+		result = baseStr;//sadece base
 	return result;
 }
 
@@ -427,14 +439,12 @@ std::string Instruction::get_x87(uint8_t instruction_byte)
 	{
 		return x87_high_map[x87_opcode][x87_modRM];
 	}
-
-
-
 }
 
 void read_instruction(ArrayReader& descriptor)
 {
 	const std::string *opcode_map;
+	std::string result;
 	bool read = true;
 	uint8_t current_byte;
 	uint64_t address;
@@ -699,10 +709,11 @@ void read_instruction(ArrayReader& descriptor)
 		}
 
 	}while(inst.done == false);
-
+	result = inst.opcode + " " + inst.operand1 + " " + inst.operand2 + " " + inst.operand3 + " " + inst.operand4;
+	return;
 }
 
-void machine_to_opcode(std::vector<uint8_t> &source, uint64_t start_address)
+void machine_to_opcode(std::vector<uint8_t> &source, uint64_t start_address = 0)
 {
 	ArrayReader desc = ArrayReader(source, start_address);
 	while(!desc.is_complete())

@@ -1,5 +1,26 @@
-all:
-	g++ -std=c++11 -g instruction.cpp arrayReader.cpp elf32.cpp elf64.cpp exe32.cpp exe64.cpp main.cpp reader.cpp fileReader.cpp -o final
+OBJECTS = arrayReader.o elf32.o elf64.o exe32.o exe64.o fileReader.o instruction.o main.o reader.o 
+OBJDIR = obj
+CXXFLAGS = -std=c++11 -g
+OBJS = $(patsubst %, $(OBJDIR)/%, $(OBJECTS))
+CXX = g++
 
+.PHONY: all
+all: final
+
+file:
+	-mkdir $(OBJDIR)
+
+$(OBJDIR)/%.o: %.cpp
+	$(CXX) -c -o $@ $(CXXFLAGS) $<
+
+$(OBJDIR)/%.d: %.cpp
+	$(CXX) -MM -MT -o $@ $(CXXFLAGS) $<
+
+-include $(DEP)
+
+final: $(OBJS)
+	$(CXX) -o $@ $(CXXFLAGS) $(OBJS)
+	
 clean:
-	rm final
+	-rm final
+	-rm -rf $(OBJDIR)
