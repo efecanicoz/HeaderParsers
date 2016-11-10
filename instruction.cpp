@@ -283,12 +283,13 @@ void Instruction::get_operand_value(uint8_t i)
 			}
 			else
 			{
-				result = modrm_rm_map[rm];
+				result = modrm_rm_map[memVal];
 			}
 
 			if(mod == 1)
 			{
 				disp = this->desc->read_1byte();
+				disp = this->desc->read_signed_1byte();
 				*operand = result + "+" + std::to_string(disp);
 			}
 			else if(mod == 2)
@@ -430,8 +431,8 @@ std::string Instruction::get_x87(uint8_t instruction_byte)
 	uint8_t x87_opcode, x87_modRM;
 	this->read_ModRM();
 	x87_opcode = instruction_byte - 0xD8; //offset of x87 instructions
-	x87_modRM = (this->modrm & 0x3F) - 0xC0;//get r/m and reg fields of modrm and subtract offset
-	if(MODRM_MOD(this->modrm) == 11)//0x00-0xBF section
+	x87_modRM = this->modrm & 0x3F;//get r/m and reg fields of modrm
+	if(MODRM_MOD(this->modrm) != 0b11)//0x00-0xBF section
 	{
 		return x87_low_map[x87_opcode][MODRM_REG(this->modrm)];
 	}

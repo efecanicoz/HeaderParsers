@@ -16,6 +16,7 @@ class ArrayReader
 
 		ArrayReader();
 		ArrayReader(std::vector<uint8_t> &,uint64_t);
+		int8_t read_signed_1byte();
 		uint8_t read_1byte();
 		uint16_t read_2byte();
 		int32_t read_signed_4byte();

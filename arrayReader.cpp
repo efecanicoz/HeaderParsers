@@ -26,6 +26,18 @@ uint8_t ArrayReader::read_1byte()
 	return retVal;
 }
 
+int8_t ArrayReader::read_signed_1byte()
+{
+	if(this->counter + 1 > this->length)
+	{
+		this->complete = true;
+		return 0;
+	}
+	int8_t retVal = this->array[this->counter];
+	this->counter++;
+	return retVal;
+}
+
 uint16_t ArrayReader::read_2byte()
 {
 	uint16_t retVal;
