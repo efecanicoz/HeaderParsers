@@ -3,6 +3,7 @@
 
 #include <string>
 #include <sstream>
+#include <utility>
 #ifndef ARRAYREADER_H
 	#include "arrayReader.h"
 #endif
@@ -51,8 +52,8 @@ class Instruction
 };
 
 
-void read_instruction();
-void machine_to_opcode(std::vector<uint8_t> &, uint64_t );
+std::string read_instruction(ArrayReader &);
+std::vector<std::pair<uint64_t, std::string>> machine_to_opcode(std::vector<uint8_t> &, uint64_t );
 
 #ifndef READER
     #include "reader.h"

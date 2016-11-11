@@ -15,6 +15,9 @@ Instruction::Instruction()
 	this->done = false;
 	this->presence = 0;
 	this->legacy_prefix = 0;
+	this->rex = 0;
+	this->sib = 0;
+	this->modrm = 0;
 }
 
 Instruction::Instruction(ArrayReader *descriptor)
@@ -175,8 +178,15 @@ void Instruction::get_operand_value(uint8_t i)
 	}
 	rest = (*operand).substr(1);
 
-	if(rest == "a" || rest == "c" || rest == "v" || rest == "y" || rest == "z")
-		length = 4;//effective operand size ?
+	if(rest == "v")
+	{
+		if(REX_W(this->rex))
+			length = 8;
+		else
+			length = 4;//effective operand size ?
+	}
+	if(rest == "a" || rest == "c" || rest == "y" || rest == "z")
+		length = 4;
 	else if(rest == "b" )
 		length = 1;
 	else if(rest == "pb" || rest == "ps")
@@ -206,20 +216,17 @@ void Instruction::get_operand_value(uint8_t i)
 				*operand = std::to_string((uint32_t)desc->read_4byte());
 			}
 		}
+		else if(length == 8)
+			*operand = std::to_string(desc->read_8byte());
 	}
 	else if(reg == true)
 	{
 		uint8_t regVal = 0;
 		this->read_ModRM();
-		if(this->presence & REX)
-		{
-			regVal = (REX_R(this->rex) << 3) | MODRM_REG(this->modrm);
-		}
-		else
-			regVal = MODRM_REG(this->modrm);
+		regVal = (REX_R(this->rex) << 3) | MODRM_REG(this->modrm);
 		//operand = register_table
 
-		if(regSel == GPR)
+		if(regSel & GPR)
 		{
 			if(length == 1)
 				*operand = modrm_reg_map[0][regVal];
@@ -233,27 +240,27 @@ void Instruction::get_operand_value(uint8_t i)
 					*operand = modrm_reg_map[3][regVal];
 			}
 		}
-		else if(regSel == MMX)
+		else if(regSel & MMX)
 		{
 			*operand = modrm_reg_map[4][regVal];
 		}
-		else if(regSel == XMM)
+		else if(regSel & XMM)
 		{
 			*operand = modrm_reg_map[5][regVal];
 		}
-		else if(regSel == YMM)
+		else if(regSel & YMM)
 		{
 			*operand = modrm_reg_map[6][regVal];
 		}
-		else if(regSel == Segment)
+		else if(regSel & Segment)
 		{
 			*operand = modrm_reg_map[7][regVal];
 		}
-		else if(regSel == Control)
+		else if(regSel & Control)
 		{
 			*operand = modrm_reg_map[8][regVal];
 		}
-		else if(regSel == Debug)
+		else if(regSel & Debug)
 		{
 			*operand = modrm_reg_map[9][regVal];
 		}
@@ -269,10 +276,7 @@ void Instruction::get_operand_value(uint8_t i)
 		rm = MODRM_RM(this->modrm);
 		mod = MODRM_MOD(this->modrm);
 
-		if(this->presence & REX)
-			memVal = (REX_B(this->rex) << 3) | rm;
-		else
-			memVal = rm;
+		memVal = (REX_B(this->rex) << 3) | rm;
 		memVal |= mod << 4;
 		//result = memory_table
 		if(mod != 0b00000011)
@@ -288,20 +292,19 @@ void Instruction::get_operand_value(uint8_t i)
 
 			if(mod == 1)
 			{
-				disp = this->desc->read_1byte();
 				disp = this->desc->read_signed_1byte();
 				*operand = result + "+" + std::to_string(disp);
 			}
 			else if(mod == 2)
 			{
-				disp = this->desc->read_4byte();
+				disp = this->desc->read_signed_4byte();
 				*operand = result + "+" + std::to_string(disp);
 			}
 			else if(mod == 0 && rm == 0b00000101)
 			{
 				/*TODO: 64bit ise rip + disp32
 				 * diğer modlarda + disp32*/
-				disp = this->desc->read_4byte();
+				disp = this->desc->read_signed_4byte();
 				*operand = result + "+" + std::to_string(disp);
 			}
 			else
@@ -368,26 +371,14 @@ std::string Instruction::read_SIB()
 {
 	uint8_t base, index;
 	std::string result, scale, baseStr;
-	if(this->presence & SIB)
-	{
-		//sib is already read
-	}
-	else
+	if(!(this->presence & SIB))//if sib is not read
 	{
 		this->sib = this->desc->read_1byte();
 	}
 	this-> presence |= SIB;
 
-	if(this->presence & REX)
-	{
-		base = REX_B(this->rex) << 3 | SIB_BASE(this->sib);
-		index = REX_X(this->rex) << 3 | SIB_INDEX(this->sib);
-	}
-	else
-	{
-		base = SIB_BASE(this->sib);
-		index = SIB_INDEX(this->sib);
-	}
+	base = REX_B(this->rex) << 3 | SIB_BASE(this->sib);
+	index = REX_X(this->rex) << 3 | SIB_INDEX(this->sib);
 	scale = std::to_string(1 << SIB_SCALE(this->sib));
 
 
@@ -414,16 +405,12 @@ std::string Instruction::read_SIB()
 
 void Instruction::read_ModRM()
 {
-	if(this->presence & ModRM)
-	{
-		//modrm is already read
-		return;
-	}
-	else
+	if(!(this->presence & ModRM))
 	{
 		this->modrm = this->desc->read_1byte();
 		this->presence |= ModRM;
 	}
+	return;
 }
 
 std::string Instruction::get_x87(uint8_t instruction_byte)
@@ -442,18 +429,16 @@ std::string Instruction::get_x87(uint8_t instruction_byte)
 	}
 }
 
-void read_instruction(ArrayReader& descriptor)
+std::string read_instruction(ArrayReader& descriptor)
 {
 	const std::string *opcode_map;
 	std::string result;
 	bool read = true;
 	uint8_t current_byte;
-	uint64_t address;
 	Instruction inst;
 
 	inst = Instruction(&descriptor);
 
-	address = descriptor.get_real_offset();
 	opcode_map = primary_opcode_map64;
 
 	do
@@ -711,14 +696,22 @@ void read_instruction(ArrayReader& descriptor)
 
 	}while(inst.done == false);
 	result = inst.opcode + " " + inst.operand1 + " " + inst.operand2 + " " + inst.operand3 + " " + inst.operand4;
-	return;
+	return result;
 }
 
-void machine_to_opcode(std::vector<uint8_t> &source, uint64_t start_address = 0)
+std::vector<std::pair<uint64_t, std::string>> machine_to_opcode(std::vector<uint8_t> &source, uint64_t start_address = 0)
 {
 	ArrayReader desc = ArrayReader(source, start_address);
+	uint64_t ip;
+	std::string inst;
+	std::vector<std::pair<uint64_t, std::string>> inst_list = std::vector<std::pair<uint64_t, std::string>>();
 	while(!desc.is_complete())
 	{
-		read_instruction(desc);
+		ip = desc.get_real_offset();
+		inst = read_instruction(desc);
+
+		/*printf("%x,\t: %s\n",ip,inst.c_str());*/
+		inst_list.push_back(std::make_pair(ip, inst));
 	}
+	return inst_list;
 }
