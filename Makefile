@@ -5,7 +5,7 @@ OBJS = $(patsubst %, $(OBJDIR)/%, $(OBJECTS))
 CXX = g++
 
 .PHONY: all
-all: final
+all: file final
 
 file:
 	-mkdir $(OBJDIR)
