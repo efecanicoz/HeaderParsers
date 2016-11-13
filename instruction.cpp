@@ -205,6 +205,8 @@ void Instruction::get_operand_value(uint8_t i)
 	{
 		if(length == 1)
 			*operand = std::to_string(desc->read_1byte());
+		else if(this->legacy_prefix & OSO)
+			*operand = std::to_string((uint16_t)desc->read_2byte());
 		else if(length == 4)
 		{
 			if(sign == true)
@@ -710,7 +712,7 @@ std::vector<std::pair<uint64_t, std::string>> machine_to_opcode(std::vector<uint
 		ip = desc.get_real_offset();
 		inst = read_instruction(desc);
 
-		/*printf("%x,\t: %s\n",ip,inst.c_str());*/
+		printf("%llx,\t: %s\n",ip,inst.c_str());
 		inst_list.push_back(std::make_pair(ip, inst));
 	}
 	return inst_list;
