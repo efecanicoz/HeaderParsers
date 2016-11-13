@@ -8,7 +8,7 @@ CXX = g++
 all: file final
 
 file:
-	-mkdir $(OBJDIR)
+	mkdir -p $(OBJDIR)
 
 $(OBJDIR)/%.o: %.cpp
 	$(CXX) -c -o $@ $(CXXFLAGS) $<
