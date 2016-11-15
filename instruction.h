@@ -35,6 +35,7 @@ class Instruction
 		uint8_t operand_count;
 		uint16_t legacy_prefix;
 		uint8_t presence;
+		uint8_t arch;
 		uint8_t rex, sib, modrm, regSel,length;
 		bool done;
 		ArrayReader *desc;
@@ -46,7 +47,7 @@ class Instruction
 		std::string get_x87(uint8_t);
 		void read_ModRM();
 		Instruction();
-		Instruction(ArrayReader *);
+		Instruction(ArrayReader *, uint8_t);
 		~Instruction();
 
 };

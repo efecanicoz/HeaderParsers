@@ -19,10 +19,10 @@ int main(int argc, char **argv)
 
 	tempDesc = readFile(argv[1]);
 	tempDesc->disassemble(disas);
-	for(i = 0; i < disas.size(); i++)
+	/*for(i = 0; i < disas.size(); i++)
 	{
 		printf("%x\t: %s\n",disas[i].first,disas[i].second.c_str());
-	}
+	}*/
 
 
 	delete tempDesc;

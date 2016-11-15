@@ -18,17 +18,21 @@ Instruction::Instruction()
 	this->rex = 0;
 	this->sib = 0;
 	this->modrm = 0;
+	this->arch = 0;
 }
 
-Instruction::Instruction(ArrayReader *descriptor)
+Instruction::Instruction(ArrayReader *descriptor, uint8_t arch)
 {
 	this->desc = descriptor;
+	this->arch = arch;
 	this->done = false;
 	this->presence = 0;
 	this->legacy_prefix = 0;
 	this->rex = 0;
 	this->sib = 0;
 	this->modrm = 0;
+	this->regSel = 0;
+	this->operand_count = 0;
 }
 
 Instruction::~Instruction()
@@ -269,9 +273,11 @@ void Instruction::get_operand_value(uint8_t i)
 	}
 	else if(mem == true)
 	{
+		static const std::string modrm_rm_map[64] = this->arch == 0 ? modrm_rm_map_64 : modrm_rm_map_32;
 		std::string result = "";
 		uint8_t rm, mod,memVal = 0;
 		uint32_t disp;
+
 		this->read_ModRM();
 		rm = MODRM_RM(this->modrm);
 		mod = MODRM_MOD(this->modrm);
@@ -369,8 +375,11 @@ void Instruction::get_operand_value(uint8_t i)
 
 std::string Instruction::read_SIB()
 {
+	static const std::string sib_byte_map[16] = this->arch == 0 ? sib_byte_map_64 : sib_byte_map_32;
 	uint8_t base, index;
 	std::string result, scale, baseStr;
+
+
 	if(!(this->presence & SIB))//if sib is not read
 	{
 		this->sib = this->desc->read_1byte();
@@ -437,7 +446,7 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 	uint8_t current_byte;
 	Instruction inst;
 
-	inst = Instruction(&descriptor);
+	inst = Instruction(&descriptor, arch);
 
 	if(arch == 0)
 		opcode_map = primary_opcode_map64;
@@ -713,7 +722,7 @@ void machine_to_opcode(std::vector<std::pair<uint64_t, std::string>> &container,
 		ip = desc.get_real_offset();
 		inst = read_instruction(desc, arch);
 
-		printf("%llx,\t: %s\n",ip,inst.c_str());
+		printf("%llx\t: %s\n",ip,inst.c_str());
 		container.push_back(std::make_pair(ip, inst));
 	}
 	return;

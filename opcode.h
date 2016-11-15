@@ -119,10 +119,12 @@ static const std::string modrm_reg_map[10][16] = {{"AL", "CL","DL","BL","AH","CH
 												{"CR0", "CR1","CR2","CR3","CR4","CR5","CR6","CR7","CR8","CR9","CR10","CR11","CR12","CR13","CR14","CR15"},
 												{"DR0", "DR1","DR2","DR3","DR4","DR5","DR6","DR7","DR8","DR9","DR10","DR11","DR12","DR13","DR14","DR15"}};
 
-static const std::string modrm_rm_map[] = {"RAX", "RCX","RDX","RBX","","RIP","RSI","RDI","RAX", "RCX","RDX","RBX","","RBP","RSI","RDI","RAX", "RCX","RDX","RBX","","RBP","RSI","RDI","","","","","","","","","R8","R9","R10","R11","","RIP","R14","R15","R8","R9","R10","R11","","R13","R14","R15","R8","R9","R10","R11","","R13","R14","R15","","","","","","","",""};
+static const std::string modrm_rm_map_64[] = {"RAX", "RCX","RDX","RBX","","RIP","RSI","RDI","RAX", "RCX","RDX","RBX","","RBP","RSI","RDI","RAX", "RCX","RDX","RBX","","RBP","RSI","RDI","","","","","","","","","R8","R9","R10","R11","","RIP","R14","R15","R8","R9","R10","R11","","R13","R14","R15","R8","R9","R10","R11","","R13","R14","R15","","","","","","","",""};
+static const std::string modrm_rm_map_32[] = {"EAX", "ECX","EDX","EBX","","EIP","ESI","EDI","EAX", "ECX","EDX","EBX","","EBP","ESI","EDI","EAX", "ECX","EDX","EBX","","EBP","ESI","EDI","","","","","","","","","","","","","","EIP","","","","","","","","","","","","","","","","","","","","","","","","","",""};
 
 //rex.b + sib.index
-static const std::string sib_byte_map[] = {"RAX", "RCX","RDX","RBX","RSP","RBP","RSI","RDI","R8","R9","R10","R11","R12","R13","R14","R15"};
+static const std::string sib_byte_map_64[] = {"RAX", "RCX","RDX","RBX","RSP","RBP","RSI","RDI","R8","R9","R10","R11","R12","R13","R14","R15"};
+static const std::string sib_byte_map_32[] = {"EAX", "ECX","EDX","EBX","ESP","EBP","ESI","EDI","","","","","","","",""};
 
 static const std::string x87_low_map[8][8] = {{"FADD mem32real","FMUL mem32real","FCOM mem32real","FCOMP mem32real","FSUB mem32real","FSUBR mem32real","FDIV mem32real","FDIVR mem32real"},
 												{"FLD mem32real","","FST mem32real","FSTP mem32real","FLDENV mem14env","FLDCW mem16","FNSTENV mem14env","FNSTCW mem16"},
