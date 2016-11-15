@@ -26,6 +26,17 @@ std::vector<uint8_t> Exe32::getSectionContent(std::string needle)
 	}
 }
 
+uint8_t Exe32::getSection(std::string needle)
+{
+	uint32_t i;
+	for(i = 0; i < this->buffer.size(); i++)
+	{
+		if(this->buffer[i].nameStr == needle)
+			return i;
+	}
+	return 0;
+}
+
 
 std::vector<std::string> Exe32::getSectionNames()
 {
@@ -147,4 +158,17 @@ void Exe32::readSectionTable(){
     
     
     return;
+}
+
+void Exe32::disassemble(std::vector<std::pair<uint64_t, std::string>> &container)
+{
+	uint32_t index;
+	uint64_t start_address;
+	uint8_t target_architecture = 1;
+
+	index = this->getSection(".text");
+	start_address = this->buffer[index].PointerToRawData;
+	std::vector<uint8_t> &machineCode = this->buffer[index].contents;
+	machine_to_opcode(container, machineCode,start_address,target_architecture);
+	return;
 }

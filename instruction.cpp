@@ -81,7 +81,6 @@ void Instruction::parse_opcode()
 
 void Instruction::get_operand_value(uint8_t i)
 {
-	;/*TODO: buraları doldur*/
 	std::string *operand;
 	std::string rest;
 	bool vex,reg,mem,imm,sign;
@@ -104,7 +103,6 @@ void Instruction::get_operand_value(uint8_t i)
 	{
 		mem = true;
 	}
-
 	switch((*operand)[0])
 	{
 	case 'A':
@@ -431,7 +429,7 @@ std::string Instruction::get_x87(uint8_t instruction_byte)
 	}
 }
 
-std::string read_instruction(ArrayReader& descriptor)
+std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 {
 	const std::string *opcode_map;
 	std::string result;
@@ -441,11 +439,15 @@ std::string read_instruction(ArrayReader& descriptor)
 
 	inst = Instruction(&descriptor);
 
-	opcode_map = primary_opcode_map64;
+	if(arch == 0)
+		opcode_map = primary_opcode_map64;
+	else if(arch == 1)
+		opcode_map = primary_opcode_map32;
+	else
+		return "";//invalid arch
 
 	do
 	{
-		/*TODO: group olduğu zaman modrmyi nerde okuyacak ? burda değil muhtemelen*/
 		if(read)
 		{
 			current_byte = descriptor.read_1byte();
@@ -453,7 +455,6 @@ std::string read_instruction(ArrayReader& descriptor)
 		}
 		inst.parse_opcode();
 
-		/*Şimdi bu eşitlik de çalışmaz c++ şov yapar*/
 		if(inst.opcode == "ESC")
 		{
 			read = true;
@@ -701,19 +702,19 @@ std::string read_instruction(ArrayReader& descriptor)
 	return result;
 }
 
-std::vector<std::pair<uint64_t, std::string>> machine_to_opcode(std::vector<uint8_t> &source, uint64_t start_address = 0)
+void machine_to_opcode(std::vector<std::pair<uint64_t, std::string>> &container, std::vector<uint8_t> &source,
+			uint64_t start_address, uint8_t arch)
 {
 	ArrayReader desc = ArrayReader(source, start_address);
 	uint64_t ip;
 	std::string inst;
-	std::vector<std::pair<uint64_t, std::string>> inst_list = std::vector<std::pair<uint64_t, std::string>>();
 	while(!desc.is_complete())
 	{
 		ip = desc.get_real_offset();
-		inst = read_instruction(desc);
+		inst = read_instruction(desc, arch);
 
 		printf("%llx,\t: %s\n",ip,inst.c_str());
-		inst_list.push_back(std::make_pair(ip, inst));
+		container.push_back(std::make_pair(ip, inst));
 	}
-	return inst_list;
+	return;
 }

@@ -53,7 +53,7 @@ class Instruction
 
 
 std::string read_instruction(ArrayReader &);
-std::vector<std::pair<uint64_t, std::string>> machine_to_opcode(std::vector<uint8_t> &, uint64_t );
+void machine_to_opcode(std::vector<std::pair<uint64_t, std::string>> &, std::vector<uint8_t> &, uint64_t , uint8_t);
 
 #ifndef READER
     #include "reader.h"

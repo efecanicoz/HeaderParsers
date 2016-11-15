@@ -8,6 +8,7 @@
 #endif
 
 #include "EInterface.h"
+#include "instruction.h"
 
 #ifndef EXE_STRUCT
 #define EXE_STRUCT
@@ -89,5 +90,7 @@ class Exe64 : public ExecutableFile
  
 		std::vector<uint8_t> getSectionContent(std::string);
 		std::vector<std::string> getSectionNames();
+		uint8_t getSection(std::string needle);
+		void disassemble(std::vector<std::pair<uint64_t, std::string>> &);
 };
 #endif

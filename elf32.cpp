@@ -169,17 +169,17 @@ std::vector<uint8_t> Elf32::getSectionContent(std::string needle)
     return std::vector<uint8_t>();
 }
 
-Elf32SH Elf32::getSection(std::string needle)
+uint32_t Elf32::getSection(std::string needle)
 {
     uint32_t i;
     for(i = 0; i < this->sHeaders.size(); i++)
     {
         if(!this->sHeaders[i].name.compare(needle))
         {
-            return this->sHeaders[i];
+            return i;
         }
     }
-    return Elf32SH();
+    return 0;
 }
 
 uint32_t Elf32::getSectionAddress(std::string needle)
@@ -193,4 +193,16 @@ uint32_t Elf32::getSectionAddress(std::string needle)
         }
     }
     return 0;
+}
+void Elf32::disassemble(std::vector<std::pair<uint64_t, std::string>> &container)
+{
+	uint32_t index;
+	uint64_t start_address;
+	uint8_t target_architecture = 1;
+
+	index = this->getSection(".text");
+	start_address = this->sHeaders[index].sh_addr;
+	std::vector<uint8_t> &machineCode = this->sHeaders[index].content;
+	machine_to_opcode(container, machineCode,start_address,target_architecture);
+	return;
 }

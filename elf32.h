@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 
+#include "instruction.h"
 #include "EInterface.h"
 
 //data uzunluklarını düzenle 64bit için geçerliler şu an..
@@ -65,8 +66,9 @@ class Elf32 : public ExecutableFile
         void readSectionHeaders();
         std::vector<uint8_t> getSectionContent(std::string);
 		std::vector<std::string> getSectionNames();
-        Elf32SH getSection(std::string);
+        uint32_t getSection(std::string);
         uint32_t getSectionAddress(std::string);
+		void disassemble(std::vector<std::pair<uint64_t, std::string>> &);
 };
 
 #endif
