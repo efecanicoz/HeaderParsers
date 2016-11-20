@@ -31,12 +31,13 @@ class Instruction
 	public:
 		std::string raw_opcode;
 		std::string opcode;
-		std::string operand1, operand2, operand3, operand4;
+		std::string operands[4];
 		uint8_t operand_count;
 		uint16_t legacy_prefix;
 		uint8_t presence;
 		uint8_t arch;
 		uint8_t rex, sib, modrm, regSel,length;
+
 		bool done;
 		ArrayReader *desc;
 

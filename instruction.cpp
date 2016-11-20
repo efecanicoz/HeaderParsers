@@ -33,7 +33,6 @@ Instruction::Instruction(ArrayReader *descriptor, uint8_t arch)
 	this->regSel = 0;
 	this->operand_count = 0;
 	this->length = 0;
-
 }
 
 std::vector<std::string> split(const std::string &s, char delim) {
@@ -49,58 +48,32 @@ std::vector<std::string> split(const std::string &s, char delim) {
 
 void Instruction::parse_opcode()
 {
-	std::vector<std::string>split_array = split(this->raw_opcode,' ');
+	std::vector<std::string>split_array;
+	uint8_t i;
+
+	split_array = split(this->raw_opcode,' ');
 	this->opcode = split_array[0];
 	this->operand_count = split_array.size()-1;
-	if(split_array.size() == 2)
-	{
-		this->operand1 = split_array[1];
-	}
-	else if(split_array.size() == 3)
-	{
-		this->operand1 = split_array[1];
-		this->operand2 = split_array[2];
-	}
-	else if(split_array.size() == 4)
-	{
-		this->operand1 = split_array[1];
-		this->operand2 = split_array[2];
-		this->operand3 = split_array[3];
-	}
-	else if(split_array.size() == 5)
-	{
-		this->operand1 = split_array[1];
-		this->operand2 = split_array[2];
-		this->operand3 = split_array[3];
-		this->operand4 = split_array[4];
-	}
+
+	for(i = 0; i < this->operand_count; i++)
+		this->operands[i] = split_array[i+1];
 }
 
 void Instruction::get_operand_value(uint8_t i)
 {
-	std::string *operand;
+	std::string &operand = this->operands[i];;
 	std::string rest;
 	bool vex,reg,mem,imm,sign;
 	vex = reg = mem = imm = sign = false;
 
-	if(i == 1)
-		operand = &this->operand1;
-	else if(i == 2)
-		operand = &this->operand2;
-	else if(i == 3)
-		operand = &this->operand3;
-	else if(i == 4)
-		operand = &this->operand4;
-	else
-		return;
 
-	if(operand->length() < 2 || ((*operand)[1] >='A' && (*operand)[1] <= 'Z'))
+	if(operand.length() < 2 || ((operand)[1] >='A' && (operand)[1] <= 'Z'))
 		return;
-	if(operand->length() > 3 && operand->find("mem") != std::string::npos)//x87 operand
+	if(operand.length() > 3 && operand.find("mem") != std::string::npos)//x87 operand
 	{
 		mem = true;
 	}
-	switch((*operand)[0])
+	switch((operand)[0])
 	{
 	case 'A':
 	case 'X':
@@ -136,13 +109,13 @@ void Instruction::get_operand_value(uint8_t i)
 		imm = true;
 		break;
 	case 'F':
-		(*operand) = "rFLAGS";
+		(operand) = "rFLAGS";
 		return;
 	default:
 		break;
 	}
 
-	switch ((*operand)[0])
+	switch ((operand)[0])
 	{
 	case 'E':
 	case 'G':
@@ -171,7 +144,7 @@ void Instruction::get_operand_value(uint8_t i)
 	case 'S':
 		regSel = Segment;
 	}
-	rest = (*operand).substr(1);
+	rest = operand.substr(1);
 
 	if(rest == "v")
 	{
@@ -199,22 +172,22 @@ void Instruction::get_operand_value(uint8_t i)
 	if(imm == true)
 	{
 		if(length == 1)
-			*operand = std::to_string(desc->read_1byte());
+			operand = std::to_string(desc->read_1byte());
 		else if(this->legacy_prefix & OSO)
-			*operand = std::to_string((uint16_t)desc->read_2byte());
+			operand = std::to_string((uint16_t)desc->read_2byte());
 		else if(length == 4)
 		{
 			if(sign == true)
 			{
-				*operand = std::to_string((int32_t)desc->read_signed_4byte());
+				operand = std::to_string((int32_t)desc->read_signed_4byte());
 			}
 			else
 			{
-				*operand = std::to_string((uint32_t)desc->read_4byte());
+				operand = std::to_string((uint32_t)desc->read_4byte());
 			}
 		}
 		else if(length == 8)
-			*operand = std::to_string(desc->read_8byte());
+			operand = std::to_string(desc->read_8byte());
 	}
 	else if(reg == true)
 	{
@@ -226,40 +199,40 @@ void Instruction::get_operand_value(uint8_t i)
 		if(regSel & GPR)
 		{
 			if(length == 1)
-				*operand = modrm_reg_map[0][regVal];
+				operand = modrm_reg_map[0][regVal];
 			else if(length == 2)
-				*operand = modrm_reg_map[1][regVal];
+				operand = modrm_reg_map[1][regVal];
 			else
 			{
 				if(!REX_W(this->rex))
-					*operand = modrm_reg_map[2][regVal];
+					operand = modrm_reg_map[2][regVal];
 				else
-					*operand = modrm_reg_map[3][regVal];
+					operand = modrm_reg_map[3][regVal];
 			}
 		}
 		else if(regSel & MMX)
 		{
-			*operand = modrm_reg_map[4][regVal];
+			operand = modrm_reg_map[4][regVal];
 		}
 		else if(regSel & XMM)
 		{
-			*operand = modrm_reg_map[5][regVal];
+			operand = modrm_reg_map[5][regVal];
 		}
 		else if(regSel & YMM)
 		{
-			*operand = modrm_reg_map[6][regVal];
+			operand = modrm_reg_map[6][regVal];
 		}
 		else if(regSel & Segment)
 		{
-			*operand = modrm_reg_map[7][regVal];
+			operand = modrm_reg_map[7][regVal];
 		}
 		else if(regSel & Control)
 		{
-			*operand = modrm_reg_map[8][regVal];
+			operand = modrm_reg_map[8][regVal];
 		}
 		else if(regSel & Debug)
 		{
-			*operand = modrm_reg_map[9][regVal];
+			operand = modrm_reg_map[9][regVal];
 		}
 		else
 			;//alert
@@ -292,25 +265,25 @@ void Instruction::get_operand_value(uint8_t i)
 			if(mod == 1)
 			{
 				disp = this->desc->read_signed_1byte();
-				*operand = result + "+" + std::to_string(disp);
+				operand = result + "+" + std::to_string(disp);
 			}
 			else if(mod == 2)
 			{
 				disp = this->desc->read_signed_4byte();
-				*operand = result + "+" + std::to_string(disp);
+				operand = result + "+" + std::to_string(disp);
 			}
 			else if(mod == 0 && rm == 0b00000101)
 			{
 				/*TODO: 64bit ise rip + disp32
 				 * diğer modlarda + disp32*/
 				disp = this->desc->read_signed_4byte();
-				*operand = result + "+" + std::to_string(disp);
+				operand = result + "+" + std::to_string(disp);
 			}
 			else
 			{
-				*operand = result;
+				operand = result;
 			}
-			*operand = "[" + *operand + "]";
+			operand = "[" + operand + "]";
 
 		}
 		else
@@ -320,40 +293,40 @@ void Instruction::get_operand_value(uint8_t i)
 			if(regSel == GPR)
 			{
 				if(length == 1)
-					*operand = modrm_reg_map[0][memVal];
+					operand = modrm_reg_map[0][memVal];
 				else if(length == 2)
-					*operand = modrm_reg_map[1][memVal];
+					operand = modrm_reg_map[1][memVal];
 				else
 				{
 					if(!REX_W(this->rex))
-						*operand = modrm_reg_map[2][memVal];
+						operand = modrm_reg_map[2][memVal];
 					else
-						*operand = modrm_reg_map[3][memVal];
+						operand = modrm_reg_map[3][memVal];
 				}
 			}
 			else if(regSel == MMX)
 			{
-				*operand = modrm_reg_map[4][memVal];
+				operand = modrm_reg_map[4][memVal];
 			}
 			else if(regSel == XMM)
 			{
-				*operand = modrm_reg_map[5][memVal];
+				operand = modrm_reg_map[5][memVal];
 			}
 			else if(regSel == YMM)
 			{
-				*operand = modrm_reg_map[6][memVal];
+				operand = modrm_reg_map[6][memVal];
 			}
 			else if(regSel == Segment)
 			{
-				*operand = modrm_reg_map[7][memVal];
+				operand = modrm_reg_map[7][memVal];
 			}
 			else if(regSel == Control)
 			{
-				*operand = modrm_reg_map[8][memVal];
+				operand = modrm_reg_map[8][memVal];
 			}
 			else if(regSel == Debug)
 			{
-				*operand = modrm_reg_map[9][memVal];
+				operand = modrm_reg_map[9][memVal];
 			}
 			else
 				;//alert
@@ -460,7 +433,7 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 		if(inst.opcode == "ESC")
 		{
 			read = true;
-			if(inst.operand1 == "secondary")
+			if(inst.operands[0] == "secondary")
 			{
 				if(inst.legacy_prefix & OSO)
 					opcode_map = secondary_opcode_map_66;
@@ -471,7 +444,7 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 				else
 					opcode_map = secondary_opcode_map_none;
 			}
-			else if(inst.operand1 == "x87")
+			else if(inst.operands[0] == "x87")
 			{
 				inst.raw_opcode = inst.get_x87(current_byte);
 				read = false;
@@ -480,32 +453,32 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 		else if(inst.opcode == "PRE")
 		{
 			read = true;
-			if(inst.operand1 == "REX")
+			if(inst.operands[0] == "REX")
 			{
 				inst.presence |= REX;
 				inst.rex = current_byte;
 			}
-			else if(inst.operand1 == "OSO")
+			else if(inst.operands[0] == "OSO")
 				inst.legacy_prefix |= OSO;
-			else if(inst.operand1 == "ASO")
+			else if(inst.operands[0] == "ASO")
 				inst.legacy_prefix |= ASO;
-			else if(inst.operand1 == "CS")
+			else if(inst.operands[0] == "CS")
 				inst.legacy_prefix |= CS;
-			else if(inst.operand1 == "DS")
+			else if(inst.operands[0] == "DS")
 				inst.legacy_prefix |= DS;
-			else if(inst.operand1 == "ES")
+			else if(inst.operands[0] == "ES")
 				inst.legacy_prefix |= ES;
-			else if(inst.operand1 == "FS")
+			else if(inst.operands[0] == "FS")
 				inst.legacy_prefix |= FS;
-			else if(inst.operand1 == "GS")
+			else if(inst.operands[0] == "GS")
 				inst.legacy_prefix |= GS;
-			else if(inst.operand1 == "SS")
+			else if(inst.operands[0] == "SS")
 				inst.legacy_prefix |= SS;
-			else if(inst.operand1 == "LOCK")
+			else if(inst.operands[0] == "LOCK")
 				inst.legacy_prefix |= LOCK;
-			else if(inst.operand1 == "REPE")
+			else if(inst.operands[0] == "REPE")
 				inst.legacy_prefix |= REPE;
-			else if(inst.operand1 == "REPNE")
+			else if(inst.operands[0] == "REPNE")
 				inst.legacy_prefix |= REPNE;
 		}
 		else if(inst.opcode == "GROUP")
@@ -514,7 +487,7 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 			inst.read_ModRM();
 			reg = MODRM_REG(inst.modrm);
 			read = false;
-			if(inst.operand1 == "1")
+			if(inst.operands[0] == "1")
 			{
 				if(current_byte == 0x80)
 				{
@@ -537,11 +510,11 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 					;//error
 				}
 			}
-			else if(inst.operand1 == "1a")
+			else if(inst.operands[0] == "1a")
 			{
 				inst.raw_opcode = group1a[reg];
 			}
-			else if(inst.operand1 == "2")
+			else if(inst.operands[0] == "2")
 			{
 				if(current_byte == 0xC0)
 				{
@@ -572,42 +545,42 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 					;//error
 				}
 			}
-			else if(inst.operand1 == "3")
+			else if(inst.operands[0] == "3")
 			{
 				if(current_byte == 0xF6)
 					inst.raw_opcode = group3_F6[reg];
 				else if(current_byte == 0xF7)
 					inst.raw_opcode = group3_F7[reg];
 			}
-			else if(inst.operand1 == "4")
+			else if(inst.operands[0] == "4")
 			{
 				inst.raw_opcode = group4[reg];
 			}
-			else if(inst.operand1 == "5")
+			else if(inst.operands[0] == "5")
 			{
 				inst.raw_opcode = group5[reg];
 			}
-			else if(inst.operand1 == "6")
+			else if(inst.operands[0] == "6")
 			{
 				inst.raw_opcode = group6[reg];
 			}
-			else if(inst.operand1 == "7")
+			else if(inst.operands[0] == "7")
 			{
 				inst.raw_opcode = group7[reg];
 			}
-			else if(inst.operand1 == "8")
+			else if(inst.operands[0] == "8")
 			{
 				inst.raw_opcode = group8[reg];
 			}
-			else if(inst.operand1 == "9")
+			else if(inst.operands[0] == "9")
 			{
 				inst.raw_opcode = group9[reg];
 			}
-			else if(inst.operand1 == "10")
+			else if(inst.operands[0] == "10")
 			{
 				inst.raw_opcode = group10[reg];
 			}
-			else if(inst.operand1 == "11")
+			else if(inst.operands[0] == "11")
 			{
 				if(current_byte == 0xC6)
 				{
@@ -618,7 +591,7 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 					inst.raw_opcode = group11_C7[reg];
 				}
 			}
-			else if(inst.operand1 == "12")
+			else if(inst.operands[0] == "12")
 			{
 				if(inst.legacy_prefix & OSO)
 					inst.raw_opcode = group12[1][reg];
@@ -629,7 +602,7 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 				else//none
 					inst.raw_opcode = group12[0][reg];
 			}
-			else if(inst.operand1 == "13")
+			else if(inst.operands[0] == "13")
 			{
 				if(inst.legacy_prefix & OSO)
 					inst.raw_opcode = group13[1][reg];
@@ -640,7 +613,7 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 				else//none
 					inst.raw_opcode = group13[0][reg];
 			}
-			else if(inst.operand1 == "14")
+			else if(inst.operands[0] == "14")
 			{
 				if(inst.legacy_prefix & OSO)
 					inst.raw_opcode = group14[1][reg];
@@ -651,7 +624,7 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 				else//none
 					inst.raw_opcode = group14[0][reg];
 			}
-			else if(inst.operand1 == "15")
+			else if(inst.operands[0] == "15")
 			{
 				if(inst.legacy_prefix & OSO)
 					inst.raw_opcode = group15[1][reg];
@@ -662,7 +635,7 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 				else//none
 					inst.raw_opcode = group15[0][reg];
 			}
-			else if(inst.operand1 == "16")
+			else if(inst.operands[0] == "16")
 			{
 				if(inst.legacy_prefix & OSO)
 					inst.raw_opcode = group16[1][reg];
@@ -673,7 +646,7 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 				else//none
 					inst.raw_opcode = group16[0][reg];
 			}
-			else if(inst.operand1 == "17")
+			else if(inst.operands[0] == "17")
 			{
 				if(inst.legacy_prefix & OSO)
 					inst.raw_opcode = group17[1][reg];
@@ -692,7 +665,7 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 		else
 		{
 			uint8_t i;
-			for(i = 1; i <= inst.operand_count; i++)
+			for(i = 0; i < inst.operand_count; i++)
 			{
 				inst.get_operand_value(i);
 			}
@@ -700,7 +673,7 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 		}
 
 	}while(inst.done == false);
-	result = inst.opcode + " " + inst.operand1 + " " + inst.operand2 + " " + inst.operand3 + " " + inst.operand4;
+	result = inst.opcode + " " + inst.operands[0] + " " + inst.operands[1] + " " + inst.operands[2] + " " + inst.operands[3];
 	return result;
 }
 
