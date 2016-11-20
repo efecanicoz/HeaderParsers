@@ -1,24 +1,23 @@
 #include "instruction.h"
 
-std::vector<std::string> split(const std::string &s, char delim) {
-    std::stringstream ss(s);
-    std::string item;
-    std::vector<std::string> tokens;
-    while (getline(ss, item, delim)) {
-        tokens.push_back(item);
-    }
-    return tokens;
+Instruction::~Instruction()
+{
+	;
 }
 
 Instruction::Instruction()
 {
+	this->desc = 0;
+	this->arch = 0;
 	this->done = false;
 	this->presence = 0;
 	this->legacy_prefix = 0;
 	this->rex = 0;
 	this->sib = 0;
 	this->modrm = 0;
-	this->arch = 0;
+	this->regSel = 0;
+	this->operand_count = 0;
+	this->length = 0;
 }
 
 Instruction::Instruction(ArrayReader *descriptor, uint8_t arch)
@@ -33,25 +32,19 @@ Instruction::Instruction(ArrayReader *descriptor, uint8_t arch)
 	this->modrm = 0;
 	this->regSel = 0;
 	this->operand_count = 0;
+	this->length = 0;
+
 }
 
-Instruction::~Instruction()
-{
-	;
-}
-
-std::string Instruction::get_operand(uint8_t index)
-{
-	if(index == 1)
-		return this->operand1;
-	else if(index == 2)
-		return this->operand2;
-	else if(index == 3)
-		return this->operand3;
-	else if(index == 4)
-		return this->operand4;
-	else
-		return "";
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::stringstream ss(s);
+    std::string item;
+    std::vector<std::string> tokens;
+    while (getline(ss, item, delim))
+    {
+        tokens.push_back(item);
+    }
+    return tokens;
 }
 
 void Instruction::parse_opcode()
