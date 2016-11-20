@@ -211,3 +211,8 @@ void Elf64::disassemble(std::vector<std::pair<uint64_t, std::string>> &container
 	machine_to_opcode(container, machineCode,start_address,target_architecture);
 	return;
 }
+
+void Elf64::readSymbolTable(uint8_t index)
+{
+	/*TODO: fill here*/;
+}

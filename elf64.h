@@ -33,7 +33,6 @@ class Elf64SH
         ~Elf64SH();
 };
 
-
 class Elf64 : public ExecutableFile
 {
     public:
@@ -65,12 +64,24 @@ class Elf64 : public ExecutableFile
         void readIdent();
         void readSectionHeader(uint64_t, uint64_t);
         void readSectionHeaders();
+        void readSymbolTable(uint8_t);
+
         std::vector<std::string> getSectionNames();
         std::vector<uint8_t> getSectionContent(std::string);
         uint32_t getSection(std::string);
 		uint64_t getSectionAddress(std::string);
 		void disassemble(std::vector<std::pair<uint64_t, std::string>> &);
 
+    private:
+		struct Elf64_Sym
+		{
+		   uint32_t      st_name;
+		   uint8_t st_info;
+		   uint8_t st_other;
+		   uint16_t      st_shndx;
+		   uint64_t    st_value;
+		   uint64_t      st_size;
+		};
 };
 
 #endif

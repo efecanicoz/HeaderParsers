@@ -64,11 +64,24 @@ class Elf32 : public ExecutableFile
         void readIdent();
         void readSectionHeader(uint32_t, uint32_t);
         void readSectionHeaders();
+        void readSymbolTable(uint8_t);
+
         std::vector<uint8_t> getSectionContent(std::string);
 		std::vector<std::string> getSectionNames();
         uint32_t getSection(std::string);
         uint32_t getSectionAddress(std::string);
 		void disassemble(std::vector<std::pair<uint64_t, std::string>> &);
+
+    private:
+		struct Elf32Sym
+		{
+		   uint32_t      st_name;
+		   uint32_t    st_value;
+		   uint32_t      st_size;
+		   uint8_t  st_info;
+		   uint8_t st_other;
+		   uint16_t      st_shndx;
+		};
 };
 
 #endif
