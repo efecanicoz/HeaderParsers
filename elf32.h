@@ -36,6 +36,17 @@ class Elf32SH
 
 class Elf32 : public ExecutableFile
 {
+	private:
+		struct Elf32_sym
+		{
+		   uint32_t     st_name;
+		   uint32_t   	st_value;
+		   uint32_t     st_size;
+		   uint8_t 		st_info;
+		   uint8_t 		st_other;
+		   uint16_t     st_shndx;
+		};
+
     public:
         struct e_ident id;
         std::ifstream fd;
@@ -54,6 +65,7 @@ class Elf32 : public ExecutableFile
         uint16_t e_shstrndx;
         uint32_t strtab;
         std::vector<Elf32SH> sHeaders;
+        std::vector<Elf32_sym> symbolTable;
         void read(uint8_t*,uint8_t*,uint8_t);
         void read(uint16_t*,uint8_t*,uint8_t);
         void read(uint32_t*,uint8_t*,uint8_t);
@@ -72,16 +84,7 @@ class Elf32 : public ExecutableFile
         uint32_t getSectionAddress(std::string);
 		void disassemble(std::vector<std::pair<uint64_t, std::string>> &);
 
-    private:
-		struct Elf32Sym
-		{
-		   uint32_t      st_name;
-		   uint32_t    st_value;
-		   uint32_t      st_size;
-		   uint8_t  st_info;
-		   uint8_t st_other;
-		   uint16_t      st_shndx;
-		};
+
 };
 
 #endif

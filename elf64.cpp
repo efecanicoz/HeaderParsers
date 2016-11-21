@@ -98,7 +98,7 @@ void Elf64::readSectionHeader(uint64_t offset, uint64_t strtab)
     char c;
     Elf64SH header;
 
-    this->fd.seekg(offset,std::ios::beg);
+    this->fd.seekg(offset,fd.beg);
     this->fd.read((char *)buffer, 64);
     readLittleEndian(&(header.sh_name), buffer, 0);
     readLittleEndian(&(header.sh_type), buffer, 4);
@@ -113,7 +113,7 @@ void Elf64::readSectionHeader(uint64_t offset, uint64_t strtab)
     
     header.name = "";
     //reading name
-    this->fd.seekg(strtab+header.sh_name,std::ios::beg);
+    this->fd.seekg(strtab+header.sh_name,fd.beg);
     do
     {
         this->fd.read(&c,1);
@@ -121,10 +121,19 @@ void Elf64::readSectionHeader(uint64_t offset, uint64_t strtab)
 			header.name += c;
     }while(c != '\0');
 
-    unsigned int i;
-    this->fd.seekg(header.sh_offset,std::ios::beg);
-    header.content.resize(header.sh_size);
-    this->fd.read((char *)&header.content[0], header.sh_size);
+    /*If type is symtab or dynsym*/
+    if(header.sh_type == 2 || header.sh_type == 11)
+    {
+    	readSymbolTable(header);
+    }
+
+    /*If type of section is SHT_NOBITS then it has no data information on file*/
+    if(header.sh_type != 8)
+    {
+    	this->fd.seekg(header.sh_offset,fd.beg);
+		header.content.resize(header.sh_size);
+		this->fd.read((char *)&header.content[0], header.sh_size);
+    }
     this->sHeaders.push_back(header);
 }
 
@@ -143,7 +152,7 @@ void Elf64::readSectionHeaders()
         offset += this->e_shentsize;
     }
     //strtab'dan sonra yazan 8 baytlık değeri fonksiyonlara gönderecen. 
-
+    return;
 }
 
 std::vector<std::string> Elf64::getSectionNames()
@@ -212,7 +221,34 @@ void Elf64::disassemble(std::vector<std::pair<uint64_t, std::string>> &container
 	return;
 }
 
-void Elf64::readSymbolTable(uint8_t index)
+void Elf64::readSymbolTable(Elf64SH &section)
 {
-	/*TODO: fill here*/;
+	/*TODO: test here*/;
+	uint8_t buffer[24];
+	uint64_t counter;
+
+	if(section.sh_entsize != 24)
+	{
+		printf("Something seems wrong, trying to read wrong sized symbol table.");
+		/*ERROR*/
+	}
+
+    this->fd.seekg(section.sh_offset,std::ios::beg);
+    for(counter = 0; counter < section.sh_size; counter += 24)
+    {
+    	struct Elf64_sym symHeader;
+
+    	this->fd.read((char *)&buffer,24);
+        readLittleEndian(&(symHeader.st_name), buffer, 0);
+        readLittleEndian(&(symHeader.st_info), buffer, 4);
+        readLittleEndian(&(symHeader.st_other), buffer, 5);
+        readLittleEndian(&(symHeader.st_shndx), buffer, 6);
+        readLittleEndian(&(symHeader.st_value), buffer, 8);
+        readLittleEndian(&(symHeader.st_size), buffer, 16);
+
+        if(section.sh_type == 2)
+        	this->staticSymbolTable.push_back(symHeader);
+        else if(section.sh_type == 11)
+        	this->dynamicSymbolTable.push_back(symHeader);
+    }
 }

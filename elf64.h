@@ -35,6 +35,17 @@ class Elf64SH
 
 class Elf64 : public ExecutableFile
 {
+	private:
+		struct Elf64_sym
+		{
+		   uint32_t     st_name;
+		   uint8_t 		st_info;
+		   uint8_t 		st_other;
+		   uint16_t     st_shndx;
+		   uint64_t    	st_value;
+		   uint64_t     st_size;
+		};
+
     public:
         struct e_ident id;
         std::ifstream fd;
@@ -53,6 +64,9 @@ class Elf64 : public ExecutableFile
         uint16_t e_shstrndx;
         uint64_t strtab;
         std::vector<Elf64SH> sHeaders;
+        std::vector<struct Elf64_sym> staticSymbolTable;
+        std::vector<struct Elf64_sym> dynamicSymbolTable;
+
         void read(uint8_t*,uint8_t*,uint8_t);
         void read(uint16_t*,uint8_t*,uint8_t);
         void read(uint32_t*,uint8_t*,uint8_t);
@@ -64,7 +78,7 @@ class Elf64 : public ExecutableFile
         void readIdent();
         void readSectionHeader(uint64_t, uint64_t);
         void readSectionHeaders();
-        void readSymbolTable(uint8_t);
+        void readSymbolTable(Elf64SH &);
 
         std::vector<std::string> getSectionNames();
         std::vector<uint8_t> getSectionContent(std::string);
@@ -72,16 +86,7 @@ class Elf64 : public ExecutableFile
 		uint64_t getSectionAddress(std::string);
 		void disassemble(std::vector<std::pair<uint64_t, std::string>> &);
 
-    private:
-		struct Elf64_Sym
-		{
-		   uint32_t      st_name;
-		   uint8_t st_info;
-		   uint8_t st_other;
-		   uint16_t      st_shndx;
-		   uint64_t    st_value;
-		   uint64_t      st_size;
-		};
+
 };
 
 #endif
