@@ -139,19 +139,46 @@ void Elf64::readSectionHeader(uint64_t offset, uint64_t strtab)
 
 void Elf64::readSectionHeaders()
 {
+	char c;
     uint8_t buf[8];
-    uint16_t i;
+	uint64_t i, index;
     uint64_t offset = this->e_shoff;
-    uint64_t strtab = (this->e_shstrndx*this->e_shentsize) + this->e_shoff + 24; 
-    this->fd.seekg(strtab,std::ios::beg);
+    uint64_t shstrtab = (this->e_shstrndx * this->e_shentsize) + this->e_shoff + 24;
+    this->fd.seekg(shstrtab,std::ios::beg);
     this->fd.read((char *)buf,8);
-    readLittleEndian(&strtab,buf,0);
+    readLittleEndian(&shstrtab,buf,0);
     for(i = 0; i < this->e_shnum; i++)
     {
-        readSectionHeader(offset,strtab);
+        readSectionHeader(offset,shstrtab);
         offset += this->e_shentsize;
     }
-    //strtab'dan sonra yazan 8 baytlık değeri fonksiyonlara gönderecen. 
+
+    std::vector<uint8_t> &dynstr = this->sHeaders[getSection(".dynstr")].content;
+    std::vector<uint8_t> &strtab = this->sHeaders[getSection(".strtab")].content;
+    /*read the names of symbols*/
+    for(i = 0; i < this->dynamicSymbolTable.size(); i++)
+    {
+    	std::string &name = this->dynamicSymbolTable[i].name;
+    	index = this->dynamicSymbolTable[i].st_name;
+    	do
+		{
+			c = dynstr[index++];
+			if(c != '\0')
+				name += c;
+		}while(c != '\0');
+    }
+
+    for(i = 0; i < this->staticSymbolTable.size(); i++)
+	{
+		std::string &name = this->staticSymbolTable[i].name;
+		index = this->staticSymbolTable[i].st_name;
+		do
+		{
+			c = strtab[index++];
+			if(c != '\0')
+				name += c;
+		}while(c != '\0');
+	}
     return;
 }
 

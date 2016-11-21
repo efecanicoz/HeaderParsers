@@ -119,28 +119,65 @@ void Elf32::readSectionHeader(uint32_t offset, uint32_t strtab)
 			header.name += c;
     }while(c != '\0');
 
-    unsigned int i;
-    this->fd.seekg(header.sh_offset,std::ios::beg);
-    header.content.resize(header.sh_size);
-    this->fd.read((char *)&header.content[0], header.sh_size);
+    if(header.sh_type == 2 || header.sh_type == 11)
+	{
+		readSymbolTable(header);
+	}
+
+	/*If type of section is SHT_NOBITS then it has no data information on file*/
+	if(header.sh_type != 8)
+	{
+		this->fd.seekg(header.sh_offset,fd.beg);
+		header.content.resize(header.sh_size);
+		this->fd.read((char *)&header.content[0], header.sh_size);
+	}
     this->sHeaders.push_back(header);
 }
 
 void Elf32::readSectionHeaders()
 {
+	char c;
     uint8_t buf[4];
     uint16_t i;
+    uint32_t index;
     uint64_t offset = this->e_shoff;
-    uint64_t strtab = (this->e_shstrndx*this->e_shentsize) + this->e_shoff + 16; 
-    this->fd.seekg(strtab,std::ios::beg);
+    uint64_t shstrtab = (this->e_shstrndx*this->e_shentsize) + this->e_shoff + 16;
+    this->fd.seekg(shstrtab,std::ios::beg);
     this->fd.read((char *)buf,4);
-    readLittleEndian(&strtab,buf,0);
+    readLittleEndian(&shstrtab,buf,0);
     for(i = 0; i < this->e_shnum; i++)
     {
-        readSectionHeader(offset,strtab);
+        readSectionHeader(offset,shstrtab);
         offset += this->e_shentsize;
     }
-    //strtab'dan sonra yazan 8 baytlık değeri fonksiyonlara gönderecen. 
+
+    std::vector<uint8_t> &dynstr = this->sHeaders[getSection(".dynstr")].content;
+	std::vector<uint8_t> &strtab = this->sHeaders[getSection(".strtab")].content;
+	/*read the names of symbols*/
+	for(i = 0; i < this->dynamicSymbolTable.size(); i++)
+	{
+		std::string &name = this->dynamicSymbolTable[i].name;
+		index = this->dynamicSymbolTable[i].st_name;
+		do
+		{
+			c = dynstr[index++];
+			if(c != '\0')
+				name += c;
+		}while(c != '\0');
+	}
+
+	for(i = 0; i < this->staticSymbolTable.size(); i++)
+	{
+		std::string &name = this->staticSymbolTable[i].name;
+		index = this->staticSymbolTable[i].st_name;
+		do
+		{
+			c = strtab[index++];
+			if(c != '\0')
+				name += c;
+		}while(c != '\0');
+	}
+	return;
 
 }
 
@@ -207,7 +244,34 @@ void Elf32::disassemble(std::vector<std::pair<uint64_t, std::string>> &container
 	return;
 }
 
-void Elf32::readSymbolTable(uint8_t index)
+void Elf32::readSymbolTable(Elf32SH &section)
 {
-	/*TODO: fill here*/;
+	/*TODO: test here*/;
+	uint8_t buffer[16];
+	uint64_t counter;
+
+	if(section.sh_entsize != 16)
+	{
+		printf("Something seems wrong, trying to read wrong sized symbol table.");
+		/*ERROR*/
+	}
+
+	this->fd.seekg(section.sh_offset,std::ios::beg);
+	for(counter = 0; counter < section.sh_size; counter += 16)
+	{
+		struct Elf32_sym symHeader;
+
+		this->fd.read((char *)&buffer,16);
+		readLittleEndian(&(symHeader.st_name), buffer, 0);
+		readLittleEndian(&(symHeader.st_info), buffer, 4);
+		readLittleEndian(&(symHeader.st_other), buffer, 5);
+		readLittleEndian(&(symHeader.st_shndx), buffer, 6);
+		readLittleEndian(&(symHeader.st_value), buffer, 8);
+		readLittleEndian(&(symHeader.st_size), buffer, 12);
+
+		if(section.sh_type == 2)
+			this->staticSymbolTable.push_back(symHeader);
+		else if(section.sh_type == 11)
+			this->dynamicSymbolTable.push_back(symHeader);
+	}
 }

@@ -39,12 +39,13 @@ class Elf32 : public ExecutableFile
 	private:
 		struct Elf32_sym
 		{
-		   uint32_t     st_name;
-		   uint32_t   	st_value;
-		   uint32_t     st_size;
-		   uint8_t 		st_info;
-		   uint8_t 		st_other;
-		   uint16_t     st_shndx;
+			std::string name;
+			uint32_t    st_name;
+			uint32_t   	st_value;
+			uint32_t    st_size;
+			uint8_t 	st_info;
+			uint8_t 	st_other;
+			uint16_t    st_shndx;
 		};
 
     public:
@@ -65,7 +66,9 @@ class Elf32 : public ExecutableFile
         uint16_t e_shstrndx;
         uint32_t strtab;
         std::vector<Elf32SH> sHeaders;
-        std::vector<Elf32_sym> symbolTable;
+        std::vector<struct Elf32_sym> staticSymbolTable;
+        std::vector<struct Elf32_sym> dynamicSymbolTable;
+
         void read(uint8_t*,uint8_t*,uint8_t);
         void read(uint16_t*,uint8_t*,uint8_t);
         void read(uint32_t*,uint8_t*,uint8_t);
@@ -76,7 +79,7 @@ class Elf32 : public ExecutableFile
         void readIdent();
         void readSectionHeader(uint32_t, uint32_t);
         void readSectionHeaders();
-        void readSymbolTable(uint8_t);
+        void readSymbolTable(Elf32SH &);
 
         std::vector<uint8_t> getSectionContent(std::string);
 		std::vector<std::string> getSectionNames();

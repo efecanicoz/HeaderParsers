@@ -9,7 +9,6 @@ ExecutableFile* readElf32(std::string fd)
     bucket->readIdent();
     bucket->readHeader();
     bucket->readSectionHeaders();
-    std::vector<std::string> secNames = bucket->getSectionNames();
     return bucket;
 }
 
@@ -19,13 +18,7 @@ ExecutableFile* readElf64(std::string fd)
     bucket->readIdent();
     bucket->readHeader();
     bucket->readSectionHeaders();
-    std::vector<std::string> secNames = bucket->getSectionNames();
 
-    /*
-    result = bucket.getSection(neym);
-
-    machine_to_opcode(result.content, result.sh_addr);
-    */
     return bucket;
 }
 

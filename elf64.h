@@ -38,12 +38,13 @@ class Elf64 : public ExecutableFile
 	private:
 		struct Elf64_sym
 		{
-		   uint32_t     st_name;
-		   uint8_t 		st_info;
-		   uint8_t 		st_other;
-		   uint16_t     st_shndx;
-		   uint64_t    	st_value;
-		   uint64_t     st_size;
+			std::string name;
+			uint32_t    st_name;
+			uint8_t 	st_info;
+			uint8_t 	st_other;
+			uint16_t    st_shndx;
+			uint64_t    st_value;
+			uint64_t    st_size;
 		};
 
     public:
