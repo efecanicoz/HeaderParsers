@@ -263,11 +263,11 @@ void Elf32::readSymbolTable(Elf32SH &section)
 
 		this->fd.read((char *)&buffer,16);
 		readLittleEndian(&(symHeader.st_name), buffer, 0);
-		readLittleEndian(&(symHeader.st_info), buffer, 4);
-		readLittleEndian(&(symHeader.st_other), buffer, 5);
-		readLittleEndian(&(symHeader.st_shndx), buffer, 6);
-		readLittleEndian(&(symHeader.st_value), buffer, 8);
-		readLittleEndian(&(symHeader.st_size), buffer, 12);
+		readLittleEndian(&(symHeader.st_value), buffer, 4);
+		readLittleEndian(&(symHeader.st_size), buffer, 8);
+		readLittleEndian(&(symHeader.st_info), buffer, 12);
+		readLittleEndian(&(symHeader.st_other), buffer, 13);
+		readLittleEndian(&(symHeader.st_shndx), buffer, 14);
 
 		if(section.sh_type == 2)
 			this->staticSymbolTable.push_back(symHeader);
