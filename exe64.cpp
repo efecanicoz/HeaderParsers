@@ -142,11 +142,11 @@ void Exe64::readSectionTable(){
     uint8_t k;
     for(k = 0; k < this->coff.NumberOfSections; k++){
         
-        this->buffer[i].contents.resize(this->buffer[i].SizeofRawData);
+        this->buffer[k].contents.resize(this->buffer[k].SizeofRawData);
         
         //alinan content adresine gidiliyor ve conten cekiliyor
-        this->fd.seekg(this->buffer[i].PointerToRawData, std::ios::beg);
-        this->fd.read((char *)&this->buffer[i].contents[i],this->buffer[i].SizeofRawData);
+        this->fd.seekg(this->buffer[k].PointerToRawData, std::ios::beg);
+        this->fd.read((char *)&this->buffer[k].contents[k],this->buffer[k].SizeofRawData);
     }
     
     //contentin icerigi bastiriliyor
