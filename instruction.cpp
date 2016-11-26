@@ -427,7 +427,14 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 		{
 			current_byte = descriptor.read_1byte();
 			inst.raw_opcode = opcode_map[current_byte];
+			printf("\t%x \n", current_byte);
+			if(inst.raw_opcode == "")
+			{
+				result = "Invalid";
+				return result;
+			}
 		}
+
 		inst.parse_opcode();
 
 		if(inst.opcode == "ESC")
@@ -447,6 +454,11 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 			else if(inst.operands[0] == "x87")
 			{
 				inst.raw_opcode = inst.get_x87(current_byte);
+				if(inst.raw_opcode == "")
+				{
+					result = "Invalid";
+					return result;
+				}
 				read = false;
 			}
 		}
@@ -660,6 +672,13 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 			else
 			{
 				;//error
+			}
+
+			/*Instruction is invalid and read 1 more byte than it should*/
+			if(inst.raw_opcode == "")
+			{
+				printf("Big invalid instruction");
+				return "";
 			}
 		}
 		else
