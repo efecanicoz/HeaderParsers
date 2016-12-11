@@ -14,8 +14,10 @@
 #include "EInterface.h"
 #include "instruction.h"
 
+
 class Elf64SH
 {
+
     public:
         uint32_t sh_name;
         std::string name;
@@ -86,6 +88,7 @@ class Elf64 : public ExecutableFile
         uint32_t getSection(std::string);
 		uint64_t getSectionAddress(std::string);
 		void disassemble(std::vector<std::pair<uint64_t, std::string>> &);
+		void disassembleAll(std::vector<std::pair<uint64_t, std::string>> &);
 
 
 };

@@ -51,6 +51,19 @@ uint16_t ArrayReader::read_2byte()
 	return retVal;
 }
 
+int16_t ArrayReader::read_signed_2byte()
+{
+	int16_t retVal;
+	if(this->counter + 2 > this->length)
+	{
+		this->complete = true;
+		return 0;
+	}
+	readLittleEndian((uint16_t *)&retVal, (uint8_t *)&this->array[this->counter], 0);
+	counter = counter + 2;
+	return retVal;
+}
+
 int32_t ArrayReader::read_signed_4byte()
 {
 	int32_t retVal;
@@ -90,6 +103,19 @@ uint64_t ArrayReader::read_8byte()
 	return retVal;
 }
 
+int64_t ArrayReader::read_signed_8byte()
+{
+	int64_t retVal;
+	if(this->counter + 8 > this->length)
+	{
+		this->complete = true;
+		return 0;
+	}
+	readLittleEndian((uint64_t *)&retVal, (uint8_t *)&this->array[this->counter], 0);
+	counter = counter + 8;
+	return retVal;
+}
+
 uint64_t ArrayReader::get_real_offset()
 {
 	return this->counter + this->start_offset;
@@ -103,4 +129,9 @@ uint64_t ArrayReader::get_index()
 bool ArrayReader::is_complete()
 {
 	return this->complete;
+}
+
+bool ArrayReader::within_array(uint64_t index)
+{
+	return index > 0 && index < this->length;
 }

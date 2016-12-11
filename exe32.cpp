@@ -110,6 +110,22 @@ void Exe32::readCoffHeader(){
     readLittleEndian(&this->coff.SizeOfOptionalHeader, buffer, 16);
     readLittleEndian(&this->coff.Characteristics, buffer, 18);
 
+    if(this->coff.SizeOfOptionalHeader != 0)/*If this is an image file*/
+    {
+    	uint8_t coff_buffer[28];
+    	this->fd.read((char *)buffer, 28);
+
+    	readLittleEndian(&this->coff_fields.magic, buffer, 0);
+    	readLittleEndian(&this->coff_fields.majorLinkerVersion,buffer, 2);
+    	readLittleEndian(&this->coff_fields.minorLinkerVersion,buffer, 3);
+    	readLittleEndian(&this->coff_fields.sizeOfCode,buffer, 4);
+    	readLittleEndian(&this->coff_fields.sizeOfInitializedData,buffer, 8);
+    	readLittleEndian(&this->coff_fields.sizeOfUninitializedData,buffer, 12);
+    	readLittleEndian(&this->coff_fields.addressOfEntryPoint,buffer, 16);
+    	readLittleEndian(&this->coff_fields.baseOfCode,buffer, 20);
+    	readLittleEndian(&this->coff_fields.baseOfData,buffer, 24);
+    }
+
     printf("coff machine: %x\n", this->coff.Machine);
     printf("coff size of optional header: %u\n", this->coff.SizeOfOptionalHeader);
     
@@ -163,12 +179,14 @@ void Exe32::readSectionTable(){
 void Exe32::disassemble(std::vector<std::pair<uint64_t, std::string>> &container)
 {
 	uint32_t index;
-	uint64_t start_address;
+	uint32_t start_address;
+	uint32_t deneme;
 	uint8_t target_architecture = 1;
 
 	index = this->getSection(".text");
 	start_address = this->buffer[index].PointerToRawData;
+	deneme = this->coff_fields.addressOfEntryPoint - this->coff_fields.baseOfCode;
 	std::vector<uint8_t> &machineCode = this->buffer[index].contents;
-	machine_to_opcode(container, machineCode,start_address,target_architecture);
+	recursive_disassemble(machineCode,start_address ,target_architecture, deneme);
 	return;
 }

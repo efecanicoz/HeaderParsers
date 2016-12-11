@@ -231,18 +231,22 @@ uint32_t Elf32::getSectionAddress(std::string needle)
     }
     return 0;
 }
+
 void Elf32::disassemble(std::vector<std::pair<uint64_t, std::string>> &container)
 {
-	uint32_t index;
-	uint64_t start_address;
-	uint8_t target_architecture = 1;
+	uint8_t i;
 
-	index = this->getSection(".text");
-	start_address = this->sHeaders[index].sh_addr;
-	std::vector<uint8_t> &machineCode = this->sHeaders[index].content;
-	machine_to_opcode(container, machineCode,start_address,target_architecture);
+	for(i = 0; i < this->sHeaders.size(); i++)
+	{
+		if(this->sHeaders[i].sh_flags & 4U)
+		{
+			container.push_back(std::make_pair(0xcafebabeUL, this->sHeaders[i].name));
+			machine_to_opcode(container, this->sHeaders[i].content, this->sHeaders[i].sh_addr,1);
+		}
+	}
 	return;
 }
+
 
 void Elf32::readSymbolTable(Elf32SH &section)
 {

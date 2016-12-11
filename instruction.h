@@ -4,10 +4,12 @@
 #include <string>
 #include <sstream>
 #include <utility>
+#include <map>
 #ifndef ARRAYREADER_H
 	#include "arrayReader.h"
 #endif
 #include "opcode.h"
+#include "block.h"
 
 enum legacy_prefixes{OSO=1,ASO=2,CS=4,DS=8,ES=16,FS=32,GS=64,SS=128,LOCK=256,REPE=512,REPNE=1024};
 enum presence{REX=1, VEX=2, XOP=4, ModRM=8, SIB=16};
@@ -25,6 +27,7 @@ enum registers{GPR=1,Control=2,Debug=4,YMM=8,XMM=16,MMX=32,Segment=64};
 #define REX_R(rex) ((rex & 0x4) >> 2)
 #define REX_X(rex) ((rex & 0x2) >> 1)
 #define REX_B(rex) (rex & 0x1)
+
 
 class Instruction
 {
@@ -56,15 +59,16 @@ class Instruction
 
 std::string read_instruction(ArrayReader &);
 void machine_to_opcode(std::vector<std::pair<uint64_t, std::string>> &, std::vector<uint8_t> &, uint64_t , uint8_t);
+/*ortalık çok karıştı*/
+void machine_to_opcode2(std::map<uint64_t,Block> &, ArrayReader &, uint8_t , uint64_t );
+std::map<uint64_t, Block> recursive_disassemble(std::vector<uint8_t> &, uint64_t, uint8_t, uint64_t);
+
+
 
 #ifndef READER
     #include "reader.h"
 #endif
-/*
-extern static const std::string primary_opcode_map32[];
-extern static const std::string primary_opcode_map64[];
-extern static const std::string secondary_opcode_map_none;
-extern static const std::string secondary_opcode_map_66;
-extern static const std::string secondary_opcode_map_f2;
-extern static const std::string secondary_opcode_map_f3;*/
+
+
+
 #endif

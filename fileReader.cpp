@@ -75,7 +75,7 @@ ExecutableFile* readFile(const std::string path)
 
 		fd.read((char *)&machine,2);
 		printf("Machine:: %u\n", machine);
-
+		fd.seekg(0,fd.beg);
 		if(machine == 332)
 		{
 			return readExe32(path);

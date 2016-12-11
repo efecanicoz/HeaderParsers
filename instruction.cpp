@@ -172,9 +172,27 @@ void Instruction::get_operand_value(uint8_t i)
 	if(imm == true)
 	{
 		if(length == 1)
-			operand = std::to_string(desc->read_1byte());
+		{
+			if(sign == true)
+			{
+				operand = std::to_string((int32_t)desc->read_signed_1byte());
+			}
+			else
+			{
+				operand = std::to_string((uint32_t)desc->read_1byte());
+			}
+		}
 		else if(this->legacy_prefix & OSO)
-			operand = std::to_string((uint16_t)desc->read_2byte());
+		{
+			if(sign == true)
+			{
+				operand = std::to_string((int32_t)desc->read_signed_2byte());
+			}
+			else
+			{
+				operand = std::to_string((uint32_t)desc->read_2byte());
+			}
+		}
 		else if(length == 4)
 		{
 			if(sign == true)
@@ -187,7 +205,16 @@ void Instruction::get_operand_value(uint8_t i)
 			}
 		}
 		else if(length == 8)
-			operand = std::to_string(desc->read_8byte());
+		{
+			if(sign == true)
+			{
+				operand = std::to_string((int32_t)desc->read_signed_8byte());
+			}
+			else
+			{
+				operand = std::to_string((uint32_t)desc->read_8byte());
+			}
+		}
 	}
 	else if(reg == true)
 	{
@@ -274,10 +301,11 @@ void Instruction::get_operand_value(uint8_t i)
 			}
 			else if(mod == 0 && rm == 0b00000101)
 			{
-				/*TODO: 64bit ise rip + disp32
-				 * diğer modlarda + disp32*/
 				disp = this->desc->read_signed_4byte();
-				operand = result + "+" + std::to_string(disp);
+				if(this->arch == 0)/*64-bit*/
+					operand = result + "+" + std::to_string(disp);
+				else if(this->arch == 1)
+					operand = std::to_string(disp);
 			}
 			else
 			{
@@ -427,7 +455,6 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 		{
 			current_byte = descriptor.read_1byte();
 			inst.raw_opcode = opcode_map[current_byte];
-			printf("\t%x \n", current_byte);
 			if(inst.raw_opcode == "")
 			{
 				result = "Invalid";
@@ -678,7 +705,7 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 			if(inst.raw_opcode == "")
 			{
 				printf("Big invalid instruction");
-				return "";
+				//return "";
 			}
 		}
 		else
@@ -692,7 +719,12 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 		}
 
 	}while(inst.done == false);
-	result = inst.opcode + " " + inst.operands[0] + " " + inst.operands[1] + " " + inst.operands[2] + " " + inst.operands[3];
+
+	result = inst.opcode;
+	for(uint8_t i = 0; i < inst.operand_count; i++)
+	{
+		result += " " + inst.operands[i];
+	}
 	return result;
 }
 
@@ -707,8 +739,92 @@ void machine_to_opcode(std::vector<std::pair<uint64_t, std::string>> &container,
 		ip = desc.get_real_offset();
 		inst = read_instruction(desc, arch);
 
-		printf("%llx\t: %s\n",ip,inst.c_str());
+		/*printf("%llx\t: %s\n",ip,inst.c_str());*/
 		container.push_back(std::make_pair(ip, inst));
 	}
 	return;
 }
+
+std::map<uint64_t, Block> recursive_disassemble(std::vector<uint8_t> &source, uint64_t start_address, uint8_t arch, uint64_t offset)
+{
+	std::map<uint64_t, Block> block_table = std::map<uint64_t, Block>();/*todo: free this table somewhere else*/
+	ArrayReader desc = ArrayReader(source, start_address);
+	machine_to_opcode2(block_table, desc, arch, offset);
+	return block_table;
+}
+
+void machine_to_opcode2(std::map<uint64_t, Block> &table, ArrayReader &desc, uint8_t arch, uint64_t offset)
+{
+	std::vector<std::pair<uint64_t, std::string>> container = std::vector<std::pair<uint64_t, std::string>>();
+	uint64_t ip, jump1 = 0, jump2 = 0;
+	std::string inst;
+	std::vector<std::string> splitted;
+	Block current_block;
+
+	current_block.start_address = offset;
+	desc.counter = offset;
+
+	while(!desc.is_complete())
+	{
+		ip = desc.get_real_offset();
+		inst = read_instruction(desc, arch);
+		container.push_back(std::make_pair(ip, inst));
+
+		splitted = split(inst, ' ');
+		if(splitted[0].compare("CALL") == 0)
+		{
+			//if(splitted[1].find("[") != std::string::npos)
+			if(splitted[1][0] == '[' || (splitted[1][0] < '0' || splitted[1][0] > '9' || splitted[1][0] == '-'))
+			{
+				/*This means far call ?*/
+				/*Works on only 32 bit*/
+				continue;
+				/*splitted[1] = splitted[1].substr(1, splitted[1].length() - 2);*/
+			}
+			current_block.jump1 = desc.counter + std::stoi(splitted[1],nullptr);
+			current_block.jump2 = desc.counter;
+			break;
+		}
+		else if(splitted[0].compare("JMP") == 0)
+		{
+			if(splitted[1][0] == '[' || (splitted[1][0] < '0' || splitted[1][0] > '9' || splitted[1][0] == '-'))
+			{
+				/*This means far call ?*/
+				/*Works on only 32 bit*/
+				continue;
+				/*splitted[1] = splitted[1].substr(1, splitted[1].length() - 2);*/
+			}
+			current_block.jump1 = desc.counter + std::stoi(splitted[1],nullptr);
+			break;
+		}
+		else if(splitted[0].find("J") == 0)
+		{
+			/*conditional jump*/
+			current_block.jump1 = desc.counter + std::stoi(splitted[1],nullptr);
+			current_block.jump2 = desc.counter;
+			break;
+		}
+		else if(splitted[0].compare("RET") == 0)
+		{
+			break;
+		}
+	}
+	/*add this block to the global table*/
+	current_block.content = container;
+	table[current_block.start_address] = current_block;
+	if(current_block.jump1 != 0 && desc.within_array(current_block.jump1) && table.count(current_block.jump1) == 0)
+	{
+		printf("here: %llx jumping to(1): %llx\n", (ip+0x401000-1024), (current_block.jump1+0x401000));
+		machine_to_opcode2(table, desc, arch, current_block.jump1);
+
+	}
+	if(current_block.jump2 != 0 && desc.within_array(current_block.jump2) && table.count(current_block.jump2) == 0)
+	{
+		printf("here: %llx jumping to(2): %llx\n", (ip+0x401000-1024), (current_block.jump2+0x401000));
+		machine_to_opcode2(table, desc, arch, current_block.jump2);
+
+	}
+	return;
+}
+
+

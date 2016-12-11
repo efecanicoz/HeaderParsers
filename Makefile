@@ -1,4 +1,4 @@
-OBJECTS = arrayReader.o elf32.o elf64.o exe32.o exe64.o fileReader.o instruction.o main.o reader.o 
+OBJECTS = arrayReader.o elf32.o elf64.o exe32.o exe64.o fileReader.o instruction.o main.o reader.o block.o
 OBJDIR = obj
 CXXFLAGS = -std=c++11 -g
 OBJS = $(patsubst %, $(OBJDIR)/%, $(OBJECTS))

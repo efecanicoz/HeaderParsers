@@ -12,10 +12,10 @@
 #include "instruction.h"
 #include "EInterface.h"
 
-//data uzunluklarını düzenle 64bit için geçerliler şu an..
 
 class Elf32SH
 {
+
     public:
         uint32_t sh_name;
         std::string   name;
@@ -80,6 +80,7 @@ class Elf32 : public ExecutableFile
         void readSectionHeader(uint32_t, uint32_t);
         void readSectionHeaders();
         void readSymbolTable(Elf32SH &);
+        void disassembleAll(std::vector<std::pair<uint64_t, std::string>> &);
 
         std::vector<uint8_t> getSectionContent(std::string);
 		std::vector<std::string> getSectionNames();
