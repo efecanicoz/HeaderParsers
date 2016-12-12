@@ -100,30 +100,30 @@ void Exe32::readPESignature(){
 
 void Exe32::readCoffHeader(){
     this->fd.seekg(this->id.exe_pe_address + 4, std::ios::beg);
-    uint8_t buffer[20];
-    this->fd.read((char *)buffer, 20);
-    readLittleEndian(&this->coff.Machine, buffer, 0);
-    readLittleEndian(&this->coff.NumberOfSections, buffer, 2);
-    readLittleEndian(&this->coff.TimeDateStamp, buffer, 4);
-    readLittleEndian(&this->coff.PointerToSymbolTable, buffer, 8);
-    readLittleEndian(&this->coff.NumberOfSymbols, buffer, 12);
-    readLittleEndian(&this->coff.SizeOfOptionalHeader, buffer, 16);
-    readLittleEndian(&this->coff.Characteristics, buffer, 18);
+    uint8_t file_buffer[20];
+    this->fd.read((char *)file_buffer, 20);
+    readLittleEndian(&this->coff.Machine, file_buffer, 0);
+    readLittleEndian(&this->coff.NumberOfSections, file_buffer, 2);
+    readLittleEndian(&this->coff.TimeDateStamp, file_buffer, 4);
+    readLittleEndian(&this->coff.PointerToSymbolTable, file_buffer, 8);
+    readLittleEndian(&this->coff.NumberOfSymbols, file_buffer, 12);
+    readLittleEndian(&this->coff.SizeOfOptionalHeader, file_buffer, 16);
+    readLittleEndian(&this->coff.Characteristics, file_buffer, 18);
 
     if(this->coff.SizeOfOptionalHeader != 0)/*If this is an image file*/
     {
     	uint8_t coff_buffer[28];
-    	this->fd.read((char *)buffer, 28);
+    	this->fd.read((char *)coff_buffer, 28);
 
-    	readLittleEndian(&this->coff_fields.magic, buffer, 0);
-    	readLittleEndian(&this->coff_fields.majorLinkerVersion,buffer, 2);
-    	readLittleEndian(&this->coff_fields.minorLinkerVersion,buffer, 3);
-    	readLittleEndian(&this->coff_fields.sizeOfCode,buffer, 4);
-    	readLittleEndian(&this->coff_fields.sizeOfInitializedData,buffer, 8);
-    	readLittleEndian(&this->coff_fields.sizeOfUninitializedData,buffer, 12);
-    	readLittleEndian(&this->coff_fields.addressOfEntryPoint,buffer, 16);
-    	readLittleEndian(&this->coff_fields.baseOfCode,buffer, 20);
-    	readLittleEndian(&this->coff_fields.baseOfData,buffer, 24);
+    	readLittleEndian(&this->coff_fields.magic, coff_buffer, 0);
+    	readLittleEndian(&this->coff_fields.majorLinkerVersion,coff_buffer, 2);
+    	readLittleEndian(&this->coff_fields.minorLinkerVersion,coff_buffer, 3);
+    	readLittleEndian(&this->coff_fields.sizeOfCode,coff_buffer, 4);
+    	readLittleEndian(&this->coff_fields.sizeOfInitializedData,coff_buffer, 8);
+    	readLittleEndian(&this->coff_fields.sizeOfUninitializedData,coff_buffer, 12);
+    	readLittleEndian(&this->coff_fields.addressOfEntryPoint,coff_buffer, 16);
+    	readLittleEndian(&this->coff_fields.baseOfCode,coff_buffer, 20);
+    	readLittleEndian(&this->coff_fields.baseOfData,coff_buffer, 24);
     }
 
     printf("coff machine: %x\n", this->coff.Machine);

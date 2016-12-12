@@ -47,6 +47,19 @@
 		uint16_t Characteristics;
 	};
 
+	struct exe_coff_fields
+	{
+		uint16_t magic;
+		uint8_t  majorLinkerVersion;
+		uint8_t  minorLinkerVersion;
+		uint32_t sizeOfCode;
+		uint32_t sizeOfInitializedData;
+		uint32_t sizeOfUninitializedData;
+		uint32_t addressOfEntryPoint;
+		uint32_t baseOfCode;
+		uint32_t baseOfData;
+	};
+
 	/*section Table Header*/
 	struct exe_section_table {
 		uint64_t Name;
@@ -74,6 +87,7 @@ class Exe64 : public ExecutableFile
         struct exe_ident id;
         struct exe_coff  coff;
         struct exe_section_table st;
+		struct exe_coff_fields coff_fields;
         std::vector<exe_section_table> buffer;
         std::ifstream fd;
 /*Section eklenecek*/

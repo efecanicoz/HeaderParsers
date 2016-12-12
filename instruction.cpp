@@ -153,7 +153,7 @@ void Instruction::get_operand_value(uint8_t i)
 		else
 			length = 4;//effective operand size ?
 	}
-	if(rest == "a" || rest == "c" || rest == "y" || rest == "z")
+	else if(rest == "a" || rest == "c" || rest == "y" || rest == "z")
 		length = 4;
 	else if(rest == "b" )
 		length = 1;
@@ -292,20 +292,31 @@ void Instruction::get_operand_value(uint8_t i)
 			if(mod == 1)
 			{
 				disp = this->desc->read_signed_1byte();
-				operand = result + "+" + std::to_string(disp);
+				if((int8_t)disp < 0)
+					operand = result + std::to_string((int8_t)disp);
+				else
+				operand = result + "+" + std::to_string((int8_t)disp);
 			}
 			else if(mod == 2)
 			{
 				disp = this->desc->read_signed_4byte();
-				operand = result + "+" + std::to_string(disp);
+				if((int32_t)disp < 0)
+					operand = result + std::to_string((int32_t)disp);
+				else
+				operand = result + "+" + std::to_string((int32_t)disp);
 			}
 			else if(mod == 0 && rm == 0b00000101)
 			{
 				disp = this->desc->read_signed_4byte();
 				if(this->arch == 0)/*64-bit*/
-					operand = result + "+" + std::to_string(disp);
+				{
+					if((int32_t)disp < 0)
+						operand = result + std::to_string((int32_t)disp);
+					else
+					operand = result + "+" + std::to_string((int32_t)disp);
+				}
 				else if(this->arch == 1)
-					operand = std::to_string(disp);
+					operand = std::to_string((int32_t)disp);
 			}
 			else
 			{
@@ -774,7 +785,8 @@ void machine_to_opcode2(std::map<uint64_t, Block> &table, ArrayReader &desc, uin
 		if(splitted[0].compare("CALL") == 0)
 		{
 			//if(splitted[1].find("[") != std::string::npos)
-			if(splitted[1][0] == '[' || (splitted[1][0] < '0' || splitted[1][0] > '9' || splitted[1][0] == '-'))
+			/*if operand is non numeric*/
+			if((splitted[1][0] < '0' || splitted[1][0] > '9') && splitted[1][0] != '-')
 			{
 				/*This means far call ?*/
 				/*Works on only 32 bit*/
@@ -787,7 +799,7 @@ void machine_to_opcode2(std::map<uint64_t, Block> &table, ArrayReader &desc, uin
 		}
 		else if(splitted[0].compare("JMP") == 0)
 		{
-			if(splitted[1][0] == '[' || (splitted[1][0] < '0' || splitted[1][0] > '9' || splitted[1][0] == '-'))
+			if((splitted[1][0] < '0' || splitted[1][0] > '9') && splitted[1][0] != '-')
 			{
 				/*This means far call ?*/
 				/*Works on only 32 bit*/

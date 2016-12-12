@@ -4,6 +4,7 @@ Exe64::Exe64(std::string path)
 {
     //this->st.contents = *new std::vector<uint8_t>();
     this->fd.open(path,std::ios::in|std::ios::binary);
+    this->buffer = std::vector<exe_section_table>();
 }
 
 /*sectionlar eklenecek*/
@@ -40,29 +41,30 @@ std::vector<std::string> Exe64::getSectionNames()
 	}
 	return temp;
 }
+
 void Exe64::readDosHeader()
 {
-    uint8_t buffer[33];
-    this->fd.read((char *)buffer, 33);
-    readLittleEndian(&this->id.exe_magic, buffer, 0);
-    readLittleEndian(&this->id.exe_bytes_in_last_block, buffer, 2);
-    readLittleEndian(&this->id.exe_blocks_in_file, buffer, 3);
-    readLittleEndian(&this->id.exe_num_relocs, buffer, 4);
-    readLittleEndian(&this->id.exe_header_paragraphs, buffer, 5);
-    readLittleEndian(&this->id.exe_min_extra_paragraphs, buffer, 6);
-    readLittleEndian(&this->id.exe_max_extra_paragraphs, buffer, 7);
-    readLittleEndian(&this->id.exe_ss, buffer, 8);
-    readLittleEndian(&this->id.exe_sp, buffer, 9);
-    readLittleEndian(&this->id.exe_checksum, buffer, 10);
-    readLittleEndian(&this->id.exe_ip, buffer, 11);
-    readLittleEndian(&this->id.exe_cs, buffer, 12);
-    readLittleEndian(&this->id.exe_relocpos, buffer, 13);
-    readLittleEndian(&this->id.exe_noverlay, buffer, 14);
-    readLittleEndian(this->id.exe_reserved1, buffer, 18);
-    readLittleEndian(&this->id.exe_oem_id, buffer, 19);
-    readLittleEndian(&this->id.exe_oem_info, buffer, 20);
-    readLittleEndian(this->id.exe_reserved2, buffer, 21);
-    readLittleEndian(&this->id.exe_e_lfanew, buffer, 31);
+    uint8_t file_buffer[33];
+    this->fd.read((char *)file_buffer, 33);
+    readLittleEndian(&this->id.exe_magic, file_buffer, 0);
+    readLittleEndian(&this->id.exe_bytes_in_last_block, file_buffer, 2);
+    readLittleEndian(&this->id.exe_blocks_in_file, file_buffer, 3);
+    readLittleEndian(&this->id.exe_num_relocs, file_buffer, 4);
+    readLittleEndian(&this->id.exe_header_paragraphs, file_buffer, 5);
+    readLittleEndian(&this->id.exe_min_extra_paragraphs, file_buffer, 6);
+    readLittleEndian(&this->id.exe_max_extra_paragraphs, file_buffer, 7);
+    readLittleEndian(&this->id.exe_ss, file_buffer, 8);
+    readLittleEndian(&this->id.exe_sp, file_buffer, 9);
+    readLittleEndian(&this->id.exe_checksum, file_buffer, 10);
+    readLittleEndian(&this->id.exe_ip, file_buffer, 11);
+    readLittleEndian(&this->id.exe_cs, file_buffer, 12);
+    readLittleEndian(&this->id.exe_relocpos, file_buffer, 13);
+    readLittleEndian(&this->id.exe_noverlay, file_buffer, 14);
+    readLittleEndian(this->id.exe_reserved1, file_buffer, 18);
+    readLittleEndian(&this->id.exe_oem_id, file_buffer, 19);
+    readLittleEndian(&this->id.exe_oem_info, file_buffer, 20);
+    readLittleEndian(this->id.exe_reserved2, file_buffer, 21);
+    readLittleEndian(&this->id.exe_e_lfanew, file_buffer, 31);
     printf("Signature: %x\n", this->id.exe_magic);
     printf("bytes in last block: %u\n", this->id.exe_bytes_in_last_block);
     
@@ -93,18 +95,33 @@ void Exe64::readPESignature(){
 void Exe64::readCoffHeader(){
     
     this->fd.seekg(this->id.exe_pe_address + 4, std::ios::beg);
-    uint8_t buffer[20];
-    this->fd.read((char *)buffer, 20);
-    readLittleEndian(&this->coff.Machine, buffer, 0);
-    readLittleEndian(&this->coff.NumberOfSections, buffer, 2);
-    readLittleEndian(&this->coff.TimeDateStamp, buffer, 4);
-    readLittleEndian(&this->coff.PointerToSymbolTable, buffer, 8);
-    readLittleEndian(&this->coff.NumberOfSymbols, buffer, 12);
-    readLittleEndian(&this->coff.SizeOfOptionalHeader, buffer, 16);
-    readLittleEndian(&this->coff.Characteristics, buffer, 18);
-    
-    printf("coff machine: %x\n", this->coff.Machine);
-    printf("coff size of optional header: %u\n", this->coff.SizeOfOptionalHeader);
+    uint8_t file_buffer[20];
+    this->fd.read((char *)file_buffer, 20);
+    readLittleEndian(&this->coff.Machine, file_buffer, 0);
+    readLittleEndian(&this->coff.NumberOfSections, file_buffer, 2);
+    readLittleEndian(&this->coff.TimeDateStamp, file_buffer, 4);
+    readLittleEndian(&this->coff.PointerToSymbolTable, file_buffer, 8);
+    readLittleEndian(&this->coff.NumberOfSymbols, file_buffer, 12);
+    readLittleEndian(&this->coff.SizeOfOptionalHeader, file_buffer, 16);
+    readLittleEndian(&this->coff.Characteristics, file_buffer, 18);
+    if(this->coff.SizeOfOptionalHeader != 0)/*If this is an image file*/
+	{
+		uint8_t coff_buffer[28];
+		this->fd.read((char *)coff_buffer, 28);
+
+		readLittleEndian(&this->coff_fields.magic, coff_buffer, 0);
+		readLittleEndian(&this->coff_fields.majorLinkerVersion,coff_buffer, 2);
+		readLittleEndian(&this->coff_fields.minorLinkerVersion,coff_buffer, 3);
+		readLittleEndian(&this->coff_fields.sizeOfCode,coff_buffer, 4);
+		readLittleEndian(&this->coff_fields.sizeOfInitializedData,coff_buffer, 8);
+		readLittleEndian(&this->coff_fields.sizeOfUninitializedData,coff_buffer, 12);
+		readLittleEndian(&this->coff_fields.addressOfEntryPoint,coff_buffer, 16);
+		readLittleEndian(&this->coff_fields.baseOfCode,coff_buffer, 20);
+		readLittleEndian(&this->coff_fields.baseOfData,coff_buffer, 24);
+	}
+
+	printf("coff machine: %x\n", this->coff.Machine);
+	printf("coff size of optional header: %u\n", this->coff.SizeOfOptionalHeader);
     
     return;
 }
@@ -165,12 +182,15 @@ void Exe64::disassemble(std::vector<std::pair<uint64_t, std::string>> &container
 {
 	uint32_t index;
 	uint64_t start_address;
+	uint32_t deneme;
 	uint8_t target_architecture = 0;
 
 	index = this->getSection(".text");
 	start_address = this->buffer[index].PointerToRawData;
+	deneme = this->coff_fields.addressOfEntryPoint - this->coff_fields.baseOfCode;
 	std::vector<uint8_t> &machineCode = this->buffer[index].contents;
-	machine_to_opcode(container, machineCode,start_address,target_architecture);
+	recursive_disassemble(machineCode,start_address ,target_architecture, deneme);
 	return;
+
 }
 
