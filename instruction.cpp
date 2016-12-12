@@ -758,7 +758,7 @@ void machine_to_opcode(std::vector<std::pair<uint64_t, std::string>> &container,
 
 std::map<uint64_t, Block> recursive_disassemble(std::vector<uint8_t> &source, uint64_t start_address, uint8_t arch, uint64_t offset)
 {
-	std::map<uint64_t, Block> block_table = std::map<uint64_t, Block>();/*todo: free this table somewhere else*/
+	std::map<uint64_t, Block> block_table = std::map<uint64_t, Block>();
 	ArrayReader desc = ArrayReader(source, start_address);
 	machine_to_opcode2(block_table, desc, arch, offset);
 	return block_table;
@@ -801,9 +801,9 @@ void machine_to_opcode2(std::map<uint64_t, Block> &table, ArrayReader &desc, uin
 		{
 			if((splitted[1][0] < '0' || splitted[1][0] > '9') && splitted[1][0] != '-')
 			{
-				/*This means far call ?*/
+				/*This means far call ?*//*todo: uzağa ise direk break*/
 				/*Works on only 32 bit*/
-				continue;
+				break;
 				/*splitted[1] = splitted[1].substr(1, splitted[1].length() - 2);*/
 			}
 			current_block.jump1 = desc.counter + std::stoi(splitted[1],nullptr);
@@ -826,13 +826,13 @@ void machine_to_opcode2(std::map<uint64_t, Block> &table, ArrayReader &desc, uin
 	table[current_block.start_address] = current_block;
 	if(current_block.jump1 != 0 && desc.within_array(current_block.jump1) && table.count(current_block.jump1) == 0)
 	{
-		printf("here: %llx jumping to(1): %llx\n", (ip+0x401000-1024), (current_block.jump1+0x401000));
+		printf("here: %llx jumping to(1): %llx\n", (ip+0xe015fb-1024), (current_block.jump1+0xe015fb));
 		machine_to_opcode2(table, desc, arch, current_block.jump1);
 
 	}
 	if(current_block.jump2 != 0 && desc.within_array(current_block.jump2) && table.count(current_block.jump2) == 0)
 	{
-		printf("here: %llx jumping to(2): %llx\n", (ip+0x401000-1024), (current_block.jump2+0x401000));
+		printf("here: %llx jumping to(2): %llx\n", (ip+0xe015fb-1024), (current_block.jump2+0xe015fb));
 		machine_to_opcode2(table, desc, arch, current_block.jump2);
 
 	}
