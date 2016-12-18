@@ -443,10 +443,10 @@ std::string Instruction::get_x87(uint8_t instruction_byte)
 	}
 }
 
-std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
+std::vector<std::string> read_instruction(ArrayReader& descriptor, uint8_t arch)
 {
 	const std::string *opcode_map;
-	std::string result;
+	std::vector<std::string> result = std::vector<std::string>();
 	bool read = true;
 	uint8_t current_byte;
 	Instruction inst;
@@ -458,7 +458,7 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 	else if(arch == 1)
 		opcode_map = primary_opcode_map32;
 	else
-		return "";//invalid arch
+		return result;//invalid arch
 
 	do
 	{
@@ -468,7 +468,7 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 			inst.raw_opcode = opcode_map[current_byte];
 			if(inst.raw_opcode == "")
 			{
-				result = "Invalid";
+				result.push_back("Invalid");
 				return result;
 			}
 		}
@@ -494,7 +494,7 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 				inst.raw_opcode = inst.get_x87(current_byte);
 				if(inst.raw_opcode == "")
 				{
-					result = "Invalid";
+					result.push_back("Invalid");
 					return result;
 				}
 				read = false;
@@ -715,28 +715,23 @@ std::string read_instruction(ArrayReader& descriptor, uint8_t arch)
 			/*Instruction is invalid and read 1 more byte than it should*/
 			if(inst.raw_opcode == "")
 			{
-				printf("Big invalid instruction");
+				printf("Invalid, sync lost.");
 				//return "";
 			}
 		}
 		else
 		{
 			uint8_t i;
+			result.push_back(inst.opcode);
 			for(i = 0; i < inst.operand_count; i++)
 			{
 				inst.get_operand_value(i);
+				result.push_back(inst.operands[i]);
 			}
 			inst.done = true;
 		}
 
 	}while(inst.done == false);
-
-	result = inst.opcode;
-	for(uint8_t i = 0; i < inst.operand_count; i++)
-	{
-		result += " " + inst.operands[i];
-	}
-	return result;
 }
 
 void machine_to_opcode(std::vector<std::pair<uint64_t, std::string>> &container, std::vector<uint8_t> &source,
@@ -744,14 +739,19 @@ void machine_to_opcode(std::vector<std::pair<uint64_t, std::string>> &container,
 {
 	ArrayReader desc = ArrayReader(source, start_address);
 	uint64_t ip;
-	std::string inst;
+	std::vector<std::string>inst;
+	std::string instruction = "";
 	while(!desc.is_complete())
 	{
 		ip = desc.get_real_offset();
 		inst = read_instruction(desc, arch);
+		for(std::string str : inst)
+		{
+			instruction += str + " ";
+		}
 
 		/*printf("%llx\t: %s\n",ip,inst.c_str());*/
-		container.push_back(std::make_pair(ip, inst));
+		container.push_back(std::make_pair(ip, instruction));
 	}
 	return;
 }
@@ -768,55 +768,51 @@ void machine_to_opcode2(std::map<uint64_t, Block> &table, ArrayReader &desc, uin
 {
 	std::vector<std::pair<uint64_t, std::string>> container = std::vector<std::pair<uint64_t, std::string>>();
 	uint64_t ip, jump1 = 0, jump2 = 0;
-	std::string inst;
-	std::vector<std::string> splitted;
+	std::string inst = "";
+	std::vector<std::string> instruction;
 	Block current_block;
-
 	current_block.start_address = offset;
 	desc.counter = offset;
 
+	/*Bazı bloklar birden fazla kez oluşturuluyor, akış sırasında var olup olmadığını bilmiyoruz*/
 	while(!desc.is_complete())
 	{
 		ip = desc.get_real_offset();
-		inst = read_instruction(desc, arch);
+		instruction = read_instruction(desc, arch);
+		for(std::string str : instruction)
+		{
+			inst += str + " ";
+		}
 		container.push_back(std::make_pair(ip, inst));
 
-		splitted = split(inst, ' ');
-		if(splitted[0].compare("CALL") == 0)
+		if(instruction[0].compare("CALL") == 0)
 		{
-			//if(splitted[1].find("[") != std::string::npos)
 			/*if operand is non numeric*/
-			if((splitted[1][0] < '0' || splitted[1][0] > '9') && splitted[1][0] != '-')
+			if((instruction[1][0] < '0' || instruction[1][0] > '9') && instruction[1][0] != '-')
 			{
-				/*This means far call ?*/
-				/*Works on only 32 bit*/
 				continue;
-				/*splitted[1] = splitted[1].substr(1, splitted[1].length() - 2);*/
 			}
-			current_block.jump1 = desc.counter + std::stoi(splitted[1],nullptr);
+			current_block.jump1 = desc.counter + std::stoi(instruction[1],nullptr);
 			current_block.jump2 = desc.counter;
 			break;
 		}
-		else if(splitted[0].compare("JMP") == 0)
+		else if(instruction[0].compare("JMP") == 0)
 		{
-			if((splitted[1][0] < '0' || splitted[1][0] > '9') && splitted[1][0] != '-')
+			if((instruction[1][0] < '0' || instruction[1][0] > '9') && instruction[1][0] != '-')
 			{
-				/*This means far call ?*//*todo: uzağa ise direk break*/
-				/*Works on only 32 bit*/
 				break;
-				/*splitted[1] = splitted[1].substr(1, splitted[1].length() - 2);*/
 			}
-			current_block.jump1 = desc.counter + std::stoi(splitted[1],nullptr);
+			current_block.jump1 = desc.counter + std::stoi(instruction[1],nullptr);
 			break;
 		}
-		else if(splitted[0].find("J") == 0)
+		else if(instruction[0].find("J") == 0)
 		{
 			/*conditional jump*/
-			current_block.jump1 = desc.counter + std::stoi(splitted[1],nullptr);
+			current_block.jump1 = desc.counter + std::stoi(instruction[1],nullptr);
 			current_block.jump2 = desc.counter;
 			break;
 		}
-		else if(splitted[0].compare("RET") == 0)
+		else if(instruction[0].compare("RET") == 0)
 		{
 			break;
 		}
@@ -833,7 +829,7 @@ void machine_to_opcode2(std::map<uint64_t, Block> &table, ArrayReader &desc, uin
 	if(current_block.jump2 != 0 && desc.within_array(current_block.jump2) && table.count(current_block.jump2) == 0)
 	{
 		printf("here: %llx jumping to(2): %llx\n", (ip+0xe015fb-1024), (current_block.jump2+0xe015fb));
-		machine_to_opcode2(table, desc, arch, current_block.jump2);
+		return machine_to_opcode2(table, desc, arch, current_block.jump2);
 
 	}
 	return;

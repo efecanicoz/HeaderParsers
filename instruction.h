@@ -57,9 +57,8 @@ class Instruction
 };
 
 
-std::string read_instruction(ArrayReader &);
+std::vector<std::string> read_instruction(ArrayReader &,uint8_t);
 void machine_to_opcode(std::vector<std::pair<uint64_t, std::string>> &, std::vector<uint8_t> &, uint64_t , uint8_t);
-/*ortalık çok karıştı*/
 void machine_to_opcode2(std::map<uint64_t,Block> &, ArrayReader &, uint8_t , uint64_t );
 std::map<uint64_t, Block> recursive_disassemble(std::vector<uint8_t> &, uint64_t, uint8_t, uint64_t);
 
