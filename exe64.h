@@ -102,9 +102,14 @@ class Exe64 : public ExecutableFile
         void readSectionTable();
  /*Section eklenecek*/
  
-		std::vector<uint8_t> getSectionContent(std::string);
+        std::vector<uint8_t> getHexSectionContent(std::string);
 		std::vector<std::string> getSectionNames();
 		uint8_t getSection(std::string needle);
 		void disassemble(std::vector<std::pair<uint64_t, std::string>> &);
+
+        std::string getHeaderInfo();
+        std::vector<uint8_t> getHexHeader();
+        std::string getSectionContent(std::string);
+
 };
 #endif

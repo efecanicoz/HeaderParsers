@@ -86,7 +86,9 @@ ExecutableFile* readFile(const std::string path)
 		}
     }
     else
-        printf("üzüldük");
+    {
+        /*Unknown file format*/
+    }
 
     return NULL;
 }

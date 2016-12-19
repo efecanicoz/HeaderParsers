@@ -82,11 +82,17 @@ class Elf32 : public ExecutableFile
         void readSymbolTable(Elf32SH &);
         void disassembleAll(std::vector<std::pair<uint64_t, std::string>> &);
 
-        std::vector<uint8_t> getSectionContent(std::string);
 		std::vector<std::string> getSectionNames();
         uint32_t getSection(std::string);
         uint32_t getSectionAddress(std::string);
 		void disassemble(std::vector<std::pair<uint64_t, std::string>> &);
+
+        std::string getHeaderInfo();
+        std::vector<uint8_t> getHexHeader();
+        std::vector<uint8_t> getHexSectionContent(std::string needle);
+        std::string getSectionContent(std::string);
+
+
 
 
 };

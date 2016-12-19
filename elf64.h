@@ -84,11 +84,15 @@ class Elf64 : public ExecutableFile
         void readSymbolTable(Elf64SH &);
 
         std::vector<std::string> getSectionNames();
-        std::vector<uint8_t> getSectionContent(std::string);
         uint32_t getSection(std::string);
 		uint64_t getSectionAddress(std::string);
 		void disassemble(std::vector<std::pair<uint64_t, std::string>> &);
 		void disassembleAll(std::vector<std::pair<uint64_t, std::string>> &);
+
+        std::vector<uint8_t> getHexHeader();
+        std::string getHeaderInfo();
+        std::vector<uint8_t> getHexSectionContent(std::string needle);
+        std::string getSectionContent(std::string);
 
 
 };

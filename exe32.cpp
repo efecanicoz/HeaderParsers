@@ -16,7 +16,19 @@ Exe32::Exe32(std::string path)
     this->buffer = std::vector<exe_section_table>();
 }
 
-std::vector<uint8_t> Exe32::getSectionContent(std::string needle)
+std::string Exe32::getHeaderInfo()
+{
+    /*todo: fill*/
+    return "";
+}
+
+std::string Exe32::getSectionContent(std::string needle)
+{
+    /*todo: fill*/
+    return "";
+}
+
+std::vector<uint8_t> Exe32::getHexSectionContent(std::string needle)
 {
 	uint32_t i;
 	for(i = 0; i < this->buffer.size(); i++)
@@ -24,6 +36,11 @@ std::vector<uint8_t> Exe32::getSectionContent(std::string needle)
 		if(this->buffer[i].nameStr == needle)
 			return this->buffer[i].contents;
 	}
+}
+
+std::vector<uint8_t> Exe32::getHexHeader()
+{
+    return std::vector<uint8_t>();
 }
 
 uint8_t Exe32::getSection(std::string needle)

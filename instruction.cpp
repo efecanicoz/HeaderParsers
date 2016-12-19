@@ -262,7 +262,9 @@ void Instruction::get_operand_value(uint8_t i)
 			operand = modrm_reg_map[9][regVal];
 		}
 		else
+        {
 			;//alert
+        }
 	}
 	else if(mem == true)
 	{
@@ -368,7 +370,9 @@ void Instruction::get_operand_value(uint8_t i)
 				operand = modrm_reg_map[9][memVal];
 			}
 			else
+            {
 				;//alert
+            }
 		}
 
 	}
@@ -396,13 +400,13 @@ std::string Instruction::read_SIB()
 	scale = std::to_string(1 << SIB_SCALE(this->sib));
 
 
-	if(MODRM_MOD(this->modrm) == 0 && SIB_BASE(this->sib) == 5)
+    if(MODRM_MOD(this->modrm) == 0 && base == 5)
 	{
 		baseStr = std::to_string(this->desc->read_4byte());
 	}
 	else
 	{
-		baseStr = sib_byte_map[SIB_BASE(this->sib)];
+        baseStr = sib_byte_map[base];
 	}
 
 	if(index != 0b00000100)
@@ -732,6 +736,7 @@ std::vector<std::string> read_instruction(ArrayReader& descriptor, uint8_t arch)
 		}
 
 	}while(inst.done == false);
+    return result;
 }
 
 void machine_to_opcode(std::vector<std::pair<uint64_t, std::string>> &container, std::vector<uint8_t> &source,
@@ -740,9 +745,10 @@ void machine_to_opcode(std::vector<std::pair<uint64_t, std::string>> &container,
 	ArrayReader desc = ArrayReader(source, start_address);
 	uint64_t ip;
 	std::vector<std::string>inst;
-	std::string instruction = "";
+    std::string instruction;
 	while(!desc.is_complete())
 	{
+        instruction = "";
 		ip = desc.get_real_offset();
 		inst = read_instruction(desc, arch);
 		for(std::string str : inst)
@@ -767,8 +773,8 @@ std::map<uint64_t, Block> recursive_disassemble(std::vector<uint8_t> &source, ui
 void machine_to_opcode2(std::map<uint64_t, Block> &table, ArrayReader &desc, uint8_t arch, uint64_t offset)
 {
 	std::vector<std::pair<uint64_t, std::string>> container = std::vector<std::pair<uint64_t, std::string>>();
-	uint64_t ip, jump1 = 0, jump2 = 0;
-	std::string inst = "";
+    uint64_t ip;
+	std::string inst;
 	std::vector<std::string> instruction;
 	Block current_block;
 	current_block.start_address = offset;
@@ -777,6 +783,7 @@ void machine_to_opcode2(std::map<uint64_t, Block> &table, ArrayReader &desc, uin
 	/*Bazı bloklar birden fazla kez oluşturuluyor, akış sırasında var olup olmadığını bilmiyoruz*/
 	while(!desc.is_complete())
 	{
+		inst = "";
 		ip = desc.get_real_offset();
 		instruction = read_instruction(desc, arch);
 		for(std::string str : instruction)
@@ -822,13 +829,13 @@ void machine_to_opcode2(std::map<uint64_t, Block> &table, ArrayReader &desc, uin
 	table[current_block.start_address] = current_block;
 	if(current_block.jump1 != 0 && desc.within_array(current_block.jump1) && table.count(current_block.jump1) == 0)
 	{
-		printf("here: %llx jumping to(1): %llx\n", (ip+0xe015fb-1024), (current_block.jump1+0xe015fb));
+        printf("here: %lx jumping to(1): %lx\n", (ip+0xe015fb-1024), (current_block.jump1+0xe015fb));
 		machine_to_opcode2(table, desc, arch, current_block.jump1);
 
 	}
 	if(current_block.jump2 != 0 && desc.within_array(current_block.jump2) && table.count(current_block.jump2) == 0)
 	{
-		printf("here: %llx jumping to(2): %llx\n", (ip+0xe015fb-1024), (current_block.jump2+0xe015fb));
+        printf("here: %lx jumping to(2): %lx\n", (ip+0xe015fb-1024), (current_block.jump2+0xe015fb));
 		return machine_to_opcode2(table, desc, arch, current_block.jump2);
 
 	}

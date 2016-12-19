@@ -17,6 +17,199 @@ Elf64SH::Elf64SH()
     this->name = "";
 }
 
+std::vector<uint8_t> Elf64::getHexHeader()
+{
+    std::vector<uint8_t> hex_buffer(e_ehsize);
+    this->fd.seekg(0,std::ios::beg);
+    this->fd.read((char *)&hex_buffer[0], e_ehsize);
+    return hex_buffer;
+}
+
+std::string Elf64::getHeaderInfo()
+{
+    std::stringstream ss;
+    std::string temp_string = "";
+
+    ss << "Magic bytes: "<< std::hex << std::showbase << id.ei_magic[0] << id.ei_magic[1] << id.ei_magic[2] << id.ei_magic[3] << "\n";
+    /*Find class of file*/
+    switch(id.ei_class)
+    {
+    case 0:
+        temp_string = "Invalid object";
+        break;
+    case 1:
+        temp_string = "32-bit object";
+        break;
+    case 2:
+        temp_string = "64-bit object";
+        break;
+    default:
+        temp_string = "Invalid object";
+        break;
+    }
+    ss << "File Class: " << temp_string << "\n";
+
+    /*find endianness of file*/
+    switch(id.ei_data)
+    {
+    case 0:
+        temp_string = "Invalid data encoding";
+        break;
+    case 1:
+        temp_string = "Little endian";
+        break;
+    case 2:
+        temp_string = "Big endian";
+        break;
+    default:
+        temp_string = "Invalid data encoding";
+        break;
+    }
+    ss << "File Endianness: " << temp_string << "\n";
+
+    /*header version*/
+    ss << "ELF Header Version: " << std::hex << std::showbase << id.ei_version << "\n";
+
+    switch(id.ei_osabi)
+    {
+    case 0:
+        temp_string = "System V";
+        break;
+    case 1:
+        temp_string = "HP-UX";
+        break;
+    case 2:
+        temp_string = "NetBSD";
+        break;
+    case 3:
+        temp_string = "Linux";
+        break;
+    case 6:
+        temp_string = "Solaris";
+        break;
+    case 7:
+        temp_string = "AIX";
+        break;
+    case 8:
+        temp_string = "IRIX";
+        break;
+    case 9:
+        temp_string = "FreeBSD";
+        break;
+    case 12:
+        temp_string = "OpenBSD";
+        break;
+    case 13:
+        temp_string = "OpenVMS";
+        break;
+    case 14:
+        temp_string = "NonStop Kernel";
+        break;
+    case 15:
+        temp_string = "AROS";
+        break;
+    case 16:
+        temp_string = "Fenix OS";
+        break;
+    case 17:
+        temp_string = "CloudABI";
+        break;
+    case 0x53:
+        temp_string = "Sortix";
+        break;
+    default:
+        temp_string = "Invalid operating system abi";
+        break;
+    }
+    ss << "Operating system ABI: " << temp_string << "\n";
+
+    ss << "ABI version: " << std::hex << std::showbase << id.ei_abiversion << "\n";
+
+    /*file type*/
+    if(e_type == 0)
+        temp_string = "No file type";
+    else if(e_type == 1)
+        temp_string = "Relocatable file";
+    else if(e_type == 2)
+        temp_string = "Executable file";
+    else if(e_type == 3)
+        temp_string = "Shared object file";
+    else if(e_type == 4)
+        temp_string = "Core file";
+    else if(e_type > 0xff00 && e_type <= 0xffff)
+        temp_string = "Processor Specific information";
+    else
+        temp_string = "Invalid file type";
+    ss << "File type: " << temp_string << "\n";
+
+    /*Target Machine*/
+    switch(e_machine)
+    {
+    case 0x0:
+        temp_string = "No machine";
+        break;
+    case 0x1:
+        temp_string = "AT&T WE 32100";
+        break;
+    case 0x2:
+        temp_string = "SPARC";
+        break;
+    case 0x3:
+        temp_string = "Intel 80386(x86)";
+        break;
+    case 0x4:
+        temp_string = "Motorola 68000";
+        break;
+    case 0x5:
+        temp_string = "Motorola 88000";
+        break;
+    case 0x6:
+        temp_string = "Intel 80860";
+        break;
+    case 0x7:
+        temp_string = "Intel 80860";
+        break;
+    case 0x8:
+        temp_string = "MIPS RS3000";
+        break;
+    case 0x14:
+        temp_string = "PowerPC";
+        break;
+    case 0x28:
+        temp_string = "ARM";
+        break;
+    case 0x2A:
+        temp_string = "Super H";
+        break;
+    case 0x32:
+        temp_string = "IA-64 (Intel Itanium)";
+        break;
+    case 0x3E:
+        temp_string = "AMD64";
+        break;
+    case 0xB7:
+        temp_string = "AArch64";
+        break;
+    default:
+        temp_string = "Invalid architecture";
+        break;
+    }
+    ss << "Target architecture: " << temp_string << "\n";
+
+    ss << "Program start address: " << std::hex << std::showbase <<e_entry << "\n";/*convert to hex ?*/
+    ss << "Start of program headers: " << std::hex << std::showbase <<e_phoff << "\n";
+    ss << "Start of section headers: " << std::hex << std::showbase <<e_shoff << "\n";
+    ss << "Flag: " << std::hex << std::showbase <<e_flags << "\n";
+    ss << "Elf header size: " << e_ehsize << "\n";
+    ss << "Entry size program headers: " << e_phentsize << "\n";
+    ss << "Number of program headers: " << e_phnum << "\n";
+    ss << "Entry size section headers: " << e_shentsize << "\n";
+    ss << "Number of section headers: " << e_shnum << "\n";
+    ss << "Index of section header names section:" << e_shstrndx <<"\n";
+
+    return ss.str();
+}
+
 void Elf64::readIdent()
 {
     this->fd.read((char *)this->id.ei_magic,4);
@@ -193,8 +386,7 @@ std::vector<std::string> Elf64::getSectionNames()
     return nameList;
 }
 
-//returns null if cant find desired name, but that statement should never be executed
-std::vector<uint8_t> Elf64::getSectionContent(std::string needle)
+std::vector<uint8_t> Elf64::getHexSectionContent(std::string needle)
 {
     uint32_t i;
     for(i = 0; i < this->sHeaders.size(); i++)
@@ -205,6 +397,188 @@ std::vector<uint8_t> Elf64::getSectionContent(std::string needle)
         }
     }
     return std::vector<uint8_t>();
+}
+
+std::string Elf64::getSectionContent(std::string needle)
+{
+    std::string temp_string;
+    uint32_t index;
+    std::stringstream ss;
+    std::vector<std::pair<uint64_t,std::string>> container = std::vector<std::pair<uint64_t,std::string>>();
+    for(index = 0; index < this->sHeaders.size(); index++)
+    {
+        if(!this->sHeaders[index].name.compare(needle))
+        {
+            break;
+        }
+    }
+    ss << "--------------Section Header Info--------------\n";
+    /*Section header info*/
+    ss << "Section index: " << index << "\n";
+    ss << "Section name: " << sHeaders[index].name << "\n";
+    ss << "Section name index: " << sHeaders[index].sh_name << "\n";
+    switch (sHeaders[index].sh_type)
+    {
+    case 0:
+        temp_string = "SHT_NULL";
+        break;
+    case 1:
+        temp_string = "SHT_PROGBITS";
+        break;
+    case 2:
+        temp_string = "SHT_SYMTAB";
+        break;
+    case 3:
+        temp_string = "SHT_STRTAB";
+        break;
+    case 4:
+        temp_string = "SHT_RELA";
+        break;
+    case 5:
+        temp_string = "SHT_HASH";
+        break;
+    case 6:
+        temp_string = "SHT_DYNAMIC";
+        break;
+    case 7:
+        temp_string = "SHT_NOTE";
+        break;
+    case 8:
+        temp_string = "SHT_NOBITS";
+        break;
+    case 9:
+        temp_string = "SHT_REL";
+        break;
+    case 10:
+        temp_string = "SHT_SHLIB";
+        break;
+    case 11:
+        temp_string = "SHT_DYNSYM";
+        break;
+    default:
+        if(sHeaders[index].sh_type >= 0x70000000 && sHeaders[index].sh_type <= 0x7fffffff )
+        {
+            temp_string = "Processor specific type";
+        }
+        else if(sHeaders[index].sh_type >= 0x80000000 && sHeaders[index].sh_type <= 0xffffffff )
+        {
+            temp_string = "User defined section type";
+        }
+        else
+        {
+            temp_string = "Invalid section header type";
+        }
+        break;
+    }
+    ss << "Section type: " << temp_string << "\n";
+
+    /*flags*/
+    temp_string = "";
+    if((sHeaders[index].sh_flags & 0x00000001) != 0)
+        temp_string += "SHF_WRITE ";
+    if((sHeaders[index].sh_flags & 0x00000002) != 0)
+        temp_string += "SHF_ALLOC ";
+    if((sHeaders[index].sh_flags & 0x00000004) != 0)
+        temp_string += "SHF_EXECINSTR";
+
+    ss << "Section flags: " << temp_string << "\n";
+
+
+    ss << "Virtual address of section: " << std::hex << std:: showbase << sHeaders[index].sh_addr << "\n";
+    ss << "File offset of section: " << std::hex << std:: showbase << sHeaders[index].sh_offset << "\n";
+    ss << "Size of section: " << std::hex << std:: showbase << sHeaders[index].sh_size << "\n";
+    ss << "Section link information: " << sHeaders[index].sh_link << "\n";
+    ss << "Section extra information: " << sHeaders[index].sh_info << "\n";
+    ss << "Size of this header: " << sHeaders[index].sh_entsize << "\n";
+
+    ss << "-----------------------------------------------\n";
+    /*Section related info*/
+    if((sHeaders[index].sh_flags & 0x4) != 0)//if section is executable
+    {
+        machine_to_opcode(container, this->sHeaders[index].content,this->sHeaders[index].sh_offset, id.ei_class == 1 ? 1 : 0);
+        for(std::pair<uint64_t,std::string> item : container)
+        {
+            ss << std::hex << std:: showbase << item.first << "\t" << item.second << "\n";
+        }
+    }
+    else if(sHeaders[index].sh_type == 2 || sHeaders[index].sh_type == 11)/*Symbol table*/
+    {
+        uint32_t counter = 0;
+        if(sHeaders[index].sh_type == 2)
+        {
+            ss << "Static Symbol Table" << "\n";
+        }
+        for(struct Elf64_sym symbol: sHeaders[index].sh_type == 2 ? staticSymbolTable : dynamicSymbolTable)
+        {
+            ss << "Symbol no: " << counter++ << "\n";
+            ss << "\tName: " << symbol.name << "\n";
+            ss << "\tIndex of name: " << symbol.st_name << "\n";
+            ss << "\tValue: " << symbol.st_value << "\n";
+            /*bind*/
+            switch (symbol.st_info >> 4)
+            {
+            case 0:
+                temp_string = "STB_LOCAL";
+                break;
+            case 1:
+                temp_string = "STB_GLOBAL";
+                break;
+            case 2:
+                temp_string = "STB_WEAK";
+                break;
+            case 10:
+            case 11:
+            case 12:
+                temp_string = "Environment specific information";
+            case 13:
+            case 14:
+            case 15:
+                temp_string = "Processor specific information";
+                break;
+            default:
+                temp_string = "Invalid bind value";
+                break;
+            }
+            ss << "\tBind: " << temp_string<< "\n";
+
+            /*type*/
+            switch (symbol.st_info & 0x0f)
+            {
+            case 0:
+                temp_string = "STT_NOTYPE";
+                break;
+            case 1:
+                temp_string = "STT_OBJECT";
+                break;
+            case 2:
+                temp_string = "STT_FUNC";
+                break;
+            case 3:
+                temp_string = "STT_SECTION";
+                break;
+            case 4:
+                temp_string = "STT_FILE";
+                break;
+            case 10:
+            case 11:
+            case 12:
+                temp_string = "Environment specific information";
+            case 13:
+            case 14:
+            case 15:
+                temp_string = "Processor specific information";
+                break;
+            default:
+                temp_string = "Invalid bind value";
+                break;
+            }
+            ss << "\tType: " << temp_string << "\n";
+            ss << "\tOther: " << symbol.st_other << "\n";
+            ss << "\tRelated section index: "<< symbol.st_shndx << "\n";
+        }
+    }
+
+    return ss.str();
 }
 
 
@@ -260,6 +634,7 @@ void Elf64::readSymbolTable(Elf64SH &section)
 	if(section.sh_entsize != 24)
 	{
 		printf("Something seems wrong, trying to read wrong sized symbol table.");
+        return;
 		/*ERROR*/
 	}
 

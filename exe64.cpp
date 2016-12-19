@@ -9,7 +9,7 @@ Exe64::Exe64(std::string path)
 
 /*sectionlar eklenecek*/
 
-std::vector<uint8_t> Exe64::getSectionContent(std::string needle)
+std::vector<uint8_t> Exe64::getHexSectionContent(std::string needle)
 {
 	uint32_t i;
 	for(i = 0; i < this->buffer.size(); i++)
@@ -17,6 +17,23 @@ std::vector<uint8_t> Exe64::getSectionContent(std::string needle)
 		if(this->buffer[i].nameStr == needle)
 			return this->buffer[i].contents;
 	}
+}
+
+std::string Exe64::getSectionContent(std::string needle)
+{
+    /*todo: fill*/
+    return "";
+}
+
+std::vector<uint8_t> Exe64::getHexHeader()
+{
+    return std::vector<uint8_t>();
+}
+
+std::string Exe64::getHeaderInfo()
+{
+    /*todo: fill*/
+    return "";
 }
 
 uint8_t Exe64::getSection(std::string needle)
