@@ -828,14 +828,12 @@ void machine_to_opcode2(std::map<uint64_t, Block> &table, ArrayReader &desc, uin
 	current_block.content = container;
 	table[current_block.start_address] = current_block;
 	if(current_block.jump1 != 0 && desc.within_array(current_block.jump1) && table.count(current_block.jump1) == 0)
-	{
-        printf("here: %lx jumping to(1): %lx\n", (ip+0xe015fb-1024), (current_block.jump1+0xe015fb));
+    {
 		machine_to_opcode2(table, desc, arch, current_block.jump1);
 
 	}
 	if(current_block.jump2 != 0 && desc.within_array(current_block.jump2) && table.count(current_block.jump2) == 0)
-	{
-        printf("here: %lx jumping to(2): %lx\n", (ip+0xe015fb-1024), (current_block.jump2+0xe015fb));
+    {
 		return machine_to_opcode2(table, desc, arch, current_block.jump2);
 
 	}

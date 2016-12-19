@@ -494,6 +494,10 @@ std::string Elf32::getSectionContent(std::string needle)
         {
             ss << "Static Symbol Table" << "\n";
         }
+        else
+        {
+            ss << "Dynamic Symbol Table" << "\n";
+        }
         for(struct Elf32_sym symbol: sHeaders[index].sh_type == 2 ? staticSymbolTable : dynamicSymbolTable)
         {
             ss << "Symbol no: " << counter++ << "\n";

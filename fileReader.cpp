@@ -48,11 +48,6 @@ ExecutableFile* readFile(const std::string path)
 
 	uint8_t buffer[4];
     std::ifstream fd(path, std::ios::in|std::ios::binary);
-    fd.read((char *)&buffer[0],4);
-    for(int i = 0; i < 4; i++)
-    {
-        printf("%x %x\n",buffer[i],ELF_H[i]);
-    }
     if(buffer[0] == ELF_H[0] && buffer[1] == ELF_H[1] && buffer[2] == ELF_H[2] && buffer[3] == ELF_H[3])
     {
         uint8_t ei_class;
