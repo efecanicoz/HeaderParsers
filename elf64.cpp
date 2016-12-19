@@ -495,10 +495,17 @@ std::string Elf64::getSectionContent(std::string needle)
     /*Section related info*/
     if((sHeaders[index].sh_flags & 0x4) != 0)//if section is executable
     {
-        machine_to_opcode(container, this->sHeaders[index].content,this->sHeaders[index].sh_offset, id.ei_class == 1 ? 1 : 0);
-        for(std::pair<uint64_t,std::string> item : container)
+        if(e_machine == 3 || e_machine == 0x3e)
         {
-            ss << std::hex << std:: showbase << item.first << "\t" << item.second << "\n";
+            machine_to_opcode(container, this->sHeaders[index].content,this->sHeaders[index].sh_offset, id.ei_class == 1 ? 1 : 0);
+            for(std::pair<uint64_t,std::string> item : container)
+            {
+                ss << std::hex << std:: showbase << item.first << "\t" << item.second << "\n";
+            }
+        }
+        else
+        {
+            ss << "Architecture not supported\n";
         }
     }
     else if(sHeaders[index].sh_type == 2 || sHeaders[index].sh_type == 11)/*Symbol table*/
