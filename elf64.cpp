@@ -25,6 +25,282 @@ std::vector<uint8_t> Elf64::getHexHeader()
     return hex_buffer;
 }
 
+
+std::string Elf64::getRelInfo()
+{
+    std::stringstream ss;
+    std::string temp_string;
+    uint64_t counter = 0;
+    /*this is an range based for loop*/
+    ss << "Rel section\n";
+    for(auto rel : this->relList)/*First use of auto*/
+    {
+        ss << "Index: " << counter++ << "\n";
+        ss << "\tOffset: " << std::hex << rel.r_offset << "\n";
+        ss << "\tRelated symbol table index: " << (rel.r_info >> 32) << "\n";
+        switch(rel.r_info & 0xffffffffL)
+        {
+        case 0:
+            temp_string = "R_x86_64_NONE";
+            break;
+        case 1:
+            temp_string = "R_x86_64_64";
+            break;
+        case 2:
+            temp_string = "R_x86_64_PC32";
+            break;
+        case 3:
+            temp_string = "R_x86_64_GOT32";
+            break;
+        case 4:
+            temp_string = "R_x86_64_PLT32";
+            break;
+        case 5:
+            temp_string = "R_x86_64_COPY";
+            break;
+        case 6:
+            temp_string = "R_x86_64_GLOB_DAT";
+            break;
+        case 7:
+            temp_string = "R_x86_64_JMP_SLOT";
+            break;
+        case 8:
+            temp_string = "R_x86_64_RELATIVE";
+            break;
+        case 9:
+            temp_string = "R_x86_64_GOTPCREL";
+            break;
+        case 10:
+            temp_string = "R_x86_64_32";
+            break;
+        case 11:
+            temp_string = "R_x86_64_32S";
+            break;
+        case 12:
+            temp_string = "R_x86_64_16";
+            break;
+        case 13:
+            temp_string = "R_x86_64_PC16";
+            break;
+        case 14:
+            temp_string = "R_x86_64_8";
+            break;
+        case 15:
+            temp_string = "R_x86_64_PC8";
+            break;
+        case 16:
+            temp_string = "R_x86_64_DTPMOD64";
+            break;
+        case 17:
+            temp_string = "R_x86_64_DTPOFF64";
+            break;
+        case 18:
+            temp_string = "R_x86_64_TPOFF64";
+            break;
+        case 19:
+            temp_string = "R_x86_64_TLSGD";
+            break;
+        case 20:
+            temp_string = "R_x86_64_TLSLD";
+            break;
+        case 21:
+            temp_string = "R_x86_64_DTPOFF32";
+            break;
+        case 22:
+            temp_string = "R_x86_64_GOTTPOFF";
+            break;
+        case 23:
+            temp_string = "R_x86_64_TPOFF32";
+            break;
+        case 24:
+            temp_string = "R_x86_64_PC64";
+            break;
+        case 25:
+            temp_string = "R_x86_64_GOTOFF64";
+            break;
+        case 26:
+            temp_string = "R_x86_64_GOTPC32";
+            break;
+        case 27:
+            temp_string = "R_x86_64_GOT64";
+            break;
+        case 28:
+            temp_string = "R_x86_64_GOTPCREL64";
+            break;
+        case 29:
+            temp_string = "R_x86_64_GOTPC64";
+            break;
+        case 30:
+            temp_string = "R_x86_64_GOTPLT64";
+            break;
+        case 31:
+            temp_string = "R_x86_64_PLTOFF64";
+            break;
+        case 32:
+            temp_string = "R_x86_64_SIZE32";
+            break;
+        case 33:
+            temp_string = "R_x86_64_SIZE64";
+            break;
+        case 34:
+            temp_string = "R_x86_64_GOTPC32_TLSDESC";
+            break;
+        case 35:
+            temp_string = "R_x86_64_TLSDESC_CALL";
+            break;
+        case 36:
+            temp_string = "R_x86_64_TLSDESC";
+            break;
+        case 37:
+            temp_string = "R_x86_64_IRELATIVE";
+            break;
+        default:
+            temp_string = "Invalid relocation type";
+            break;
+        }
+        ss << "\tRelocation type: " <<temp_string << "\n";
+    }
+    return ss.str();
+}
+
+std::string Elf64::getRelaInfo()
+{
+    std::stringstream ss;
+    std::string temp_string;
+    uint64_t counter = 0;
+    /*this is an range based for loop*/
+    ss << "Rela section\n";
+    for(auto rela : this->relaList)/*First use of auto*/
+    {
+        ss << "Index: " << counter++ << "\n";
+        ss << "\tOffset: " << std::hex << rela.r_offset << "\n";
+        ss << "\tRelated symbol table index: " << (rela.r_info >> 32) << "\n";
+        switch(rela.r_info & 0xffffffffL)
+        {
+        case 0:
+            temp_string = "R_x86_64_NONE";
+            break;
+        case 1:
+            temp_string = "R_x86_64_64";
+            break;
+        case 2:
+            temp_string = "R_x86_64_PC32";
+            break;
+        case 3:
+            temp_string = "R_x86_64_GOT32";
+            break;
+        case 4:
+            temp_string = "R_x86_64_PLT32";
+            break;
+        case 5:
+            temp_string = "R_x86_64_COPY";
+            break;
+        case 6:
+            temp_string = "R_x86_64_GLOB_DAT";
+            break;
+        case 7:
+            temp_string = "R_x86_64_JMP_SLOT";
+            break;
+        case 8:
+            temp_string = "R_x86_64_RELATIVE";
+            break;
+        case 9:
+            temp_string = "R_x86_64_GOTPCREL";
+            break;
+        case 10:
+            temp_string = "R_x86_64_32";
+            break;
+        case 11:
+            temp_string = "R_x86_64_32S";
+            break;
+        case 12:
+            temp_string = "R_x86_64_16";
+            break;
+        case 13:
+            temp_string = "R_x86_64_PC16";
+            break;
+        case 14:
+            temp_string = "R_x86_64_8";
+            break;
+        case 15:
+            temp_string = "R_x86_64_PC8";
+            break;
+        case 16:
+            temp_string = "R_x86_64_DTPMOD64";
+            break;
+        case 17:
+            temp_string = "R_x86_64_DTPOFF64";
+            break;
+        case 18:
+            temp_string = "R_x86_64_TPOFF64";
+            break;
+        case 19:
+            temp_string = "R_x86_64_TLSGD";
+            break;
+        case 20:
+            temp_string = "R_x86_64_TLSLD";
+            break;
+        case 21:
+            temp_string = "R_x86_64_DTPOFF32";
+            break;
+        case 22:
+            temp_string = "R_x86_64_GOTTPOFF";
+            break;
+        case 23:
+            temp_string = "R_x86_64_TPOFF32";
+            break;
+        case 24:
+            temp_string = "R_x86_64_PC64";
+            break;
+        case 25:
+            temp_string = "R_x86_64_GOTOFF64";
+            break;
+        case 26:
+            temp_string = "R_x86_64_GOTPC32";
+            break;
+        case 27:
+            temp_string = "R_x86_64_GOT64";
+            break;
+        case 28:
+            temp_string = "R_x86_64_GOTPCREL64";
+            break;
+        case 29:
+            temp_string = "R_x86_64_GOTPC64";
+            break;
+        case 30:
+            temp_string = "R_x86_64_GOTPLT64";
+            break;
+        case 31:
+            temp_string = "R_x86_64_PLTOFF64";
+            break;
+        case 32:
+            temp_string = "R_x86_64_SIZE32";
+            break;
+        case 33:
+            temp_string = "R_x86_64_SIZE64";
+            break;
+        case 34:
+            temp_string = "R_x86_64_GOTPC32_TLSDESC";
+            break;
+        case 35:
+            temp_string = "R_x86_64_TLSDESC_CALL";
+            break;
+        case 36:
+            temp_string = "R_x86_64_TLSDESC";
+            break;
+        case 37:
+            temp_string = "R_x86_64_IRELATIVE";
+            break;
+        default:
+            temp_string = "Invalid relocation type";
+            break;
+        }
+        ss << "\tRelocation type: " <<temp_string << "\n";
+        ss << "\tAddend: " << rela.r_addend << "\n";
+    }
+    return ss.str();
+}
+
 std::string Elf64::getHeaderInfo()
 {
     std::stringstream ss;
@@ -319,6 +595,45 @@ void Elf64::readSectionHeader(uint64_t offset, uint64_t strtab)
     {
     	readSymbolTable(header);
     }
+    else if(header.sh_type == 9)/*rel*/
+    {
+        /*may be a function*/
+        uint8_t rel_buffer[16];
+        uint64_t counter;
+
+        /*set file descriptor to beginning of rel section content*/
+        this->fd.seekg(header.sh_offset, std::ios::beg);
+        for(counter = 0; counter < header.sh_size; counter += 16)
+        {
+            Elf64_Rel relContent;
+
+            this->fd.read((char *)&rel_buffer, 16);/*& neden?*/
+            readLittleEndian(&(relContent.r_offset), rel_buffer, 0);
+            readLittleEndian(&(relContent.r_info), rel_buffer, 8);
+
+            this->relList.push_back(relContent);
+        }
+    }
+    else if(header.sh_type == 4)/*rela*/
+    {
+        /*may be a function*/
+        uint8_t rela_buffer[24];
+        uint64_t counter;
+
+        /*set file descriptor to beginning of rel section content*/
+        this->fd.seekg(header.sh_offset, std::ios::beg);
+        for(counter = 0; counter < header.sh_size; counter += 24)
+        {
+            Elf64_Rela relaContent;
+
+            this->fd.read((char *)&rela_buffer, 24);/*& neden?*/
+            readLittleEndian(&(relaContent.r_offset), rela_buffer, 0);
+            readLittleEndian(&(relaContent.r_info), rela_buffer, 8);
+            readLittleEndian((uint32_t *)&relaContent.r_addend, rela_buffer, 16);
+
+            this->relaList.push_back(relaContent);
+        }
+    }
 
     /*If type of section is SHT_NOBITS then it has no data information on file*/
     if(header.sh_type != 8)
@@ -588,11 +903,40 @@ std::string Elf64::getSectionContent(std::string needle)
             ss << "\tRelated section index: "<< symbol.st_shndx << "\n";
         }
     }
+    else if(sHeaders[index].sh_type == 4)/*rela*/
+    {
+        ss << getRelaInfo();
+    }
+    else if(sHeaders[index].sh_type == 9)/*rel*/
+    {
+        ss << getRelInfo();
+    }
+    else if(sHeaders[index].sh_type == 3)/*strtab*/
+    {
+        ss << getStringTableInfo(sHeaders[index]);
+    }
 
     return ss.str();
 }
 
-
+std::string Elf64::getStringTableInfo(Elf64SH &section)
+{
+    std::stringstream ss;
+    uint64_t counter;
+    ss << "String table\n";
+    for(counter = 0L; counter < section.sh_size; counter++)
+    {
+        if(section.content[counter] == '\0')
+        {
+            ss << "\n" << std::hex << std::showbase << counter << ": ";
+        }
+        else
+        {
+            ss << (char)section.content[counter];
+        }
+    }
+    return ss.str();
+}
 
 uint32_t Elf64::getSection(std::string needle)
 {

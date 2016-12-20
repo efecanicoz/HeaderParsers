@@ -48,6 +48,16 @@ class Elf64 : public ExecutableFile
 			uint64_t    st_value;
 			uint64_t    st_size;
 		};
+        typedef struct {
+            uint64_t	r_offset;
+            uint64_t	r_info;
+        } Elf64_Rel;
+
+        typedef struct {
+            uint64_t	r_offset;
+            uint64_t	r_info;
+            int64_t	r_addend;
+        } Elf64_Rela;
 
     public:
         struct e_ident id;
@@ -69,6 +79,8 @@ class Elf64 : public ExecutableFile
         std::vector<Elf64SH> sHeaders;
         std::vector<struct Elf64_sym> staticSymbolTable;
         std::vector<struct Elf64_sym> dynamicSymbolTable;
+        std::vector<Elf64_Rel> relList;
+        std::vector<Elf64_Rela> relaList;
 
         void read(uint8_t*,uint8_t*,uint8_t);
         void read(uint16_t*,uint8_t*,uint8_t);
@@ -88,6 +100,10 @@ class Elf64 : public ExecutableFile
 		uint64_t getSectionAddress(std::string);
 		void disassemble(std::vector<std::pair<uint64_t, std::string>> &);
 		void disassembleAll(std::vector<std::pair<uint64_t, std::string>> &);
+
+        std::string getRelaInfo();
+        std::string getRelInfo();
+        std::string getStringTableInfo(Elf64SH &);
 
         std::vector<uint8_t> getHexHeader();
         std::string getHeaderInfo();

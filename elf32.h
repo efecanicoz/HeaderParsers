@@ -48,6 +48,17 @@ class Elf32 : public ExecutableFile
 			uint16_t    st_shndx;
 		};
 
+        typedef struct {
+            uint32_t	r_offset;
+            uint32_t	r_info;
+        } Elf32_Rel;
+
+        typedef struct {
+            uint32_t	r_offset;
+            uint32_t	r_info;
+            int32_t	r_addend;
+        } Elf32_Rela;
+
     public:
         struct e_ident id;
         std::ifstream fd;
@@ -66,6 +77,8 @@ class Elf32 : public ExecutableFile
         uint16_t e_shstrndx;
         uint32_t strtab;
         std::vector<Elf32SH> sHeaders;
+        std::vector<Elf32_Rel> relList;
+        std::vector<Elf32_Rela> relaList;
         std::vector<struct Elf32_sym> staticSymbolTable;
         std::vector<struct Elf32_sym> dynamicSymbolTable;
 
@@ -82,6 +95,10 @@ class Elf32 : public ExecutableFile
         void readSymbolTable(Elf32SH &);
         void disassembleAll(std::vector<std::pair<uint64_t, std::string>> &);
 
+        std::string getRelaInfo();
+        std::string getRelInfo();
+        std::string getStringTableInfo(Elf32SH &);
+
 		std::vector<std::string> getSectionNames();
         uint32_t getSection(std::string);
         uint32_t getSectionAddress(std::string);
@@ -91,9 +108,6 @@ class Elf32 : public ExecutableFile
         std::vector<uint8_t> getHexHeader();
         std::vector<uint8_t> getHexSectionContent(std::string needle);
         std::string getSectionContent(std::string);
-
-
-
 
 };
 

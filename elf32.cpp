@@ -261,6 +261,120 @@ void Elf32::read(uint64_t* to, uint8_t* from, uint8_t offset)
         ;//TODO: throw something to user
 }
 
+
+std::string Elf32::getRelInfo()
+{
+    std::stringstream ss;
+    std::string temp_string;
+    uint64_t counter = 0;
+    /*this is an range based for loop*/
+    ss << "Rel section\n";
+    for(auto rel : this->relList)/*First use of auto*/
+    {
+        ss << "Index: " << counter++ << "\n";
+        ss << "\tOffset: " << std::hex << rel.r_offset << "\n";
+        ss << "\tRelated symbol table index: " << (rel.r_info >> 8) << "\n";
+        switch(rel.r_info & 0x0f)
+        {
+        case 0:
+            temp_string = "R_386_NONE";
+            break;
+        case 1:
+            temp_string = "R_386_32";
+            break;
+        case 2:
+            temp_string = "R_386_PC32";
+            break;
+        case 3:
+            temp_string = "R_386_GOT32";
+            break;
+        case 4:
+            temp_string = "R_386_PLT32";
+            break;
+        case 5:
+            temp_string = "R_386_COPY";
+            break;
+        case 6:
+            temp_string = "R_386_GLOB_DAT";
+            break;
+        case 7:
+            temp_string = "R_386_JMP_SLOT";
+            break;
+        case 8:
+            temp_string = "R_386_RELATIVE";
+            break;
+        case 9:
+            temp_string = "R_386_GOTOFF";
+            break;
+        case 10:
+            temp_string = "R_386_GOTPC";
+            break;
+        default:
+            temp_string = "Invalid relocation type";
+            break;
+        }
+        ss << "\tRelocation type: " <<temp_string << "\n";
+    }
+    return ss.str();
+}
+
+std::string Elf32::getRelaInfo()
+{
+    std::stringstream ss;
+    std::string temp_string;
+    uint64_t counter = 0;
+    /*this is an range based for loop*/
+    ss << "Rela section\n";
+    for(auto rela : this->relaList)/*First use of auto*/
+    {
+        ss << "Index: " << counter++ << "\n";
+        ss << "\tOffset: " << std::hex << rela.r_offset << "\n";
+        ss << "\tRelated symbol table index: " << (rela.r_info >> 8) << "\n";
+        switch(rela.r_info & 0x0f)
+        {
+        case 0:
+            temp_string = "R_386_NONE";
+            break;
+        case 1:
+            temp_string = "R_386_32";
+            break;
+        case 2:
+            temp_string = "R_386_PC32";
+            break;
+        case 3:
+            temp_string = "R_386_GOT32";
+            break;
+        case 4:
+            temp_string = "R_386_PLT32";
+            break;
+        case 5:
+            temp_string = "R_386_COPY";
+            break;
+        case 6:
+            temp_string = "R_386_GLOB_DAT";
+            break;
+        case 7:
+            temp_string = "R_386_JMP_SLOT";
+            break;
+        case 8:
+            temp_string = "R_386_RELATIVE";
+            break;
+        case 9:
+            temp_string = "R_386_GOTOFF";
+            break;
+        case 10:
+            temp_string = "R_386_GOTPC";
+            break;
+        default:
+            temp_string = "Invalid relocation type";
+            break;
+        }
+        ss << "\tRelocation type: " <<temp_string << "\n";
+        ss << "\tAddend: " << rela.r_addend << "\n";
+    }
+    return ss.str();
+}
+
 void Elf32::readHeader()
 {
     uint8_t buffer[36];
@@ -315,14 +429,55 @@ void Elf32::readSectionHeader(uint32_t offset, uint32_t strtab)
 	{
 		readSymbolTable(header);
 	}
+    else if(header.sh_type == 9)/*rel*/
+    {
+        /*may be a function*/
+        uint8_t rel_buffer[8];
+        uint64_t counter;
 
-	/*If type of section is SHT_NOBITS then it has no data information on file*/
-	if(header.sh_type != 8)
+        /*set file descriptor to beginning of rel section content*/
+        this->fd.seekg(header.sh_offset, std::ios::beg);
+        for(counter = 0; counter < header.sh_size; counter += 8)
+        {
+            Elf32_Rel relContent;
+
+            this->fd.read((char *)&rel_buffer, 8);/*& neden?*/
+            readLittleEndian(&(relContent.r_offset), rel_buffer, 0);
+            readLittleEndian(&(relContent.r_info), rel_buffer, 4);
+
+            this->relList.push_back(relContent);
+        }
+    }
+    else if(header.sh_type == 4)/*rela*/
+    {
+        /*may be a function*/
+        uint8_t rela_buffer[12];
+        uint64_t counter;
+
+        /*set file descriptor to beginning of rel section content*/
+        this->fd.seekg(header.sh_offset, std::ios::beg);
+        for(counter = 0; counter < header.sh_size; counter += 12)
+        {
+            Elf32_Rela relaContent;
+
+            this->fd.read((char *)&rela_buffer, 12);/*& neden?*/
+            readLittleEndian(&(relaContent.r_offset), rela_buffer, 0);
+            readLittleEndian(&(relaContent.r_info), rela_buffer, 4);
+            readLittleEndian((uint32_t *)&relaContent.r_addend, rela_buffer, 8);
+
+            this->relaList.push_back(relaContent);
+        }
+    }
+
+    if(header.sh_type != 8)
 	{
+        /*If type of section is SHT_NOBITS then it has no data information on file*/
 		this->fd.seekg(header.sh_offset,fd.beg);
 		header.content.resize(header.sh_size);
 		this->fd.read((char *)&header.content[0], header.sh_size);
 	}
+
+
     this->sHeaders.push_back(header);
 }
 
@@ -574,10 +729,41 @@ std::string Elf32::getSectionContent(std::string needle)
             ss << "\tRelated section index: "<< symbol.st_shndx << "\n";
         }
     }
+    else if(sHeaders[index].sh_type == 4)/*rela*/
+    {
+        ss << getRelaInfo();
+    }
+    else if(sHeaders[index].sh_type == 9)/*rel*/
+    {
+        ss << getRelInfo();
+    }
+    else if(sHeaders[index].sh_type == 3)/*strtab*/
+    {
+        ss << getStringTableInfo(sHeaders[index]);
+    }
 
     return ss.str();
 }
 
+std::string Elf32::getStringTableInfo(Elf32SH &section)
+{
+    std::stringstream ss;
+    uint64_t counter;
+    ss << "String table\n";
+    for(counter = 0L; counter < section.sh_size; counter++)
+    {
+        if(section.content[counter] == '\0')
+        {
+            ss << "\n" << std::hex << std::showbase << counter << ": ";
+        }
+        else
+        {
+            ss << (char)section.content[counter];
+        }
+    }
+
+    return ss.str();
+}
 
 //returns null if cant find desired name, but that statement should never be executed
 std::vector<uint8_t> Elf32::getHexSectionContent(std::string needle)
