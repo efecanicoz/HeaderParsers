@@ -9,6 +9,9 @@ MainWindow::MainWindow(QWidget *parent) :
     const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     ui->asciiBrowser->setFont(fixedFont);
     ui->hexBrowser->setFont(fixedFont);
+    ui->sectionContentBrowser->setUndoRedoEnabled(false);
+    ui->asciiBrowser->setUndoRedoEnabled(false);
+    ui->hexBrowser->setUndoRedoEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -73,7 +76,7 @@ void MainWindow::on_pushButton_clicked()
     }
     listModel = new QStringListModel(*stringList, NULL);
     ui->sectionListView->setModel(listModel);
-    ui->sectionContentBrowser->setText(QString::fromStdString(exeObj->getHeaderInfo()));
+    ui->sectionContentBrowser->setPlainText(QString::fromStdString(exeObj->getHeaderInfo()));
     headerHexContent = exeObj->getHexHeader();
     ui->asciiBrowser->setText(format_for_ascii_view(headerHexContent));
     ui->hexBrowser->setText(format_for_hex_view(headerHexContent));
@@ -87,7 +90,7 @@ void MainWindow::on_sectionListView_doubleClicked(const QModelIndex &index)
     hexContent = exeObj->getHexSectionContent(itemText.toStdString());
     content = exeObj->getSectionContent(itemText.toStdString());
 
-    ui->sectionContentBrowser->setText(QString::fromStdString(content));
+    ui->sectionContentBrowser->setPlainText(QString::fromStdString(content));
     ui->asciiBrowser->setText(format_for_ascii_view(hexContent));
     ui->hexBrowser->setText(format_for_hex_view(hexContent));
 }
