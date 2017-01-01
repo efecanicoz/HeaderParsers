@@ -41,7 +41,7 @@ std::vector<std::string> split(const std::string &s, char delim) {
     std::vector<std::string> tokens;
     while (getline(ss, item, delim))
     {
-        tokens.push_back(item);
+        tokens.push_back(std::move(item));/*move may improve performance*/
     }
     return tokens;
 }
@@ -268,7 +268,7 @@ void Instruction::get_operand_value(uint8_t i)
 	}
 	else if(mem == true)
 	{
-		static const std::string modrm_rm_map[64] = this->arch == 0 ? modrm_rm_map_64 : modrm_rm_map_32;
+		static const std::array<std::string, 64> &modrm_rm_map = this->arch == 0 ? modrm_rm_map_64 : modrm_rm_map_32;
 		std::string result = "";
 		uint8_t rm, mod,memVal = 0;
 		uint32_t disp;
@@ -384,7 +384,7 @@ void Instruction::get_operand_value(uint8_t i)
 
 std::string Instruction::read_SIB()
 {
-	static const std::string sib_byte_map[16] = this->arch == 0 ? sib_byte_map_64 : sib_byte_map_32;
+	static const std::array<std::string, 16> &sib_byte_map = this->arch == 0 ? sib_byte_map_64 : sib_byte_map_32;
 	uint8_t base, index;
 	std::string result, scale, baseStr;
 
@@ -449,7 +449,7 @@ std::string Instruction::get_x87(uint8_t instruction_byte)
 
 std::vector<std::string> read_instruction(ArrayReader& descriptor, uint8_t arch)
 {
-	const std::string *opcode_map;
+	std::array<std::string, 256> opcode_map;
 	std::vector<std::string> result = std::vector<std::string>();
 	bool read = true;
 	uint8_t current_byte;

@@ -5,6 +5,7 @@
 #include <sstream>
 #include <utility>
 #include <map>
+#include <array>
 #ifndef ARRAYREADER_H
 	#include "arrayReader.h"
 #endif
