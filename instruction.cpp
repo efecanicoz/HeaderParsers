@@ -35,33 +35,28 @@ Instruction::Instruction(ArrayReader *descriptor, uint8_t arch)
 	this->length = 0;
 }
 
-std::vector<std::string> split(const std::string &s, char delim) {
-    std::stringstream ss(s);
-    std::string item;
-    std::vector<std::string> tokens;
-    while (getline(ss, item, delim))
-    {
-        tokens.push_back(std::move(item));/*move may improve performance*/
-    }
-    return tokens;
-}
-
-void Instruction::parse_opcode()
+void Instruction::split_opcode()
 {
-	std::vector<std::string>split_array;
-	uint8_t i;
+    static std::stringstream ss;
+    static const char delim = ' ';
+    uint8_t counter = 0;
 
-	split_array = split(this->raw_opcode,' ');
-	this->opcode = split_array[0];
-	this->operand_count = split_array.size()-1;
-
-	for(i = 0; i < this->operand_count; i++)
-		this->operands[i] = split_array[i+1];
+    ss.clear();
+    ss.str(this->raw_opcode);
+    /*string before first space is */
+    getline(ss, this->opcode, delim);
+    /*get all operands*/
+    while (getline(ss, this->operands[counter], delim))
+    {
+        counter++;
+    }
+    this->operand_count = counter;
+    return;
 }
 
 void Instruction::get_operand_value(uint8_t i)
 {
-	std::string &operand = this->operands[i];;
+    std::string &operand = this->operands[i];
 	std::string rest;
 	bool vex,reg,mem,imm,sign;
 	vex = reg = mem = imm = sign = false;
@@ -268,7 +263,7 @@ void Instruction::get_operand_value(uint8_t i)
 	}
 	else if(mem == true)
 	{
-		static const std::array<std::string, 64> &modrm_rm_map = this->arch == 0 ? modrm_rm_map_64 : modrm_rm_map_32;
+        static const std::array<const char *, 64> &modrm_rm_map = this->arch == 0 ? modrm_rm_map_64 : modrm_rm_map_32;
 		std::string result = "";
 		uint8_t rm, mod,memVal = 0;
 		uint32_t disp;
@@ -384,7 +379,7 @@ void Instruction::get_operand_value(uint8_t i)
 
 std::string Instruction::read_SIB()
 {
-	static const std::array<std::string, 16> &sib_byte_map = this->arch == 0 ? sib_byte_map_64 : sib_byte_map_32;
+    static const std::array<const char *, 16> &sib_byte_map = this->arch == 0 ? sib_byte_map_64 : sib_byte_map_32;
 	uint8_t base, index;
 	std::string result, scale, baseStr;
 
@@ -411,10 +406,15 @@ std::string Instruction::read_SIB()
 
 	if(index != 0b00000100)
 	{
+        result = sib_byte_map[index];
 		if(scale != "1")
-			result = sib_byte_map[index] + " * " + scale  + " + " + baseStr;
+        {
+            result += " * " + scale  + " + " + baseStr;
+        }
 		else
-			result = sib_byte_map[index]  + " + " + baseStr;
+        {
+            result += " + " + baseStr;
+        }
 	}
 	else
 		result = baseStr;//sadece base
@@ -431,7 +431,7 @@ void Instruction::read_ModRM()
 	return;
 }
 
-std::string Instruction::get_x87(uint8_t instruction_byte)
+const char * Instruction::get_x87(uint8_t instruction_byte)
 {
 	uint8_t x87_opcode, x87_modRM;
 	this->read_ModRM();
@@ -449,8 +449,8 @@ std::string Instruction::get_x87(uint8_t instruction_byte)
 
 std::vector<std::string> read_instruction(ArrayReader& descriptor, uint8_t arch)
 {
-	std::array<std::string, 256> opcode_map;
-	std::vector<std::string> result = std::vector<std::string>();
+    const std::array<const char *, 256> *opcode_map;
+        std::vector<std::string> result(5);
 	bool read = true;
 	uint8_t current_byte;
 	Instruction inst;
@@ -458,26 +458,26 @@ std::vector<std::string> read_instruction(ArrayReader& descriptor, uint8_t arch)
 	inst = Instruction(&descriptor, arch);
 
 	if(arch == 0)
-		opcode_map = primary_opcode_map64;
+        opcode_map = &primary_opcode_map64;
 	else if(arch == 1)
-		opcode_map = primary_opcode_map32;
+        opcode_map = &primary_opcode_map32;
 	else
-		return result;//invalid arch
+            return result;//invalid arch
 
 	do
 	{
 		if(read)
 		{
 			current_byte = descriptor.read_1byte();
-			inst.raw_opcode = opcode_map[current_byte];
-			if(inst.raw_opcode == "")
+            inst.raw_opcode = opcode_map->at(current_byte);
+            if(!strcmp(inst.raw_opcode, ""))
 			{
 				result.push_back("Invalid");
 				return result;
 			}
 		}
 
-		inst.parse_opcode();
+        inst.split_opcode();
 
 		if(inst.opcode == "ESC")
 		{
@@ -485,18 +485,18 @@ std::vector<std::string> read_instruction(ArrayReader& descriptor, uint8_t arch)
 			if(inst.operands[0] == "secondary")
 			{
 				if(inst.legacy_prefix & OSO)
-					opcode_map = secondary_opcode_map_66;
+                    opcode_map = &secondary_opcode_map_66;
 				else if(inst.legacy_prefix & REPE)
-					opcode_map = secondary_opcode_map_f2;
+                    opcode_map = &secondary_opcode_map_f2;
 				else if(inst.legacy_prefix & REPNE)
-					opcode_map = secondary_opcode_map_f3;
+                    opcode_map = &secondary_opcode_map_f3;
 				else
-					opcode_map = secondary_opcode_map_none;
+                    opcode_map = &secondary_opcode_map_none;
 			}
 			else if(inst.operands[0] == "x87")
 			{
 				inst.raw_opcode = inst.get_x87(current_byte);
-				if(inst.raw_opcode == "")
+                if(!strcmp(inst.raw_opcode, ""))
 				{
 					result.push_back("Invalid");
 					return result;
@@ -717,7 +717,7 @@ std::vector<std::string> read_instruction(ArrayReader& descriptor, uint8_t arch)
 			}
 
 			/*Instruction is invalid and read 1 more byte than it should*/
-			if(inst.raw_opcode == "")
+            if(!strcmp(inst.raw_opcode, ""))
 			{
 				printf("Invalid, sync lost.");
 				//return "";

@@ -6,6 +6,7 @@
 #include <utility>
 #include <map>
 #include <array>
+#include <cstring>
 #ifndef ARRAYREADER_H
 	#include "arrayReader.h"
 #endif
@@ -33,9 +34,9 @@ enum registers{GPR=1,Control=2,Debug=4,YMM=8,XMM=16,MMX=32,Segment=64};
 class Instruction
 {
 	public:
-		std::string raw_opcode;
+        const char * raw_opcode;
 		std::string opcode;
-		std::string operands[4];
+        std::array<std::string, 4> operands;
 		uint8_t operand_count;
 		uint16_t legacy_prefix;
 		uint8_t presence;
@@ -46,10 +47,10 @@ class Instruction
 		ArrayReader *desc;
 
 		std::string get_operand(uint8_t);
-		void parse_opcode();
+        void split_opcode();
 		void get_operand_value(uint8_t );
 		std::string read_SIB();
-		std::string get_x87(uint8_t);
+        const char *get_x87(uint8_t);
 		void read_ModRM();
 		Instruction();
 		Instruction(ArrayReader *, uint8_t);
@@ -57,13 +58,9 @@ class Instruction
 
 };
 
-
-std::vector<std::string> read_instruction(ArrayReader &,uint8_t);
 void machine_to_opcode(std::vector<std::pair<uint64_t, std::string>> &, std::vector<uint8_t> &, uint64_t , uint8_t);
 void machine_to_opcode2(std::map<uint64_t,Block> &, ArrayReader &, uint8_t , uint64_t );
 std::map<uint64_t, Block> recursive_disassemble(std::vector<uint8_t> &, uint64_t, uint8_t, uint64_t);
-
-
 
 #ifndef READER
     #include "reader.h"
