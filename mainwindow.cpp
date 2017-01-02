@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -9,9 +10,14 @@ MainWindow::MainWindow(QWidget *parent) :
     const QFont fixedFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
     ui->asciiBrowser->setFont(fixedFont);
     ui->hexBrowser->setFont(fixedFont);
+
+    ui->sectionContentBrowser->setReadOnly(true);
     ui->sectionContentBrowser->setUndoRedoEnabled(false);
     ui->asciiBrowser->setUndoRedoEnabled(false);
     ui->hexBrowser->setUndoRedoEnabled(false);
+    connect(ui->asciiBrowser->verticalScrollBar(), SIGNAL(valueChanged(int)), ui->hexBrowser->verticalScrollBar(), SLOT(setValue(int)));
+    connect(ui->hexBrowser->verticalScrollBar(), SIGNAL(valueChanged(int)), ui->asciiBrowser->verticalScrollBar(), SLOT(setValue(int)));
+
 }
 
 MainWindow::~MainWindow()
@@ -78,8 +84,8 @@ void MainWindow::on_pushButton_clicked()
     ui->sectionListView->setModel(listModel);
     ui->sectionContentBrowser->setPlainText(QString::fromStdString(exeObj->getHeaderInfo()));
     headerHexContent = exeObj->getHexHeader();
-    ui->asciiBrowser->setText(format_for_ascii_view(headerHexContent));
-    ui->hexBrowser->setText(format_for_hex_view(headerHexContent));
+    ui->asciiBrowser->setPlainText(format_for_ascii_view(headerHexContent));
+    ui->hexBrowser->setPlainText(format_for_hex_view(headerHexContent));
 }
 
 void MainWindow::on_sectionListView_doubleClicked(const QModelIndex &index)
@@ -90,7 +96,14 @@ void MainWindow::on_sectionListView_doubleClicked(const QModelIndex &index)
     hexContent = exeObj->getHexSectionContent(itemText.toStdString());
     content = exeObj->getSectionContent(itemText.toStdString());
 
+    ui->sectionContentBrowser->setUpdatesEnabled(false);
+    ui->asciiBrowser->setUpdatesEnabled(false);
+    ui->hexBrowser->setUpdatesEnabled(false);
     ui->sectionContentBrowser->setPlainText(QString::fromStdString(content));
-    ui->asciiBrowser->setText(format_for_ascii_view(hexContent));
-    ui->hexBrowser->setText(format_for_hex_view(hexContent));
+    ui->asciiBrowser->setPlainText(format_for_ascii_view(hexContent));
+    ui->hexBrowser->setPlainText(format_for_hex_view(hexContent));
+    ui->sectionContentBrowser->setUpdatesEnabled(true);
+    ui->asciiBrowser->setUpdatesEnabled(true);
+    ui->hexBrowser->setUpdatesEnabled(true);
+
 }

@@ -8,6 +8,7 @@
 #include <fileReader.h>
 #include <qstringlistmodel.h>
 #include <iomanip>
+#include <QScrollBar>
 
 
 
