@@ -107,3 +107,8 @@ void MainWindow::on_sectionListView_doubleClicked(const QModelIndex &index)
     ui->hexBrowser->setUpdatesEnabled(true);
 
 }
+
+void MainWindow::on_pushButton_2_clicked()
+{
+
+}

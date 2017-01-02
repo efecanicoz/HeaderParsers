@@ -29,6 +29,8 @@ private slots:
 
     void on_sectionListView_doubleClicked(const QModelIndex &index);
 
+    void on_pushButton_2_clicked();
+
 private:
     QString format_for_hex_view(std::vector<uint8_t>);
     QString format_for_ascii_view(std::vector<uint8_t>);
