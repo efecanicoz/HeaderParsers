@@ -12,7 +12,7 @@
 #include <vector>
 #include <list>
 #include "EInterface.h"
-#include "instruction.h"
+#include "disassemble.h"
 
 
 class Elf64SH

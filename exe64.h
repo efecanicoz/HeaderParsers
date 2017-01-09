@@ -8,7 +8,7 @@
 #endif
 
 #include "EInterface.h"
-#include "instruction.h"
+#include "disassemble.h"
 
 #ifndef EXE_STRUCT
 #define EXE_STRUCT

@@ -197,7 +197,7 @@ void Exe64::readSectionTable(){
 
 void Exe64::disassemble(std::vector<std::pair<uint64_t, std::string>> &container)
 {
-	uint32_t index;
+    /*uint32_t index;
 	uint64_t start_address;
 	uint32_t deneme;
 	uint8_t target_architecture = 0;
@@ -207,7 +207,7 @@ void Exe64::disassemble(std::vector<std::pair<uint64_t, std::string>> &container
 	deneme = this->coff_fields.addressOfEntryPoint - this->coff_fields.baseOfCode;
 	std::vector<uint8_t> &machineCode = this->buffer[index].contents;
 	recursive_disassemble(machineCode,start_address ,target_architecture, deneme);
-	return;
+    return;*/
 
 }
 

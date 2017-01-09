@@ -638,7 +638,8 @@ std::string Elf32::getSectionContent(std::string needle)
     {
         if(e_machine == 3 || e_machine == 0x3e)
         {
-            machine_to_opcode(container, this->sHeaders[index].content,this->sHeaders[index].sh_offset, id.ei_class == 1 ? 1 : 0);
+            //machine_to_opcode(container, this->sHeaders[index].content,this->sHeaders[index].sh_offset, id.ei_class == 1 ? 1 : 0);
+            disassemble_content(container, this->sHeaders[index].content,this->sHeaders[index].sh_offset, id.ei_class == 1 ? 1 : 0,0,true);
             for(std::pair<uint64_t,std::string> item : container)
             {
                 ss << std::hex << std:: showbase << item.first << "\t" << item.second << "\n";
@@ -805,19 +806,20 @@ uint32_t Elf32::getSectionAddress(std::string needle)
     return 0;
 }
 
+
 void Elf32::disassemble(std::vector<std::pair<uint64_t, std::string>> &container)
 {
+    /*
 	uint8_t i;
 
 	for(i = 0; i < this->sHeaders.size(); i++)
 	{
 		if(this->sHeaders[i].sh_flags & 4U)
-		{
-			container.push_back(std::make_pair(0xcafebabeUL, this->sHeaders[i].name));
-			machine_to_opcode(container, this->sHeaders[i].content, this->sHeaders[i].sh_addr,1);
+        {
+            disassemble(container, this->sHeaders[i].content, this->sHeaders[i].sh_addr,1);
 		}
 	}
-	return;
+    return;*/
 }
 
 

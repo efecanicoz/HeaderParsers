@@ -9,7 +9,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "instruction.h"
+#include "disassemble.h"
 #include "EInterface.h"
 
 

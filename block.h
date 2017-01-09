@@ -1,3 +1,6 @@
+#ifndef BLOCK_H
+#define BLOCK_H
+
 #include <vector>
 #include <cstdint>
 #include <utility>
@@ -14,3 +17,5 @@ class Block
 		Block();
 		~Block();
 };
+
+#endif

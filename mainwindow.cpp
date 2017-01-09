@@ -12,12 +12,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->hexBrowser->setFont(fixedFont);
 
     ui->sectionContentBrowser->setReadOnly(true);
+    ui->hexBrowser->setReadOnly(true);
+    ui->asciiBrowser->setReadOnly(true);
     ui->sectionContentBrowser->setUndoRedoEnabled(false);
     ui->asciiBrowser->setUndoRedoEnabled(false);
     ui->hexBrowser->setUndoRedoEnabled(false);
     connect(ui->asciiBrowser->verticalScrollBar(), SIGNAL(valueChanged(int)), ui->hexBrowser->verticalScrollBar(), SLOT(setValue(int)));
     connect(ui->hexBrowser->verticalScrollBar(), SIGNAL(valueChanged(int)), ui->asciiBrowser->verticalScrollBar(), SLOT(setValue(int)));
-
 }
 
 MainWindow::~MainWindow()
