@@ -540,7 +540,7 @@ std::vector<std::string> Elf32::getSectionNames()
 }
 
 
-std::string Elf32::getSectionContent(std::string needle)
+std::string Elf32::getSectionContent(std::string needle, bool linearSweep)
 {
     std::string temp_string;
     uint32_t index;
@@ -639,7 +639,7 @@ std::string Elf32::getSectionContent(std::string needle)
         if(e_machine == 3 || e_machine == 0x3e)
         {
             //machine_to_opcode(container, this->sHeaders[index].content,this->sHeaders[index].sh_offset, id.ei_class == 1 ? 1 : 0);
-            disassemble_content(container, this->sHeaders[index].content,this->sHeaders[index].sh_offset, id.ei_class == 1 ? 1 : 0,0,true);
+            disassemble_content(container, this->sHeaders[index].content,this->sHeaders[index].sh_offset, id.ei_class == 1 ? 1 : 0,0,linearSweep);
             for(std::pair<uint64_t,std::string> item : container)
             {
                 ss << std::hex << std:: showbase << item.first << "\t" << item.second << "\n";

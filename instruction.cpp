@@ -450,7 +450,7 @@ const char * Instruction::get_x87(uint8_t instruction_byte)
 std::vector<std::string> read_instruction(ArrayReader& descriptor, uint8_t arch)
 {
     const std::array<const char *, 256> *opcode_map;
-    std::vector<std::string> result(5);
+    std::vector<std::string> result = std::vector<std::string>();
 	bool read = true;
 	uint8_t current_byte;
 	Instruction inst;

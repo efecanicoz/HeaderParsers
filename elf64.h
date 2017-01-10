@@ -108,7 +108,7 @@ class Elf64 : public ExecutableFile
         std::vector<uint8_t> getHexHeader();
         std::string getHeaderInfo();
         std::vector<uint8_t> getHexSectionContent(std::string needle);
-        std::string getSectionContent(std::string);
+        std::string getSectionContent(std::string, bool);
 
 
 };

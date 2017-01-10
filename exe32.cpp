@@ -22,7 +22,7 @@ std::string Exe32::getHeaderInfo()
     return "";
 }
 
-std::string Exe32::getSectionContent(std::string needle)
+std::string Exe32::getSectionContent(std::string needle, bool linearSweep)
 {
     /*todo: fill*/
     return "";

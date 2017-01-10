@@ -95,7 +95,7 @@ void MainWindow::on_sectionListView_doubleClicked(const QModelIndex &index)
     std::string content;
     QString itemText = index.data(Qt::DisplayRole).toString();
     hexContent = exeObj->getHexSectionContent(itemText.toStdString());
-    content = exeObj->getSectionContent(itemText.toStdString());
+    content = exeObj->getSectionContent(itemText.toStdString(), ui->linearSweepButton->isChecked());
 
     ui->sectionContentBrowser->setUpdatesEnabled(false);
     ui->asciiBrowser->setUpdatesEnabled(false);

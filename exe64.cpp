@@ -17,9 +17,10 @@ std::vector<uint8_t> Exe64::getHexSectionContent(std::string needle)
 		if(this->buffer[i].nameStr == needle)
 			return this->buffer[i].contents;
 	}
+    return std::vector<uint8_t>();
 }
 
-std::string Exe64::getSectionContent(std::string needle)
+std::string Exe64::getSectionContent(std::string needle, bool linearSweep)
 {
     /*todo: fill*/
     return "";
