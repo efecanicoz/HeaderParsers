@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -43,6 +44,9 @@ HEADERS  += mainwindow.h \
     instruction.h \
     opcode.h \
     reader.h \
+    Display.h \
+    Node.h \
+    Point.h
     disassemble.h
 
 FORMS    += mainwindow.ui
