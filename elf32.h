@@ -9,7 +9,7 @@
 #include <iostream>
 #include <fstream>
 
-#include "instruction.h"
+#include "disassemble.h"
 #include "EInterface.h"
 
 
@@ -107,7 +107,7 @@ class Elf32 : public ExecutableFile
         std::string getHeaderInfo();
         std::vector<uint8_t> getHexHeader();
         std::vector<uint8_t> getHexSectionContent(std::string needle);
-        std::string getSectionContent(std::string);
+        std::string getSectionContent(std::string, bool);
 
 };
 

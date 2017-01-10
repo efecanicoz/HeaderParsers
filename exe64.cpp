@@ -51,9 +51,10 @@ std::vector<uint8_t> Exe64::getHexSectionContent(std::string needle)
 		if(this->buffer[i].nameStr == needle)
 			return this->buffer[i].contents;
 	}
+    return std::vector<uint8_t>();
 }
 
-std::string Exe64::getSectionContent(std::string needle)
+std::string Exe64::getSectionContent(std::string needle, bool linearSweep)
 {
     /*todo: fill*/
     return "";
@@ -231,6 +232,7 @@ void Exe64::readSectionTable(){
 
 void Exe64::disassemble(std::vector<std::pair<uint64_t, std::string>> &container)
 {
+  /*
     uint32_t index;
     uint64_t start_address;
     uint32_t deneme;
@@ -243,7 +245,7 @@ void Exe64::disassemble(std::vector<std::pair<uint64_t, std::string>> &container
     std::map<uint64_t, Block> block_table;
     block_table = recursive_disassemble(machineCode,start_address ,target_architecture, deneme);
     svg_create(block_table);
-	return;
+	return;*/
 
 }
 

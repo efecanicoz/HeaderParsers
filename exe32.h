@@ -15,7 +15,7 @@
     #include "reader.h"
 #endif
 #include "EInterface.h"
-#include "instruction.h"
+#include "disassemble.h"
 
 #ifndef EXE_STRUCT
 #define EXE_STRUCT
@@ -112,7 +112,7 @@ class Exe32 : public ExecutableFile
 
         std::string getHeaderInfo();
         std::vector<uint8_t> getHexHeader();
-        std::string getSectionContent(std::string);
+        std::string getSectionContent(std::string, bool );
 
 };
 #endif

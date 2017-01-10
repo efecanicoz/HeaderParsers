@@ -22,7 +22,7 @@ std::string Exe32::getHeaderInfo()
     return "";
 }
 
-std::string Exe32::getSectionContent(std::string needle)
+std::string Exe32::getSectionContent(std::string needle, bool linearSweep)
 {
     /*todo: fill*/
     return "";
@@ -195,7 +195,7 @@ void Exe32::readSectionTable(){
 
 void Exe32::disassemble(std::vector<std::pair<uint64_t, std::string>> &container)
 {
-	uint32_t index;
+    /*uint32_t index;
 	uint32_t start_address;
 	uint32_t deneme;
 	uint8_t target_architecture = 1;
@@ -204,6 +204,6 @@ void Exe32::disassemble(std::vector<std::pair<uint64_t, std::string>> &container
 	start_address = this->buffer[index].PointerToRawData;
 	deneme = this->coff_fields.addressOfEntryPoint - this->coff_fields.baseOfCode;
 	std::vector<uint8_t> &machineCode = this->buffer[index].contents;
-	recursive_disassemble(machineCode,start_address ,target_architecture, deneme);
-	return;
+    recursive_disassemble(machineCode,start_address ,target_architecture, deneme);
+    return;*/
 }

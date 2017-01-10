@@ -12,7 +12,7 @@ class ExecutableFile
         virtual void disassemble(std::vector<std::pair<uint64_t, std::string > > &) = 0;
         virtual std::string getHeaderInfo() = 0;
         virtual std::vector<uint8_t> getHexHeader() = 0;
-        virtual std::string getSectionContent(std::string) = 0;
+        virtual std::string getSectionContent(std::string, bool) = 0;
 
 };
 

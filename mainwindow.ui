@@ -66,7 +66,7 @@
      <string>Create SVG</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton">
+   <widget class="QRadioButton" name="linearSweepButton">
     <property name="geometry">
      <rect>
       <x>140</x>
@@ -78,8 +78,11 @@
     <property name="text">
      <string>Linear Sweep</string>
     </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
    </widget>
-   <widget class="QRadioButton" name="radioButton_2">
+   <widget class="QRadioButton" name="recursiveDisasButton">
     <property name="geometry">
      <rect>
       <x>250</x>

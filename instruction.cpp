@@ -166,209 +166,209 @@ void Instruction::get_operand_value(uint8_t i)
 
 	if(imm == true)
 	{
-		if(length == 1)
-		{
-			if(sign == true)
-			{
-				operand = std::to_string((int32_t)desc->read_signed_1byte());
-			}
-			else
-			{
-				operand = std::to_string((uint32_t)desc->read_1byte());
-			}
-		}
-		else if(this->legacy_prefix & OSO)
-		{
-			if(sign == true)
-			{
-				operand = std::to_string((int32_t)desc->read_signed_2byte());
-			}
-			else
-			{
-				operand = std::to_string((uint32_t)desc->read_2byte());
-			}
-		}
-		else if(length == 4)
-		{
-			if(sign == true)
-			{
-				operand = std::to_string((int32_t)desc->read_signed_4byte());
-			}
-			else
-			{
-				operand = std::to_string((uint32_t)desc->read_4byte());
-			}
-		}
-		else if(length == 8)
-		{
-			if(sign == true)
-			{
-				operand = std::to_string((int32_t)desc->read_signed_8byte());
-			}
-			else
-			{
-				operand = std::to_string((uint32_t)desc->read_8byte());
-			}
-		}
+            if(length == 1)
+            {
+                if(sign == true)
+                {
+                        operand = std::to_string((int32_t)desc->read_signed_1byte());
+                }
+                else
+                {
+                        operand = std::to_string((uint32_t)desc->read_1byte());
+                }
+            }
+            else if(this->legacy_prefix & OSO)
+            {
+                if(sign == true)
+                {
+                        operand = std::to_string((int32_t)desc->read_signed_2byte());
+                }
+                else
+                {
+                        operand = std::to_string((uint32_t)desc->read_2byte());
+                }
+            }
+            else if(length == 4)
+            {
+                if(sign == true)
+                {
+                        operand = std::to_string((int32_t)desc->read_signed_4byte());
+                }
+                else
+                {
+                        operand = std::to_string((uint32_t)desc->read_4byte());
+                }
+            }
+            else if(length == 8)
+            {
+                if(sign == true)
+                {
+                        operand = std::to_string((int32_t)desc->read_signed_8byte());
+                }
+                else
+                {
+                        operand = std::to_string((uint32_t)desc->read_8byte());
+                }
+            }
 	}
 	else if(reg == true)
 	{
-		uint8_t regVal = 0;
-		this->read_ModRM();
-		regVal = (REX_R(this->rex) << 3) | MODRM_REG(this->modrm);
-		//operand = register_table
+            uint8_t regVal = 0;
+            this->read_ModRM();
+            regVal = (REX_R(this->rex) << 3) | MODRM_REG(this->modrm);
+            //operand = register_table
 
-		if(regSel & GPR)
-		{
-			if(length == 1)
-				operand = modrm_reg_map[0][regVal];
-			else if(length == 2)
-				operand = modrm_reg_map[1][regVal];
-			else
-			{
-				if(!REX_W(this->rex))
-					operand = modrm_reg_map[2][regVal];
-				else
-					operand = modrm_reg_map[3][regVal];
-			}
-		}
-		else if(regSel & MMX)
-		{
-			operand = modrm_reg_map[4][regVal];
-		}
-		else if(regSel & XMM)
-		{
-			operand = modrm_reg_map[5][regVal];
-		}
-		else if(regSel & YMM)
-		{
-			operand = modrm_reg_map[6][regVal];
-		}
-		else if(regSel & Segment)
-		{
-			operand = modrm_reg_map[7][regVal];
-		}
-		else if(regSel & Control)
-		{
-			operand = modrm_reg_map[8][regVal];
-		}
-		else if(regSel & Debug)
-		{
-			operand = modrm_reg_map[9][regVal];
-		}
-		else
-        {
-			;//alert
-        }
+            if(regSel & GPR)
+            {
+                if(length == 1)
+                    operand = modrm_reg_map[0][regVal];
+                else if(length == 2)
+                    operand = modrm_reg_map[1][regVal];
+                else
+                {
+                    if(!REX_W(this->rex))
+                        operand = modrm_reg_map[2][regVal];
+                    else
+                        operand = modrm_reg_map[3][regVal];
+                }
+            }
+            else if(regSel & MMX)
+            {
+                operand = modrm_reg_map[4][regVal];
+            }
+            else if(regSel & XMM)
+            {
+                operand = modrm_reg_map[5][regVal];
+            }
+            else if(regSel & YMM)
+            {
+                operand = modrm_reg_map[6][regVal];
+            }
+            else if(regSel & Segment)
+            {
+                operand = modrm_reg_map[7][regVal];
+            }
+            else if(regSel & Control)
+            {
+                operand = modrm_reg_map[8][regVal];
+            }
+            else if(regSel & Debug)
+            {
+               operand = modrm_reg_map[9][regVal];
+            }
+            else
+            {
+                            ;//alert
+            }
 	}
 	else if(mem == true)
 	{
-        static const std::array<const char *, 64> &modrm_rm_map = this->arch == 0 ? modrm_rm_map_64 : modrm_rm_map_32;
-		std::string result = "";
-		uint8_t rm, mod,memVal = 0;
-		uint32_t disp;
+            static const std::array<const char *, 64> &modrm_rm_map = this->arch == 0 ? modrm_rm_map_64 : modrm_rm_map_32;
+            std::string result = "";
+            uint8_t rm, mod,memVal = 0;
+            uint32_t disp;
 
-		this->read_ModRM();
-		rm = MODRM_RM(this->modrm);
-		mod = MODRM_MOD(this->modrm);
+            this->read_ModRM();
+            rm = MODRM_RM(this->modrm);
+            mod = MODRM_MOD(this->modrm);
 
-		memVal = (REX_B(this->rex) << 3) | rm;
-		memVal |= mod << 4;
-		//result = memory_table
-		if(mod != 0b00000011)
-		{
-			if(rm == 0b00000100)
-			{
-				result = this->read_SIB();
-			}
-			else
-			{
-				result = modrm_rm_map[memVal];
-			}
-
-			if(mod == 1)
-			{
-				disp = this->desc->read_signed_1byte();
-				if((int8_t)disp < 0)
-					operand = result + std::to_string((int8_t)disp);
-				else
-				operand = result + "+" + std::to_string((int8_t)disp);
-			}
-			else if(mod == 2)
-			{
-				disp = this->desc->read_signed_4byte();
-				if((int32_t)disp < 0)
-					operand = result + std::to_string((int32_t)disp);
-				else
-				operand = result + "+" + std::to_string((int32_t)disp);
-			}
-			else if(mod == 0 && rm == 0b00000101)
-			{
-				disp = this->desc->read_signed_4byte();
-				if(this->arch == 0)/*64-bit*/
-				{
-					if((int32_t)disp < 0)
-						operand = result + std::to_string((int32_t)disp);
-					else
-					operand = result + "+" + std::to_string((int32_t)disp);
-				}
-				else if(this->arch == 1)
-					operand = std::to_string((int32_t)disp);
-			}
-			else
-			{
-				operand = result;
-			}
-			operand = "[" + operand + "]";
-
-		}
-		else
-		{
-			/*TODO:rm de kullanılabilir ?*/
-			memVal &= 0x0F;
-			if(regSel == GPR)
-			{
-				if(length == 1)
-					operand = modrm_reg_map[0][memVal];
-				else if(length == 2)
-					operand = modrm_reg_map[1][memVal];
-				else
-				{
-					if(!REX_W(this->rex))
-						operand = modrm_reg_map[2][memVal];
-					else
-						operand = modrm_reg_map[3][memVal];
-				}
-			}
-			else if(regSel == MMX)
-			{
-				operand = modrm_reg_map[4][memVal];
-			}
-			else if(regSel == XMM)
-			{
-				operand = modrm_reg_map[5][memVal];
-			}
-			else if(regSel == YMM)
-			{
-				operand = modrm_reg_map[6][memVal];
-			}
-			else if(regSel == Segment)
-			{
-				operand = modrm_reg_map[7][memVal];
-			}
-			else if(regSel == Control)
-			{
-				operand = modrm_reg_map[8][memVal];
-			}
-			else if(regSel == Debug)
-			{
-				operand = modrm_reg_map[9][memVal];
-			}
-			else
+            memVal = (REX_B(this->rex) << 3) | rm;
+            memVal |= mod << 4;
+            //result = memory_table
+            if(mod != 0b00000011)
             {
-				;//alert
+                    if(rm == 0b00000100)
+                    {
+                            result = this->read_SIB();
+                    }
+                    else
+                    {
+                            result = modrm_rm_map[memVal];
+                    }
+
+                    if(mod == 1)
+                    {
+                            disp = this->desc->read_signed_1byte();
+                            if((int8_t)disp < 0)
+                                    operand = result + std::to_string((int8_t)disp);
+                            else
+                            operand = result + "+" + std::to_string((int8_t)disp);
+                    }
+                    else if(mod == 2)
+                    {
+                            disp = this->desc->read_signed_4byte();
+                            if((int32_t)disp < 0)
+                                    operand = result + std::to_string((int32_t)disp);
+                            else
+                            operand = result + "+" + std::to_string((int32_t)disp);
+                    }
+                    else if(mod == 0 && rm == 0b00000101)
+                    {
+                            disp = this->desc->read_signed_4byte();
+                            if(this->arch == 0)/*64-bit*/
+                            {
+                                    if((int32_t)disp < 0)
+                                            operand = result + std::to_string((int32_t)disp);
+                                    else
+                                    operand = result + "+" + std::to_string((int32_t)disp);
+                            }
+                            else if(this->arch == 1)
+                                    operand = std::to_string((int32_t)disp);
+                    }
+                    else
+                    {
+                            operand = result;
+                    }
+                    operand = "[" + operand + "]";
+
             }
-		}
+            else
+            {
+                    /*TODO:rm de kullanılabilir ?*/
+                    memVal &= 0x0F;
+                    if(regSel == GPR)
+                    {
+                        if(length == 1)
+                            operand = modrm_reg_map[0][memVal];
+                        else if(length == 2)
+                            operand = modrm_reg_map[1][memVal];
+                        else
+                        {
+                            if(!REX_W(this->rex))
+                                    operand = modrm_reg_map[2][memVal];
+                            else
+                                    operand = modrm_reg_map[3][memVal];
+                        }
+                    }
+                    else if(regSel == MMX)
+                    {
+                            operand = modrm_reg_map[4][memVal];
+                    }
+                    else if(regSel == XMM)
+                    {
+                            operand = modrm_reg_map[5][memVal];
+                    }
+                    else if(regSel == YMM)
+                    {
+                            operand = modrm_reg_map[6][memVal];
+                    }
+                    else if(regSel == Segment)
+                    {
+                            operand = modrm_reg_map[7][memVal];
+                    }
+                    else if(regSel == Control)
+                    {
+                            operand = modrm_reg_map[8][memVal];
+                    }
+                    else if(regSel == Debug)
+                    {
+                            operand = modrm_reg_map[9][memVal];
+                    }
+                    else
+                    {
+                        ;//alert
+                    }
+            }
 
 	}
 	else if(vex == true)
@@ -450,7 +450,7 @@ const char * Instruction::get_x87(uint8_t instruction_byte)
 std::vector<std::string> read_instruction(ArrayReader& descriptor, uint8_t arch)
 {
     const std::array<const char *, 256> *opcode_map;
-        std::vector<std::string> result(5);
+    std::vector<std::string> result = std::vector<std::string>();
 	bool read = true;
 	uint8_t current_byte;
 	Instruction inst;
@@ -739,105 +739,5 @@ std::vector<std::string> read_instruction(ArrayReader& descriptor, uint8_t arch)
     return result;
 }
 
-void machine_to_opcode(std::vector<std::pair<uint64_t, std::string>> &container, std::vector<uint8_t> &source,
-			uint64_t start_address, uint8_t arch)
-{
-	ArrayReader desc = ArrayReader(source, start_address);
-	uint64_t ip;
-	std::vector<std::string>inst;
-    std::string instruction;
-	while(!desc.is_complete())
-	{
-        instruction = "";
-		ip = desc.get_real_offset();
-		inst = read_instruction(desc, arch);
-		for(std::string str : inst)
-		{
-			instruction += str + " ";
-		}
-
-		/*printf("%llx\t: %s\n",ip,inst.c_str());*/
-		container.push_back(std::make_pair(ip, instruction));
-	}
-	return;
-}
-
-std::map<uint64_t, Block> recursive_disassemble(std::vector<uint8_t> &source, uint64_t start_address, uint8_t arch, uint64_t offset)
-{
-	std::map<uint64_t, Block> block_table = std::map<uint64_t, Block>();
-	ArrayReader desc = ArrayReader(source, start_address);
-	machine_to_opcode2(block_table, desc, arch, offset);
-	return block_table;
-}
-
-void machine_to_opcode2(std::map<uint64_t, Block> &table, ArrayReader &desc, uint8_t arch, uint64_t offset)
-{
-	std::vector<std::pair<uint64_t, std::string>> container = std::vector<std::pair<uint64_t, std::string>>();
-    uint64_t ip;
-	std::string inst;
-	std::vector<std::string> instruction;
-	Block current_block;
-	current_block.start_address = offset;
-	desc.counter = offset;
-
-	/*Bazı bloklar birden fazla kez oluşturuluyor, akış sırasında var olup olmadığını bilmiyoruz*/
-	while(!desc.is_complete())
-	{
-		inst = "";
-		ip = desc.get_real_offset();
-		instruction = read_instruction(desc, arch);
-		for(std::string str : instruction)
-		{
-			inst += str + " ";
-		}
-		container.push_back(std::make_pair(ip, inst));
-
-		if(instruction[0].compare("CALL") == 0)
-		{
-			/*if operand is non numeric*/
-			if((instruction[1][0] < '0' || instruction[1][0] > '9') && instruction[1][0] != '-')
-			{
-				continue;
-			}
-			current_block.jump1 = desc.counter + std::stoi(instruction[1],nullptr);
-			current_block.jump2 = desc.counter;
-			break;
-		}
-		else if(instruction[0].compare("JMP") == 0)
-		{
-			if((instruction[1][0] < '0' || instruction[1][0] > '9') && instruction[1][0] != '-')
-			{
-				break;
-			}
-			current_block.jump1 = desc.counter + std::stoi(instruction[1],nullptr);
-			break;
-		}
-		else if(instruction[0].find("J") == 0)
-		{
-			/*conditional jump*/
-			current_block.jump1 = desc.counter + std::stoi(instruction[1],nullptr);
-			current_block.jump2 = desc.counter;
-			break;
-		}
-		else if(instruction[0].compare("RET") == 0)
-		{
-			break;
-		}
-	}
-	/*add this block to the global table*/
-	current_block.content = container;
-	table[current_block.start_address] = current_block;
-	if(current_block.jump1 != 0 && desc.within_array(current_block.jump1) && table.count(current_block.jump1) == 0)
-    {
-		machine_to_opcode2(table, desc, arch, current_block.jump1);
-
-	}
-	if(current_block.jump2 != 0 && desc.within_array(current_block.jump2) && table.count(current_block.jump2) == 0)
-    {
-		return machine_to_opcode2(table, desc, arch, current_block.jump2);
-
-	}
-	return;
-}
 
 

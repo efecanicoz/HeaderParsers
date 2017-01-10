@@ -13,6 +13,12 @@ TARGET = final_project
 TEMPLATE = app
 
 
+
+#QMAKE_CXXFLAGS_DEBUG *= -pg
+#QMAKE_LFLAGS_DEBUG *= -pg
+
+#CONFIG += debug
+
 SOURCES += main.cpp\
     mainwindow.cpp \
     arrayReader.cpp \
@@ -23,7 +29,8 @@ SOURCES += main.cpp\
     exe64.cpp \
     fileReader.cpp \
     instruction.cpp \
-    reader.cpp
+    reader.cpp \
+    disassemble.cpp
 
 HEADERS  += mainwindow.h \
     arrayReader.h \
@@ -40,6 +47,7 @@ HEADERS  += mainwindow.h \
     Display.h \
     Node.h \
     Point.h
+    disassemble.h
 
 FORMS    += mainwindow.ui
 
