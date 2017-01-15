@@ -74,7 +74,6 @@ void MainWindow::on_pushButton_clicked()
         /*Invalid file*/
         return;
     }
-    ui->pushButton_2->setEnabled(false);
     /*Fill sectionListView*/
     stringList = new QStringList();
     sectionList = exeObj->getSectionNames();
