@@ -97,9 +97,7 @@ class Elf64 : public ExecutableFile
 
         std::vector<std::string> getSectionNames();
         uint32_t getSection(std::string);
-		uint64_t getSectionAddress(std::string);
-		void disassemble(std::vector<std::pair<uint64_t, std::string>> &);
-		void disassembleAll(std::vector<std::pair<uint64_t, std::string>> &);
+        uint64_t getSectionAddress(std::string);
 
         std::string getRelaInfo();
         std::string getRelInfo();

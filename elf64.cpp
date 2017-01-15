@@ -503,40 +503,32 @@ void Elf64::read(uint8_t* to, uint8_t* from, uint8_t offset)
 {
     if(this->id.ei_data == 1)//lsb
         readLittleEndian(to,from,offset);
-    else if(this->id.ei_data == 2)//msb
+    else//msb
         readBigEndian(to,from,offset);
-    else
-        ;//TODO: throw something to user
 }
 
 void Elf64::read(uint16_t* to, uint8_t* from, uint8_t offset)
 {
     if(this->id.ei_data == 1)//lsb
         readLittleEndian(to,from,offset);
-    else if(this->id.ei_data == 2)//msb
+    else//msb
         readBigEndian(to,from,offset);
-    else
-        ;//TODO: throw something to user
 }
 
 void Elf64::read(uint32_t* to, uint8_t* from, uint8_t offset)
 {
     if(this->id.ei_data == 1)//lsb
         readLittleEndian(to,from,offset);
-    else if(this->id.ei_data == 2)//msb
+    else//msb
         readBigEndian(to,from,offset);
-    else
-        ;//TODO: throw something to user
 }
 
 void Elf64::read(uint64_t* to, uint8_t* from, uint8_t offset)
 {
     if(this->id.ei_data == 1)//lsb
         readLittleEndian(to,from,offset);
-    else if(this->id.ei_data == 2)//msb
+    else//msb
         readBigEndian(to,from,offset);
-    else
-        ;//TODO: throw something to user
 }
 
 
@@ -835,7 +827,7 @@ std::string Elf64::getSectionContent(std::string needle, bool linearSweep = true
         {
             ss << "Dynamic Symbol Table" << "\n";
         }
-        for(struct Elf64_sym &symbol: sHeaders[index].sh_type == 2 ? staticSymbolTable : dynamicSymbolTable)
+        for(auto &symbol: sHeaders[index].sh_type == 2 ? staticSymbolTable : dynamicSymbolTable)
         {
             ss << "Symbol no: " << counter++ << "\n";
             ss << "\tName: " << symbol.name << "\n";
@@ -964,21 +956,6 @@ uint64_t Elf64::getSectionAddress(std::string needle)
     }
     return 0;
 }
-
-void Elf64::disassemble(std::vector<std::pair<uint64_t, std::string>> &container)
-{
-    /*uint8_t i;
-
-	for(i = 0; i < this->sHeaders.size(); i++)
-	{
-		if(this->sHeaders[i].sh_flags & 4U)
-        {
-			machine_to_opcode(container, this->sHeaders[i].content, this->sHeaders[i].sh_addr,0);
-		}
-	}
-    return;*/
-}
-
 
 void Elf64::readSymbolTable(Elf64SH &section)
 {

@@ -106,8 +106,7 @@ class Exe64 : public ExecutableFile
  
         std::vector<uint8_t> getHexSectionContent(std::string);
 		std::vector<std::string> getSectionNames();
-		uint8_t getSection(std::string needle);
-		void disassemble(std::vector<std::pair<uint64_t, std::string>> &);
+        uint8_t getSection(std::string needle);
 
         std::string getHeaderInfo();
         std::vector<uint8_t> getHexHeader();

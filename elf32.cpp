@@ -225,40 +225,32 @@ void Elf32::read(uint8_t* to, uint8_t* from, uint8_t offset)
 {
     if(this->id.ei_data == 1)//lsb
         readLittleEndian(to,from,offset);
-    else if(this->id.ei_data == 2)//msb
+    else//msb
         readBigEndian(to,from,offset);
-    else
-        ;//TODO: throw something to user
 }
 
 void Elf32::read(uint16_t* to, uint8_t* from, uint8_t offset)
 {
     if(this->id.ei_data == 1)//lsb
         readLittleEndian(to,from,offset);
-    else if(this->id.ei_data == 2)//msb
+    else//msb
         readBigEndian(to,from,offset);
-    else
-        ;//TODO: throw something to user
 }
 
 void Elf32::read(uint32_t* to, uint8_t* from, uint8_t offset)
 {
     if(this->id.ei_data == 1)//lsb
         readLittleEndian(to,from,offset);
-    else if(this->id.ei_data == 2)//msb
+    else//msb
         readBigEndian(to,from,offset);
-    else
-        ;//TODO: throw something to user
 }
 
 void Elf32::read(uint64_t* to, uint8_t* from, uint8_t offset)
 {
     if(this->id.ei_data == 1)//lsb
         readLittleEndian(to,from,offset);
-    else if(this->id.ei_data == 2)//msb
+    else//msb
         readBigEndian(to,from,offset);
-    else
-        ;//TODO: throw something to user
 }
 
 std::string Elf32::getRelInfo()
@@ -660,7 +652,7 @@ std::string Elf32::getSectionContent(std::string needle, bool linearSweep)
         {
             ss << "Dynamic Symbol Table" << "\n";
         }
-        for(struct Elf32_sym symbol: sHeaders[index].sh_type == 2 ? staticSymbolTable : dynamicSymbolTable)
+        for(auto symbol: sHeaders[index].sh_type == 2 ? staticSymbolTable : dynamicSymbolTable)
         {
             ss << "Symbol no: " << counter++ << "\n";
             ss << "\tName: " << symbol.name << "\n";
@@ -804,23 +796,6 @@ uint32_t Elf32::getSectionAddress(std::string needle)
     }
     return 0;
 }
-
-
-void Elf32::disassemble(std::vector<std::pair<uint64_t, std::string>> &container)
-{
-    /*
-	uint8_t i;
-
-	for(i = 0; i < this->sHeaders.size(); i++)
-	{
-		if(this->sHeaders[i].sh_flags & 4U)
-        {
-            disassemble(container, this->sHeaders[i].content, this->sHeaders[i].sh_addr,1);
-		}
-	}
-    return;*/
-}
-
 
 void Elf32::readSymbolTable(Elf32SH &section)
 {

@@ -454,25 +454,6 @@ void Exe64::readSectionTable(){
 
 }
 
-void Exe64::disassemble(std::vector<std::pair<uint64_t, std::string>> &container)
-{
-  /*
-    uint32_t index;
-    uint64_t start_address;
-    uint32_t deneme;
-    uint8_t target_architecture = 0;
-
-    index = this->getSection(".text");
-    start_address = this->buffer[index].PointerToRawData;
-    deneme = this->coff_fields.addressOfEntryPoint - this->coff_fields.baseOfCode;
-    std::vector<uint8_t> &machineCode = this->buffer[index].contents;
-    std::map<uint64_t, Block> block_table;
-    block_table = recursive_disassemble(machineCode,start_address ,target_architecture, deneme);
-    svg_create(block_table);
-	return;*/
-
-}
-
 void Exe64::create_svg(std::string section_name)
 {
     exe_section_table &section = this->buffer[getSection(section_name)];

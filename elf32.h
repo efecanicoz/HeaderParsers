@@ -93,7 +93,6 @@ class Elf32 : public ExecutableFile
         void readSectionHeader(uint32_t, uint32_t);
         void readSectionHeaders();
         void readSymbolTable(Elf32SH &);
-        void disassembleAll(std::vector<std::pair<uint64_t, std::string>> &);
 
         std::string getRelaInfo();
         std::string getRelInfo();
@@ -102,7 +101,6 @@ class Elf32 : public ExecutableFile
 		std::vector<std::string> getSectionNames();
         uint32_t getSection(std::string);
         uint32_t getSectionAddress(std::string);
-		void disassemble(std::vector<std::pair<uint64_t, std::string>> &);
 
         std::string getHeaderInfo();
         std::vector<uint8_t> getHexHeader();

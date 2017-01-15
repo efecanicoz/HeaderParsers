@@ -314,6 +314,7 @@ std::vector<uint8_t> Exe32::getHexSectionContent(std::string needle)
 		if(this->buffer[i].nameStr == needle)
 			return this->buffer[i].contents;
 	}
+    return std::vector<uint8_t>();
 }
 
 std::vector<uint8_t> Exe32::getHexHeader()
@@ -460,21 +461,6 @@ void Exe32::readSectionTable(){
     
     
     return;
-}
-
-void Exe32::disassemble(std::vector<std::pair<uint64_t, std::string>> &container)
-{
-    /*uint32_t index;
-	uint32_t start_address;
-	uint32_t deneme;
-	uint8_t target_architecture = 1;
-
-	index = this->getSection(".text");
-	start_address = this->buffer[index].PointerToRawData;
-	deneme = this->coff_fields.addressOfEntryPoint - this->coff_fields.baseOfCode;
-	std::vector<uint8_t> &machineCode = this->buffer[index].contents;
-    recursive_disassemble(machineCode,start_address ,target_architecture, deneme);
-    return;*/
 }
 
 void Exe32::create_svg(std::string section_name)
