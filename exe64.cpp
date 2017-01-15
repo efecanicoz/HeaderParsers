@@ -115,8 +115,7 @@ std::string Exe64::getHeaderInfo()
     ss << "\tMachine: " << temp_string << "\n";
     ss << "\tNuber of sections: " << coff.NumberOfSections << "\n";
      long int timeLong = coff.TimeDateStamp;
-    const time_t time = std::time(&timeLong);
-    ss << "\tTimeDateStamp: " << std::asctime(std::localtime(&time)) << "\n";
+    ss << "\tTimeDateStamp: " << std::asctime(std::localtime(&timeLong)) << "\n";
     ss << "\tAddress of symbol table: " << std::hex << std::showbase << coff.PointerToSymbolTable << "\n";
     ss << "\tNumber of symbols: " << coff.NumberOfSymbols;
     ss << "\tSize of optional header: " << coff.SizeOfOptionalHeader << "\n";

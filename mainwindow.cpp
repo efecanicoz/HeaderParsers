@@ -87,8 +87,6 @@ void MainWindow::on_pushButton_clicked()
     headerHexContent = exeObj->getHexHeader();
     ui->asciiBrowser->setPlainText(format_for_ascii_view(headerHexContent));
     ui->hexBrowser->setPlainText(format_for_hex_view(headerHexContent));
-
-
 }
 
 void MainWindow::on_sectionListView_doubleClicked(const QModelIndex &index)
