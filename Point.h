@@ -6,8 +6,8 @@
 //  Copyright © 2016 İsmail Fırat Sezel. All rights reserved.
 //
 
-#ifndef Point_h
-#define Point_h
+#ifndef POINT_H
+#define POINT_H
 
 struct Points {
     int x, y;

@@ -1,8 +1,7 @@
-#ifndef READER
-    #include "reader.h"
-#endif
 #ifndef ELF64
 #define ELF64
+
+#include "reader.h"
 #include <iostream>
 #include <fstream>
 #include <string>

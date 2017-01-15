@@ -6,9 +6,7 @@
 #include <utility>
 #include <array>
 #include <cstring>
-#ifndef ARRAYREADER_H
-	#include "arrayReader.h"
-#endif
+#include "arrayReader.h"
 #include "opcode.h"
 
 enum legacy_prefixes{OSO=1,ASO=2,CS=4,DS=8,ES=16,FS=32,GS=64,SS=128,LOCK=256,REPE=512,REPNE=1024};

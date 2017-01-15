@@ -5,12 +5,11 @@
 //  Created by Fırat Sezel on 30/11/2016.
 //  Copyright © 2016 İsmail Fırat Sezel. All rights reserved.
 //
-#ifndef Point_h
-#include "Point.h"
-#endif
 
-#ifndef Node_h
-#define Node_h
+
+#ifndef NODE_H
+#define NODE_H
+#include "Point.h"
 #include <vector>
 
 class Node

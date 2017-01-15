@@ -1,5 +1,5 @@
-#ifndef EXEC_H
-#define EXEC_H
+#ifndef EINTERFACE_H
+#define EINTERFACE_H
 
 #include <vector>
 #include <string>

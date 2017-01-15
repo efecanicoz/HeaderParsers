@@ -1,8 +1,7 @@
-#ifndef READER
-    #include "reader.h"
-#endif
 #ifndef ELF32
 #define ELF32
+
+#include "reader.h"
 #include <cstdint>
 #include <vector>
 #include <list>

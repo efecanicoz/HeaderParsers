@@ -261,7 +261,6 @@ void Elf32::read(uint64_t* to, uint8_t* from, uint8_t offset)
         ;//TODO: throw something to user
 }
 
-
 std::string Elf32::getRelInfo()
 {
     std::stringstream ss;

@@ -6,14 +6,16 @@
 //  Copyright © 2016 İsmail Fırat Sezel. All rights reserved.
 //
 
+#ifndef EXE32
+#define EXE32
+
 #include <cstdint>
 #include <vector>
 #include <list>
 #include <iostream>
 #include <fstream>
-#ifndef READER
-    #include "reader.h"
-#endif
+#include <ctime>
+#include "reader.h"
 #include "EInterface.h"
 #include "disassemble.h"
 
@@ -83,8 +85,6 @@
 		uint32_t Characteristics;
 	};
 #endif
-#ifndef EXE32
-#define EXE32
 
 class Exe32 : public ExecutableFile
 {

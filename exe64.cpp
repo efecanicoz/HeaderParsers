@@ -54,11 +54,7 @@ std::vector<uint8_t> Exe64::getHexSectionContent(std::string needle)
     return std::vector<uint8_t>();
 }
 
-std::string Exe64::getSectionContent(std::string needle, bool linearSweep)
-{
-    /*todo: fill*/
-    return "";
-}
+
 
 std::vector<uint8_t> Exe64::getHexHeader()
 {
@@ -67,8 +63,292 @@ std::vector<uint8_t> Exe64::getHexHeader()
 
 std::string Exe64::getHeaderInfo()
 {
-    /*todo: fill*/
-    return "";
+    std::stringstream ss;
+    std::string temp_string = "";
+    ss << "DOS header: \n";
+    ss << "\tMagic bytes: "<< std::hex << std::showbase << id.exe_magic << "\n";
+    ss << "COFF header: \n";
+    ss << "\tSignature: " << std::hex << std::showbase << coff.Signature << "\n";
+    switch (coff.Machine)
+    {
+    case 0x0:
+        temp_string = "Any";
+        break;
+    case 0x1D3:
+        temp_string = "Matsushita AM33";
+        break;
+    case 0x8664:
+        temp_string = "x64";
+        break;
+    case 0x1C0:
+        temp_string = "ARM little endian";
+        break;
+    case 0xAA64:
+        temp_string = "ARM64 little endian";
+        break;
+    case 0x1C4:
+        temp_string = "ARM Thumb-2 little endian";
+        break;
+    case 0xEBC:
+        temp_string = "EFI byte code";
+        break;
+    case 0x14C:
+        temp_string = "Intel 386 and successors";
+        break;
+    case 0x200:
+        temp_string = "Intel Itanium";
+        break;
+    case 0x9041:
+        temp_string = "Mitsubishi M32R little endian";
+        break;
+    case 0x266:
+        temp_string = "MIPS16";
+        break;
+    case 0x366:
+        temp_string = "MIPS with FPU";
+        break;
+    case 0x466:
+        temp_string = "MIPS16 with FPU";
+        break;
+    case 0x1F0:
+        temp_string = "Power PC little endian";
+        break;
+    case 0x1F1:
+        temp_string = "Power PC with floating point support";
+        break;
+    case 0x166:
+        temp_string = "MIPS little endian";
+        break;
+    case 0x5032:
+        temp_string = "RISC-V 32-bit address space";
+        break;
+    case 0x5064:
+        temp_string = "RISC-V 64-bit address space";
+        break;
+    case 0x5128:
+        temp_string = "RISC-V 128-bit address space";
+        break;
+    case 0x1A2:
+        temp_string = "Hitachi SH3";
+        break;
+    case 0x1A3:
+        temp_string = "Hitachi SH3 DSP";
+        break;
+    case 0x1A6:
+        temp_string = "Hitachi SH4";
+        break;
+    case 0x1A8:
+        temp_string = "Hitachi SH5";
+        break;
+    case 0x1C2:
+        temp_string = "Thumb";
+        break;
+    case 0x169:
+        temp_string = "MIPS little-endian WCE v2";
+        break;
+    default:
+        temp_string = "Machine unknown";
+        break;
+    }
+    ss << "\tMachine: " << temp_string << "\n";
+    ss << "\tNuber of sections: " << coff.NumberOfSections << "\n";
+     long int timeLong = coff.TimeDateStamp;
+    const time_t time = std::time(&timeLong);
+    ss << "\tTimeDateStamp: " << std::asctime(std::localtime(&time)) << "\n";
+    ss << "\tAddress of symbol table: " << std::hex << std::showbase << coff.PointerToSymbolTable << "\n";
+    ss << "\tNumber of symbols: " << coff.NumberOfSymbols;
+    ss << "\tSize of optional header: " << coff.SizeOfOptionalHeader << "\n";
+    temp_string = "";
+    if(coff.Characteristics & 0x0001)
+        temp_string += "IMAGE_FILE_RELOCS_STRIPPED ";
+    if(coff.Characteristics & 0x0002)
+        temp_string += "IMAGE_FILE_EXECUTABLE_IMAGE ";
+    if(coff.Characteristics & 0x0004)
+        temp_string += "IMAGE_FILE_LINE_NUMS_STRIPPED ";
+    if(coff.Characteristics & 0x0008)
+        temp_string += "IMAGE_FILE_LOCAL_SYMS_STRIPPED ";
+    if(coff.Characteristics & 0x0010)
+        temp_string += "IMAGE_FILE_AGGRESSIVE_WS_TRIM ";
+    if(coff.Characteristics & 0x0020)
+        temp_string += "IMAGE_FILE_LARGE_ADDRESS_AWARE ";
+    if(coff.Characteristics & 0x0040)
+        temp_string += "RESERVED ";
+    if(coff.Characteristics & 0x0080)
+        temp_string += "IMAGE_FILE_BYTES_REVERSED_LO ";
+    if(coff.Characteristics & 0x0100)
+        temp_string += "IMAGE_FILE_32BIT_MACHINE ";
+    if(coff.Characteristics & 0x0200)
+        temp_string += "IMAGE_FILE_DEBUG_STRIPPED ";
+    if(coff.Characteristics & 0x0400)
+        temp_string += "IMAGE_FILE_REMOVABLE_RUN_FROM_SWAP ";
+    if(coff.Characteristics & 0x0800)
+        temp_string += "IMAGE_FILE_NET_RUN_FROM_SWAP ";
+    if(coff.Characteristics & 0x1000)
+        temp_string += "IMAGE_FILE_SYSTEM ";
+    if(coff.Characteristics & 0x2000)
+        temp_string += "IMAGE_FILE_DLL ";
+    if(coff.Characteristics & 0x4000)
+        temp_string += "IMAGE_FILE_UP_SYSTEM_ONLY ";
+    if(coff.Characteristics & 0x8000)
+        temp_string += "IMAGE_FILE_BYTES_REVERSED_HI ";
+    ss << "\tCharacteristics: " << temp_string << "\n";
+
+    ss << "Optional Header:\n";
+    ss << "\tMagic number: " << ((coff_fields.magic == 0x10B) ? "PE32\n" : "PE32+\n");
+    ss << "\tMajor linker version: " << std::hex << std::showbase << coff_fields.majorLinkerVersion << "\n";
+    ss << "\tMinor linker version: " << std::hex << std::showbase << coff_fields.minorLinkerVersion << "\n";
+    ss << "\tSize of code section: " << coff_fields.sizeOfCode << "\n";
+    ss << "Size of initialized data: " << coff_fields.sizeOfInitializedData << "\n";
+    ss << "Size of uninitialized data: " << coff_fields.sizeOfUninitializedData << "\n";
+    ss << "Address of entry point: " << coff_fields.addressOfEntryPoint << "\n";
+    ss << "Base of code: " << coff_fields.baseOfCode << "\n";
+    ss << "Base of data: " << coff_fields.baseOfData << "\n";
+
+    return ss.str();
+}
+
+std::string Exe64::getSectionContent(std::string needle, bool linearSweep)
+{
+    uint8_t sectionIndex;
+    std::stringstream ss;
+    std::string temp_string = "";
+    std::vector<std::pair<uint64_t,std::string>> container = std::vector<std::pair<uint64_t,std::string>>();
+
+    sectionIndex = getSection(needle);
+    exe_section_table &section = this->buffer[sectionIndex];
+    ss << "Section Header Info\n";
+    ss << "Name: " << section.nameStr << "\n";
+    ss << "Virtual size: " << section.VirtualSize << "\n";
+    ss << "Virtual address:" << std::hex << std::showbase << section.VirtualAddress << "\n";
+    ss << "Size of raw data: " << section.SizeofRawData << "\n";
+    ss << "Pointer to raw data: " << std::hex << std::showbase << section.PointerToRawData << "\n";
+    ss << "Pointer to relocations: " << std::hex << std::showbase << section.PointertoRelocations << "\n";
+    ss << "Pointer to line numbers: " << std::hex << std::showbase << section.PointertoLineNumbers << "\n";
+    ss << "Number of relocations: " << section.NumberofRelocations << "\n";
+    ss << "Number of line numbers: " << section.NumberofLineNumbers << "\n";
+    temp_string = "";
+    if(section.Characteristics & 0x00000000)
+        temp_string += "Reserved ";
+    if(section.Characteristics & 0x00000001)
+        temp_string += "Reserved ";
+    if(section.Characteristics & 0x00000002)
+        temp_string += "Reserved ";
+    if(section.Characteristics & 0x00000004)
+        temp_string += "Reserved ";
+    if(section.Characteristics & 0x00000008)
+        temp_string += "IMAGE_SCN_TYPE_NO_PAD ";
+    if(section.Characteristics & 0x00000010)
+        temp_string += "Reserved ";
+    if(section.Characteristics & 0x00000020)
+        temp_string += "IMAGE_SCN_CNT_CODE ";
+    if(section.Characteristics & 0x00000040)
+        temp_string += "IMAGE_SCN_CNT_INITIALIZED_DATA ";
+    if(section.Characteristics & 0x00000080)
+        temp_string += "IMAGE_SCN_CNT_UNINITIALIZED_DATA ";
+    if(section.Characteristics & 0x00000100)
+        temp_string += "IMAGE_SCN_LNK_OTHER ";
+    if(section.Characteristics & 0x00000200)
+        temp_string += "IMAGE_SCN_LNK_INFO ";
+    if(section.Characteristics & 0x00000400)
+        temp_string += "Reserved ";
+    if(section.Characteristics & 0x00000800)
+        temp_string += "IMAGE_SCN_LNK_REMOVE ";
+    if(section.Characteristics & 0x00001000)
+        temp_string += "IMAGE_SCN_LNK_COMDAT ";
+    if(section.Characteristics & 0x00002000)
+        temp_string += "Reserved ";
+    if(section.Characteristics & 0x00004000)
+        temp_string += "Reserved ";
+    if(section.Characteristics & 0x00008000)
+        temp_string += "IMAGE_SCN_GPREL ";
+    if(section.Characteristics & 0x00010000)
+        temp_string += "IMAGE_SCN_MEM_PURGEABLE ";
+    if(section.Characteristics & 0x00020000)
+        temp_string += "IMAGE_SCN_MEM_16BIT ";
+    if(section.Characteristics & 0x00040000)
+        temp_string += "IMAGE_SCN_MEM_LOCKED ";
+    if(section.Characteristics & 0x00080000)
+        temp_string += "IMAGE_SCN_MEM_PRELOAD ";
+    switch ((section.Characteristics & 0x00F00000) >> 20 )
+    {
+    case 0:
+        temp_string += " ";
+        break;
+    case 1:
+        temp_string += "IMAGE_SCN_ALIGN_1BYTES ";
+        break;
+    case 2:
+        temp_string += "IMAGE_SCN_ALIGN_2BYTES ";
+        break;
+    case 3:
+        temp_string += "IMAGE_SCN_ALIGN_4BYTES ";
+        break;
+    case 4:
+        temp_string += "IMAGE_SCN_ALIGN_8BYTES ";
+        break;
+    case 5:
+        temp_string += "IMAGE_SCN_ALIGN_16BYTES ";
+        break;
+    case 6:
+        temp_string += "IMAGE_SCN_ALIGN_32BYTES ";
+        break;
+    case 7:
+        temp_string += "IMAGE_SCN_ALIGN_64BYTES ";
+        break;
+    case 8:
+        temp_string += "IMAGE_SCN_ALIGN_128BYTES ";
+        break;
+    case 9:
+        temp_string += "IMAGE_SCN_ALIGN_256BYTES ";
+        break;
+    case 10:
+        temp_string += "IMAGE_SCN_ALIGN_512BYTES ";
+        break;
+    case 11:
+        temp_string += "IMAGE_SCN_ALIGN_1024BYTES ";
+        break;
+    case 12:
+        temp_string += "IMAGE_SCN_ALIGN_2048BYTES ";
+        break;
+    case 13:
+        temp_string += "IMAGE_SCN_ALIGN_4096BYTES ";
+        break;
+    case 14:
+        temp_string += "IMAGE_SCN_ALIGN_8192BYTES ";
+        break;
+    default:
+        temp_string += "";
+        break;
+    }
+    if(section.Characteristics & 0x01000000)
+        temp_string += "IMAGE_SCN_LNK_NRELOC_OVFL";
+    if(section.Characteristics & 0x02000000)
+        temp_string += "IMAGE_SCN_MEM_DISCARDABLE";
+    if(section.Characteristics & 0x04000000)
+        temp_string += "IMAGE_SCN_MEM_NOT_CACHED";
+    if(section.Characteristics & 0x08000000)
+        temp_string += "IMAGE_SCN_MEM_NOT_PAGED";
+    if(section.Characteristics & 0x10000000)
+        temp_string += "IMAGE_SCN_MEM_SHARED";
+    if(section.Characteristics & 0x20000000)
+        temp_string += "IMAGE_SCN_MEM_EXECUTE";
+    if(section.Characteristics & 0x40000000)
+        temp_string += "IMAGE_SCN_MEM_READ";
+    if(section.Characteristics & 0x80000000)
+        temp_string += "IMAGE_SCN_MEM_WRITE";
+    ss << "Characteristics: " << temp_string << "\n";
+
+    ss << "-----------------------------------------------\n";
+
+    if(section.Characteristics & 0x00000020)/*if it has code inside*/
+    {
+        disassemble_content(container, section.contents, section.PointerToRawData, 0, coff_fields.addressOfEntryPoint - coff_fields.baseOfCode, linearSweep );
+        for(auto &line: container)
+        {
+            ss << std::hex << std:: showbase << line.first << "\t" << line.second << "\n";
+        }
+    }
+    return ss.str();
 }
 
 uint8_t Exe64::getSection(std::string needle)

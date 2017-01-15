@@ -1,11 +1,13 @@
+#ifndef EXE64
+#define EXE64
+
 #include <cstdint>
 #include <vector>
 #include <list>
 #include <iostream>
 #include <fstream>
-#ifndef READER
-    #include "reader.h"
-#endif
+#include "reader.h"
+#include <ctime>
 
 #include "EInterface.h"
 #include "disassemble.h"
@@ -77,8 +79,6 @@
 	};
 #endif
 
-#ifndef EXE64
-#define EXE64
 
 
 class Exe64 : public ExecutableFile
