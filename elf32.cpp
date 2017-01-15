@@ -127,7 +127,7 @@ std::string Elf32::getHeaderInfo()
         temp_string = "Shared object file";
     else if(e_type == 4)
         temp_string = "Core file";
-    else if(e_type > 0xff00 && e_type <= 0xffff)
+    else if(e_type > 0xff00)
         temp_string = "Processor Specific information";
     else
         temp_string = "Invalid file type";
