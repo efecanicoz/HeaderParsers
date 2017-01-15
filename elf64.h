@@ -12,6 +12,7 @@
 #include <list>
 #include "EInterface.h"
 #include "disassemble.h"
+#include "svg.h"
 
 
 class Elf64SH

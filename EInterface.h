@@ -14,7 +14,6 @@ class ExecutableFile
         virtual std::vector<uint8_t> getHexHeader() = 0;
         virtual std::string getSectionContent(std::string, bool) = 0;
         virtual void create_svg(std::string) = 0;
-
 };
 
 #endif

@@ -855,9 +855,10 @@ void Elf32::readSymbolTable(Elf32SH &section)
 	}
 }
 
-void Elf32::create_svg(std::string)
+void Elf32::create_svg(std::string section_name)
 {
-    /*std::map<uint64_t, Block> &block_table = get_blocks(section.contents, section.PointerToRawData, 0, coff_fields.addressOfEntryPoint - coff_fields.baseOfCode);
+    Elf32SH &section = this->sHeaders[getSection(section_name)];
+    std::map<uint64_t, Block> block_table = get_blocks(section.content, section.sh_addr, 1, 0);
 
-    svg_create(block_table);*/
+    svg_create(block_table);
 }

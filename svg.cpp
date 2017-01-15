@@ -13,7 +13,8 @@ Node cachenode;
 Node nod, linkNod, link2Nod;
 Points current;
 
-void svg_create(std::map<uint64_t, Block> block_table){
+void svg_create(std::map<uint64_t, Block> &block_table)
+{
     printf("Enter the Function.");
     Block block;
     svg::Polygon border(svg::Stroke(1, svg::Color::Red));

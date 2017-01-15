@@ -276,21 +276,21 @@ std::string Exe32::getSectionContent(std::string needle, bool linearSweep)
         break;
     }
     if(section.Characteristics & 0x01000000)
-        temp_string += "IMAGE_SCN_LNK_NRELOC_OVFL";
+        temp_string += "IMAGE_SCN_LNK_NRELOC_OVFL ";
     if(section.Characteristics & 0x02000000)
-        temp_string += "IMAGE_SCN_MEM_DISCARDABLE";
+        temp_string += "IMAGE_SCN_MEM_DISCARDABLE ";
     if(section.Characteristics & 0x04000000)
-        temp_string += "IMAGE_SCN_MEM_NOT_CACHED";
+        temp_string += "IMAGE_SCN_MEM_NOT_CACHED ";
     if(section.Characteristics & 0x08000000)
-        temp_string += "IMAGE_SCN_MEM_NOT_PAGED";
+        temp_string += "IMAGE_SCN_MEM_NOT_PAGED ";
     if(section.Characteristics & 0x10000000)
-        temp_string += "IMAGE_SCN_MEM_SHARED";
+        temp_string += "IMAGE_SCN_MEM_SHARED ";
     if(section.Characteristics & 0x20000000)
-        temp_string += "IMAGE_SCN_MEM_EXECUTE";
+        temp_string += "IMAGE_SCN_MEM_EXECUTE ";
     if(section.Characteristics & 0x40000000)
-        temp_string += "IMAGE_SCN_MEM_READ";
+        temp_string += "IMAGE_SCN_MEM_READ ";
     if(section.Characteristics & 0x80000000)
-        temp_string += "IMAGE_SCN_MEM_WRITE";
+        temp_string += "IMAGE_SCN_MEM_WRITE ";
     ss << "Characteristics: " << temp_string << "\n";
 
     ss << "-----------------------------------------------\n";
@@ -480,7 +480,7 @@ void Exe32::disassemble(std::vector<std::pair<uint64_t, std::string>> &container
 void Exe32::create_svg(std::string section_name)
 {
     exe_section_table &section = this->buffer[getSection(section_name)];
-    std::map<uint64_t, Block> block_table = get_blocks(section.contents, section.PointerToRawData, 0, coff_fields.addressOfEntryPoint - coff_fields.baseOfCode);
+    std::map<uint64_t, Block> block_table = get_blocks(section.contents, section.PointerToRawData, 1, coff_fields.addressOfEntryPoint - coff_fields.baseOfCode);
 
     svg_create(block_table);
 }

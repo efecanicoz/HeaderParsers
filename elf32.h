@@ -10,6 +10,7 @@
 
 #include "disassemble.h"
 #include "EInterface.h"
+#include "svg.h"
 
 
 class Elf32SH
