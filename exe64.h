@@ -8,6 +8,8 @@
 #include <fstream>
 #include "reader.h"
 #include <ctime>
+#include "block.h"
+#include "svg.h"
 
 #include "EInterface.h"
 #include "disassemble.h"
@@ -111,5 +113,7 @@ class Exe64 : public ExecutableFile
         std::vector<uint8_t> getHexHeader();
         std::string getSectionContent(std::string, bool);
 
+
+        void create_svg(std::string);
 };
 #endif

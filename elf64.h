@@ -110,6 +110,7 @@ class Elf64 : public ExecutableFile
         std::string getSectionContent(std::string, bool);
 
 
+        void create_svg(std::string);
 };
 
 #endif

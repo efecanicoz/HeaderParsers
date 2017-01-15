@@ -30,7 +30,9 @@ SOURCES += main.cpp\
     fileReader.cpp \
     instruction.cpp \
     reader.cpp \
-    disassemble.cpp
+    disassemble.cpp \
+    svg.cpp \
+    display.cpp
 
 HEADERS  += mainwindow.h \
     arrayReader.h \
@@ -46,7 +48,8 @@ HEADERS  += mainwindow.h \
     reader.h \
     Display.h \
     Node.h \
-    Point.h
+    Point.h \
+    svg.h
     disassemble.h
 
 FORMS    += mainwindow.ui

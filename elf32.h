@@ -108,6 +108,7 @@ class Elf32 : public ExecutableFile
         std::vector<uint8_t> getHexSectionContent(std::string needle);
         std::string getSectionContent(std::string, bool);
 
+        void create_svg(std::string);
 };
 
 #endif

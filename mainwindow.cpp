@@ -111,5 +111,7 @@ void MainWindow::on_sectionListView_doubleClicked(const QModelIndex &index)
 
 void MainWindow::on_pushButton_2_clicked()
 {
-
+    QModelIndexList selected_section_list = ui->sectionListView->selectionModel()->selectedIndexes();
+    std::string selected_section = selected_section_list.at(0).data(Qt::DisplayRole).toString().toStdString();
+    exeObj->create_svg(selected_section);
 }

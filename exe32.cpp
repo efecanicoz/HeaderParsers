@@ -332,7 +332,6 @@ uint8_t Exe32::getSection(std::string needle)
 	return 0;
 }
 
-
 std::vector<std::string> Exe32::getSectionNames()
 {
 	std::vector<std::string> temp = std::vector<std::string>();
@@ -367,17 +366,13 @@ void Exe32::readDosHeader()
     readLittleEndian(&this->id.exe_oem_info, buffer, 20);
     readLittleEndian(this->id.exe_reserved2, buffer, 21);
     readLittleEndian(&this->id.exe_e_lfanew, buffer, 31);
-    printf("Signature: %x\n", this->id.exe_magic);
-    printf("bytes in last block: %u\n", this->id.exe_bytes_in_last_block);
-    
+
     
     this->fd.seekg(60, std::ios::beg);
     uint8_t bufferPeAddress[4];
     this->fd.read((char *)bufferPeAddress, 4);
     
     readLittleEndian(&this->id.exe_pe_address, bufferPeAddress, 0);
-   // this->fd.read((char *)&this->id.exe_pe_address, 4);
-    printf("pe address: %u\n", this->id.exe_pe_address);
     return;
 }
 
@@ -387,8 +382,6 @@ void Exe32::readPESignature(){
     this->fd.read((char *)bufferPeAddress, 4);
     
     readLittleEndian(&this->coff.Signature, bufferPeAddress, 0);
-    
-    printf("coff signature: %u\n", this->coff.Signature);
     
     return;
 }
@@ -421,9 +414,6 @@ void Exe32::readCoffHeader(){
         if(coff_fields.magic == 0x10b)/*this field is ony exists in pe32*/
             readLittleEndian(&this->coff_fields.baseOfData,coff_buffer, 24);
     }
-
-    printf("coff machine: %x\n", this->coff.Machine);
-    printf("coff size of optional header: %u\n", this->coff.SizeOfOptionalHeader);
     
     return;
 }
@@ -485,4 +475,12 @@ void Exe32::disassemble(std::vector<std::pair<uint64_t, std::string>> &container
 	std::vector<uint8_t> &machineCode = this->buffer[index].contents;
     recursive_disassemble(machineCode,start_address ,target_architecture, deneme);
     return;*/
+}
+
+void Exe32::create_svg(std::string section_name)
+{
+    exe_section_table &section = this->buffer[getSection(section_name)];
+    std::map<uint64_t, Block> block_table = get_blocks(section.contents, section.PointerToRawData, 0, coff_fields.addressOfEntryPoint - coff_fields.baseOfCode);
+
+    svg_create(block_table);
 }

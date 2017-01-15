@@ -51,6 +51,16 @@ void recursive_disassemble(std::vector<std::pair<uint64_t, std::string>> &inst_c
     return ;
 }
 
+std::map<uint64_t, Block> get_blocks(std::vector<uint8_t> &source, uint64_t start_address,
+                                                                    uint8_t arch, uint64_t offset)
+{
+    std::map<uint64_t, Block> block_table = std::map<uint64_t, Block>();
+    ArrayReader desc = ArrayReader(source, start_address);
+    trace_blocks(block_table, desc, arch, offset);
+
+    return block_table;
+}
+
 void trace_blocks(std::map<uint64_t, Block> &table, ArrayReader &desc, uint8_t arch, uint64_t offset)
 {
     std::vector<std::pair<uint64_t, std::string>> container = std::vector<std::pair<uint64_t, std::string>>();

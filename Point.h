@@ -9,6 +9,8 @@
 #ifndef POINT_H
 #define POINT_H
 
+#include <string>
+
 struct Points {
     int x, y;
 };

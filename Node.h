@@ -9,8 +9,10 @@
 
 #ifndef NODE_H
 #define NODE_H
+
 #include "Point.h"
 #include <vector>
+#include <string>
 
 class Node
 {

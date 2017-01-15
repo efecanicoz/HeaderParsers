@@ -1,11 +1,19 @@
 
+#include <vector>
+#include <string>
+#include <sstream>
+#include <fstream>
+
+#include <iostream>
+
+
 /*******************************************************************************
  *  The "New BSD License" : http://www.opensource.org/licenses/bsd-license.php  *
  ********************************************************************************
- 
+
  Copyright (c) 2010, Mark Turney
  All rights reserved.
- 
+
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  * Redistributions of source code must retain the above copyright
@@ -16,7 +24,7 @@
  * Neither the name of the <organization> nor the
  names of its contributors may be used to endorse or promote products
  derived from this software without specific prior written permission.
- 
+
  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,18 +35,8 @@
  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- 
+
  ******************************************************************************/
-
-#ifndef DISPLAY_H
-#define DISPLAY_H
-
-#include <vector>
-#include <string>
-#include <sstream>
-#include <fstream>
-
-#include <iostream>
 
 namespace svg
 {
@@ -51,19 +49,10 @@ namespace svg
         ss << attribute_name << "=\"" << value << unit << "\" ";
         return ss.str();
     }
-    std::string elemStart(std::string const & element_name)
-    {
-        return "\t<" + element_name + " ";
-    }
-    std::string elemEnd(std::string const & element_name)
-    {
-        return "</" + element_name + ">\n";
-    }
-    std::string emptyElemEnd()
-    {
-        return "/>\n";
-    }
-    
+    std::string elemStart(std::string const & element_name);
+    std::string elemEnd(std::string const & element_name);
+    std::string emptyElemEnd();
+
     // Quick optional return type.  This allows functions to return an invalid
     //  value if no good return is possible.  The user checks for validity
     //  before using the returned value.
@@ -79,7 +68,7 @@ namespace svg
             // If we try to access an invalid value, an exception is thrown.
             if (!valid)
                 throw std::exception();
-            
+
             return &type;
         }
         // Test for validity.
@@ -88,7 +77,7 @@ namespace svg
         bool valid;
         T type;
     };
-    
+
     struct Dimensions
     {
         Dimensions(double width, double height) : width(width), height(height) { }
@@ -96,47 +85,22 @@ namespace svg
         double width;
         double height;
     };
-    
+
     struct Point
     {
         Point(double x = 0, double y = 0) : x(x), y(y) { }
         double x;
         double y;
     };
-    optional<Point> getMinPoint(std::vector<Point> const & points)
-    {
-        if (points.empty())
-            return optional<Point>();
-        
-        Point min = points[0];
-        for (unsigned i = 0; i < points.size(); ++i) {
-            if (points[i].x < min.x)
-                min.x = points[i].x;
-            if (points[i].y < min.y)
-                min.y = points[i].y;
-        }
-        return optional<Point>(min);
-    }
-    optional<Point> getMaxPoint(std::vector<Point> const & points)
-    {
-        if (points.empty())
-            return optional<Point>();
-        
-        Point max = points[0];
-        for (unsigned i = 0; i < points.size(); ++i) {
-            if (points[i].x > max.x)
-                max.x = points[i].x;
-            if (points[i].y > max.y)
-                max.y = points[i].y;
-        }
-        return optional<Point>(max);
-    }
-    
+
+    optional<Point> getMinPoint(std::vector<Point> const & points);
+    optional<Point> getMaxPoint(std::vector<Point> const & points);
+
     // Defines the dimensions, scale, origin, and origin offset of the document.
     struct Layout
     {
         enum Origin { TopLeft, BottomLeft, TopRight, BottomRight };
-        
+
         Layout(Dimensions const & dimensions = Dimensions(400, 300), Origin origin = BottomLeft,
                double scale = 1, Point const & origin_offset = Point(0, 0))
         : dimensions(dimensions), scale(scale), origin(origin), origin_offset(origin_offset) { }
@@ -145,28 +109,12 @@ namespace svg
         Origin origin;
         Point origin_offset;
     };
-    
+
     // Convert coordinates in user space to SVG native space.
-    double translateX(double x, Layout const & layout)
-    {
-        if (layout.origin == Layout::BottomRight || layout.origin == Layout::TopRight)
-            return layout.dimensions.width - ((x + layout.origin_offset.x) * layout.scale);
-        else
-            return (layout.origin_offset.x + x) * layout.scale;
-    }
-    
-    double translateY(double y, Layout const & layout)
-    {
-        if (layout.origin == Layout::BottomLeft || layout.origin == Layout::BottomRight)
-            return layout.dimensions.height - ((y + layout.origin_offset.y) * layout.scale);
-        else
-            return (layout.origin_offset.y + y) * layout.scale;
-    }
-    double translateScale(double dimension, Layout const & layout)
-    {
-        return dimension * layout.scale;
-    }
-    
+    double translateX(double x, Layout const & layout);
+    double translateY(double y, Layout const & layout);
+    double translateScale(double dimension, Layout const & layout);
+
     class Serializeable
     {
     public:
@@ -174,13 +122,13 @@ namespace svg
         virtual ~Serializeable() { }
         virtual std::string toString(Layout const & layout) const = 0;
     };
-    
+
     class Color : public Serializeable
     {
     public:
         enum Defaults { Transparent = -1, Aqua, Black, Blue, Brown, Cyan, Fuchsia,
             Green, Lime, Magenta, Orange, Purple, Red, Silver, White, Yellow };
-        
+
         Color(int r, int g, int b) : transparent(false), red(r), green(g), blue(b) { }
         Color(Defaults color)
         : transparent(false), red(0), green(0), blue(0)
@@ -220,7 +168,7 @@ namespace svg
         int red;
         int green;
         int blue;
-        
+
         void assign(int r, int g, int b)
         {
             red = r;
@@ -228,7 +176,7 @@ namespace svg
             blue = b;
         }
     };
-    
+
     class Fill : public Serializeable
     {
     public:
@@ -244,7 +192,7 @@ namespace svg
     private:
         Color color;
     };
-    
+
     class Stroke : public Serializeable
     {
     public:
@@ -255,7 +203,7 @@ namespace svg
             // If stroke width is invalid.
             if (width < 0)
                 return std::string();
-            
+
             std::stringstream ss;
             ss << attribute("stroke-width", translateScale(width, layout)) << attribute("stroke", color.toString(layout));
             return ss.str();
@@ -264,7 +212,7 @@ namespace svg
         double width;
         Color color;
     };
-    
+
     class Font : public Serializeable
     {
     public:
@@ -279,7 +227,7 @@ namespace svg
         double size;
         std::string family;
     };
-    
+
     class Shape : public Serializeable
     {
     public:
@@ -293,15 +241,8 @@ namespace svg
         Stroke stroke;
     };
     template <typename T>
-    std::string vectorToString(std::vector<T> collection, Layout const & layout)
-    {
-        std::string combination_str;
-        for (unsigned i = 0; i < collection.size(); ++i)
-            combination_str += collection[i].toString(layout);
-        
-        return combination_str;
-    }
-    
+    std::string vectorToString(std::vector<T> collection, Layout const & layout);
+
     class Circle : public Shape
     {
     public:
@@ -326,7 +267,7 @@ namespace svg
         Point center;
         double radius;
     };
-    
+
     class Elipse : public Shape
     {
     public:
@@ -354,7 +295,7 @@ namespace svg
         double radius_width;
         double radius_height;
     };
-    
+
     class Rectangle : public Shape
     {
     public:
@@ -382,7 +323,7 @@ namespace svg
         double width;
         double height;
     };
-    
+
     class Line : public Shape
     {
     public:
@@ -404,7 +345,7 @@ namespace svg
         {
             start_point.x += offset.x;
             start_point.y += offset.y;
-            
+
             end_point.x += offset.x;
             end_point.y += offset.y;
         }
@@ -412,7 +353,7 @@ namespace svg
         Point start_point;
         Point end_point;
     };
-    
+
     class Polygon : public Shape
     {
     public:
@@ -428,12 +369,12 @@ namespace svg
         {
             std::stringstream ss;
             ss << elemStart("polygon");
-            
+
             ss << "points=\"";
             for (unsigned i = 0; i < points.size(); ++i)
                 ss << translateX(points[i].x, layout) << "," << translateY(points[i].y, layout) << " ";
             ss << "\" ";
-            
+
             ss << fill.toString(layout) << stroke.toString(layout) << emptyElemEnd();
             return ss.str();
         }
@@ -447,7 +388,7 @@ namespace svg
     private:
         std::vector<Point> points;
     };
-    
+
     class Polyline : public Shape
     {
     public:
@@ -466,12 +407,12 @@ namespace svg
         {
             std::stringstream ss;
             ss << elemStart("polyline");
-            
+
             ss << "points=\"";
             for (unsigned i = 0; i < points.size(); ++i)
                 ss << translateX(points[i].x, layout) << "," << translateY(points[i].y, layout) << " ";
             ss << "\" ";
-            
+
             ss << fill.toString(layout) << stroke.toString(layout) << emptyElemEnd();
             return ss.str();
         }
@@ -484,7 +425,7 @@ namespace svg
         }
         std::vector<Point> points;
     };
-    
+
     class Text : public Shape
     {
     public:
@@ -510,7 +451,7 @@ namespace svg
         std::string content;
         Font font;
     };
-    
+
     // Sample charting class.
     class LineChart : public Shape
     {
@@ -522,7 +463,7 @@ namespace svg
         {
             if (polyline.points.empty())
                 return *this;
-            
+
             polylines.push_back(polyline);
             return *this;
         }
@@ -530,11 +471,11 @@ namespace svg
         {
             if (polylines.empty())
                 return "";
-            
+
             std::string ret;
             for (unsigned i = 0; i < polylines.size(); ++i)
                 ret += polylineToString(polylines[i], layout);
-            
+
             return ret + axisString(layout);
         }
         void offset(Point const & offset)
@@ -547,12 +488,12 @@ namespace svg
         Dimensions margin;
         double scale;
         std::vector<Polyline> polylines;
-        
+
         optional<Dimensions> getDimensions() const
         {
             if (polylines.empty())
                 return optional<Dimensions>();
-            
+
             optional<Point> min = getMinPoint(polylines[0].points);
             optional<Point> max = getMaxPoint(polylines[0].points);
             for (unsigned i = 0; i < polylines.size(); ++i) {
@@ -565,7 +506,7 @@ namespace svg
                 if (getMaxPoint(polylines[i].points)->y > max->y)
                     max->y = getMaxPoint(polylines[i].points)->y;
             }
-            
+
             return optional<Dimensions>(Dimensions(max->x - min->x, max->y - min->y));
         }
         std::string axisString(Layout const & layout) const
@@ -573,37 +514,37 @@ namespace svg
             optional<Dimensions> dimensions = getDimensions();
             if (!dimensions)
                 return "";
-            
+
             // Make the axis 10% wider and higher than the data points.
             double width = dimensions->width * 1.1;
             double height = dimensions->height * 1.1;
-            
+
             // Draw the axis.
             Polyline axis(Color::Transparent, axis_stroke);
             axis << Point(margin.width, margin.height + height) << Point(margin.width, margin.height)
             << Point(margin.width + width, margin.height);
-            
+
             return axis.toString(layout);
         }
         std::string polylineToString(Polyline const & polyline, Layout const & layout) const
         {
             Polyline shifted_polyline = polyline;
             shifted_polyline.offset(Point(margin.width, margin.height));
-            
+
             std::vector<Circle> vertices;
             for (unsigned i = 0; i < shifted_polyline.points.size(); ++i)
                 vertices.push_back(Circle(shifted_polyline.points[i], getDimensions()->height / 30.0, Color::Black));
-            
+
             return shifted_polyline.toString(layout) + vectorToString(vertices, layout);
         }
     };
-    
+
     class Document
     {
     public:
         Document(std::string const & file_name, Layout layout = Layout())
         : file_name(file_name), layout(layout) { }
-        
+
         Document & operator<<(Shape const & shape)
         {
             body_nodes_str += shape.toString(layout);
@@ -626,7 +567,7 @@ namespace svg
             std::ofstream ofs(file_name.c_str());
             if (!ofs.good())
                 return false;
-            
+
             ofs << toString();
             ofs.close();
             return true;
@@ -634,9 +575,6 @@ namespace svg
     private:
         std::string file_name;
         Layout layout;
-        
         std::string body_nodes_str;
     };
 }
-
-#endif

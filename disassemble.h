@@ -14,5 +14,6 @@ void disassemble_content(std::vector<std::pair<uint64_t, std::string>> &, std::v
 void linear_sweep(std::vector<std::pair<uint64_t, std::string>> &, std::vector<uint8_t> &, uint64_t , uint8_t);
 void trace_blocks(std::map<uint64_t,Block> &, ArrayReader &, uint8_t , uint64_t );
 void recursive_disassemble(std::vector<std::pair<uint64_t, std::string>> &, std::vector<uint8_t> &, uint64_t, uint8_t, uint64_t);
+std::map<uint64_t, Block> get_blocks(std::vector<uint8_t> &source, uint64_t start_address, uint8_t arch, uint64_t offset);
 
 #endif // DISASSEMBLE_H

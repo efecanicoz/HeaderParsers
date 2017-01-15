@@ -854,3 +854,10 @@ void Elf32::readSymbolTable(Elf32SH &section)
 			this->dynamicSymbolTable.push_back(symHeader);
 	}
 }
+
+void Elf32::create_svg(std::string)
+{
+    /*std::map<uint64_t, Block> &block_table = get_blocks(section.contents, section.PointerToRawData, 0, coff_fields.addressOfEntryPoint - coff_fields.baseOfCode);
+
+    svg_create(block_table);*/
+}
