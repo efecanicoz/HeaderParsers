@@ -3,7 +3,7 @@
 svg::Dimensions dimensions(20000, 20000);
 std::vector<Node> nodes;//holds all rectangels
 
-svg::Document doc("/home/firat/Desktop/my_svg.svg", svg::Layout(dimensions, svg::Layout::TopLeft));
+svg::Document doc("my_svg.svg", svg::Layout(dimensions, svg::Layout::TopLeft));
 std::map<std::string,int> mymap;
 std::map<std::string,int>::iterator it;
 std::map<uint64_t, Block>::iterator blockite;
@@ -135,38 +135,6 @@ void svg_create(std::map<uint64_t, Block> block_table){
                 }
             }
         }
-
-        /*if (nod.name.compare(cachenode.name) != 0){
-         doc << Rectangle(Point(nod.location.x, nod.location.y), 80, 80, Color::Yellow);
-         doc << Text(Point(nod.location.x, nod.location.y), nod.name, Color::Red, Font(15, "Verdana"));
-
-         Polyline polyline1(Stroke(.5, Color::Red));
-         if(cachenode.name.compare("") != 0){
-         polyline1 << Point(current.x, current.y + 40) << Point(cachenode.location.x + 80, cachenode.location.y + 40);
-         doc << polyline1;
-         }
-         cachenode = nod;
-         countfory -= 1;
-         current.x += 100;
-         }*/
-
-        /*if(locCur.x == cachenode.location.x && locCur.y == cachenode.location.y){//recursive alert
-         doc << Circle(Point(nod.location.x + 40, nod.location.y + 40), 60, Fill(Color(100, 200, 120)), Stroke(1, Color(200, 250, 150)));
-         }else{
-         cachenode = nod;
-         int xyer = (num % 3) + 1;
-         int yyer = (num / 3) + 1;
-
-         xyer = xyer * 50;
-         yyer = yyer * 90;
-         Polyline polyline1(Stroke(.5, Color::Red));
-
-         polyline1 << Point(current.x, current.y + 40) << Point(xyer - 20, yyer + 40);
-         doc << polyline1;
-         }*/
-
-
-
 
         if(countfory == 0){
             current.y += 90;

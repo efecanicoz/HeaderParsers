@@ -74,6 +74,7 @@ void MainWindow::on_pushButton_clicked()
         /*Invalid file*/
         return;
     }
+    ui->pushButton_2->setEnabled(false);
     /*Fill sectionListView*/
     stringList = new QStringList();
     sectionList = exeObj->getSectionNames();
@@ -87,6 +88,8 @@ void MainWindow::on_pushButton_clicked()
     headerHexContent = exeObj->getHexHeader();
     ui->asciiBrowser->setPlainText(format_for_ascii_view(headerHexContent));
     ui->hexBrowser->setPlainText(format_for_hex_view(headerHexContent));
+
+
 }
 
 void MainWindow::on_sectionListView_doubleClicked(const QModelIndex &index)
@@ -106,6 +109,9 @@ void MainWindow::on_sectionListView_doubleClicked(const QModelIndex &index)
     ui->sectionContentBrowser->setUpdatesEnabled(true);
     ui->asciiBrowser->setUpdatesEnabled(true);
     ui->hexBrowser->setUpdatesEnabled(true);
+
+    ui->pushButton_2->setEnabled(true);
+
 
 }
 
