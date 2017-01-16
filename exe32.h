@@ -25,23 +25,19 @@
 #define EXE_STRUCT
 	struct exe_ident {
 		uint16_t exe_magic;
-		uint8_t exe_bytes_in_last_block;
-		uint8_t exe_blocks_in_file;
-		uint8_t exe_num_relocs;
-		uint8_t exe_header_paragraphs;
-		uint8_t exe_min_extra_paragraphs;
-		uint8_t exe_max_extra_paragraphs;
-		uint8_t exe_ss;
-		uint8_t exe_sp;
-		uint8_t exe_checksum;
-		uint8_t exe_ip;
-		uint8_t exe_cs;
-		uint8_t exe_relocpos;
-		uint8_t exe_noverlay;
-		uint8_t exe_reserved1[4];
-		uint8_t exe_oem_id;
-		uint8_t exe_oem_info;
-		uint8_t exe_reserved2[10];
+        uint16_t exe_bytes_in_last_block;
+        uint16_t exe_blocks_in_file;
+        uint16_t exe_num_relocs;
+        uint16_t exe_header_paragraphs;
+        uint16_t exe_min_extra_paragraphs;
+        uint16_t exe_max_extra_paragraphs;
+        uint16_t exe_ss;
+        uint16_t exe_sp;
+        uint16_t exe_checksum;
+        uint16_t exe_ip;
+        uint16_t exe_cs;
+        uint16_t exe_relocpos;
+        uint16_t exe_noverlay;
 		uint16_t  exe_e_lfanew;
 		uint32_t exe_pe_address;
 	};

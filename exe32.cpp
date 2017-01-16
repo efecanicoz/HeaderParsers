@@ -22,6 +22,21 @@ std::string Exe32::getHeaderInfo()
     std::string temp_string = "";
     ss << "DOS header: \n";
     ss << "\tMagic bytes: "<< std::hex << std::showbase << id.exe_magic << "\n";
+    ss << "\tImage size mod 512: "<< std::hex << std::showbase << id.exe_bytes_in_last_block << "\n";
+    ss << "\tNumber of blocks in the file: " << std::hex << std::showbase << id.exe_blocks_in_file << "\n";
+    ss << "\tNumber of relocation entries: " << std::hex << std::showbase << id.exe_num_relocs << "\n";
+    ss << "\tNumber of paragraphs in header: " << std::hex << std::showbase << id.exe_header_paragraphs << "\n";
+    ss << "\tMinimum required memory" << std::hex << std::showbase << id.exe_min_extra_paragraphs << "\n";
+    ss << "\tMaximum required memory: " << std::hex << std::showbase << id.exe_max_extra_paragraphs << "\n";
+    ss << "\tRelative value of stack segment: " << std::hex << std::showbase << id.exe_ss << "\n";
+    ss << "\tInitial value of sp register: " << std::hex << std::showbase << id.exe_sp << "\n";
+    ss << "\tFile checksum: " << std::hex << std::showbase << id.exe_checksum << "\n";
+    ss << "\tInitial value of ip register: " << std::hex << std::showbase << id.exe_ip << "\n";
+    ss << "\tInitial value of cs register: " << std::hex << std::showbase << id.exe_cs << "\n";
+    ss << "\tOffset of first relocation item: " << std::hex << std::showbase << id.exe_relocpos << "\n";
+    ss << "\tOverlay number: " << std::hex << std::showbase << id.exe_noverlay << "\n";
+
+
     ss << "COFF header: \n";
     ss << "\tSignature: " << std::hex << std::showbase << coff.Signature << "\n";
     switch (coff.Machine)
@@ -152,11 +167,11 @@ std::string Exe32::getHeaderInfo()
     ss << "\tMajor linker version: " << std::hex << std::showbase << coff_fields.majorLinkerVersion << "\n";
     ss << "\tMinor linker version: " << std::hex << std::showbase << coff_fields.minorLinkerVersion << "\n";
     ss << "\tSize of code section: " << coff_fields.sizeOfCode << "\n";
-    ss << "Size of initialized data: " << coff_fields.sizeOfInitializedData << "\n";
-    ss << "Size of uninitialized data: " << coff_fields.sizeOfUninitializedData << "\n";
-    ss << "Address of entry point: " << coff_fields.addressOfEntryPoint << "\n";
-    ss << "Base of code: " << coff_fields.baseOfCode << "\n";
-    ss << "Base of data: " << coff_fields.baseOfData << "\n";
+    ss << "\tSize of initialized data: " << coff_fields.sizeOfInitializedData << "\n";
+    ss << "\tSize of uninitialized data: " << coff_fields.sizeOfUninitializedData << "\n";
+    ss << "\tAddress of entry point: " << coff_fields.addressOfEntryPoint << "\n";
+    ss << "\tBase of code: " << coff_fields.baseOfCode << "\n";
+    ss << "\tBase of data: " << coff_fields.baseOfData << "\n";
 
     return ss.str();
 }
@@ -348,29 +363,23 @@ std::vector<std::string> Exe32::getSectionNames()
 
 void Exe32::readDosHeader()
 {
-    uint8_t buffer[33];
-    this->fd.read((char *)buffer, 33);
+    uint8_t buffer[28];
+    this->fd.read((char *)buffer, 28);
     readLittleEndian(&this->id.exe_magic, buffer, 0);
     readLittleEndian(&this->id.exe_bytes_in_last_block, buffer, 2);
-    readLittleEndian(&this->id.exe_blocks_in_file, buffer, 3);
-    readLittleEndian(&this->id.exe_num_relocs, buffer, 4);
-    readLittleEndian(&this->id.exe_header_paragraphs, buffer, 5);
-    readLittleEndian(&this->id.exe_min_extra_paragraphs, buffer, 6);
-    readLittleEndian(&this->id.exe_max_extra_paragraphs, buffer, 7);
-    readLittleEndian(&this->id.exe_ss, buffer, 8);
-    readLittleEndian(&this->id.exe_sp, buffer, 9);
-    readLittleEndian(&this->id.exe_checksum, buffer, 10);
-    readLittleEndian(&this->id.exe_ip, buffer, 11);
-    readLittleEndian(&this->id.exe_cs, buffer, 12);
-    readLittleEndian(&this->id.exe_relocpos, buffer, 13);
-    readLittleEndian(&this->id.exe_noverlay, buffer, 14);
-    readLittleEndian(this->id.exe_reserved1, buffer, 18);
-    readLittleEndian(&this->id.exe_oem_id, buffer, 19);
-    readLittleEndian(&this->id.exe_oem_info, buffer, 20);
-    readLittleEndian(this->id.exe_reserved2, buffer, 21);
-    readLittleEndian(&this->id.exe_e_lfanew, buffer, 31);
+    readLittleEndian(&this->id.exe_blocks_in_file, buffer, 4);
+    readLittleEndian(&this->id.exe_num_relocs, buffer, 6);
+    readLittleEndian(&this->id.exe_header_paragraphs, buffer, 8);
+    readLittleEndian(&this->id.exe_min_extra_paragraphs, buffer, 10);
+    readLittleEndian(&this->id.exe_max_extra_paragraphs, buffer, 12);
+    readLittleEndian(&this->id.exe_ss, buffer, 14);
+    readLittleEndian(&this->id.exe_sp, buffer, 16);
+    readLittleEndian(&this->id.exe_checksum, buffer, 18);
+    readLittleEndian(&this->id.exe_ip, buffer, 20);
+    readLittleEndian(&this->id.exe_cs, buffer, 22);
+    readLittleEndian(&this->id.exe_relocpos, buffer, 24);
+    readLittleEndian(&this->id.exe_noverlay, buffer, 26);
 
-    
     this->fd.seekg(60, std::ios::beg);
     uint8_t bufferPeAddress[4];
     this->fd.read((char *)bufferPeAddress, 4);
