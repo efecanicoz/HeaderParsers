@@ -20,7 +20,10 @@ std::vector<uint8_t> Exe64::getHexSectionContent(std::string needle)
 
 std::vector<uint8_t> Exe64::getHexHeader()
 {
-    return std::vector<uint8_t>();
+    std::vector<uint8_t> file_buffer(376);
+    this->fd.seekg(0,std::ios::beg);
+    this->fd.read((char *)&file_buffer[0], 376);
+    return file_buffer;
 }
 
 std::string Exe64::getHeaderInfo()
