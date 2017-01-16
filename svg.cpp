@@ -1,20 +1,21 @@
 #include "svg.h"
 
-svg::Dimensions dimensions(20000, 20000);
-std::vector<Node> nodes;//holds all rectangels
-
-svg::Document doc("my_svg.svg", svg::Layout(dimensions, svg::Layout::TopLeft));
-std::map<std::string,int> mymap;
-std::map<std::string,int>::iterator it;
-std::map<uint64_t, Block>::iterator blockite;
 std::vector<Node>::iterator n;
-
-Node cachenode;
-Node nod, linkNod, link2Nod;
-Points current;
+std::map<std::string,int>::iterator it;
 
 void svg_create(std::map<uint64_t, Block> &block_table)
 {
+    svg::Dimensions dimensions(20000, 20000);
+    std::vector<Node> nodes;//holds all rectangels
+
+    svg::Document doc("my_svg.svg", svg::Layout(dimensions, svg::Layout::TopLeft));
+    std::map<std::string,int> mymap;
+    std::map<uint64_t, Block>::iterator blockite;
+
+    Node cachenode;
+    Node nod, linkNod, link2Nod;
+    Points current;
+
     printf("Enter the Function.");
     Block block;
     svg::Polygon border(svg::Stroke(1, svg::Color::Red));
@@ -63,7 +64,8 @@ void svg_create(std::map<uint64_t, Block> &block_table)
         std::string link1 = std::to_string(block.jump1);
         std::string link2 = std::to_string(block.jump2);
 
-        if(1){//link varsa
+        if(link1 != "0")
+        {//link varsa
             svg::Polyline polyline1(svg::Stroke(.5, svg::Color::Green));
             if(nod.name.compare(nod.Link) == 0){
                 //recursive
@@ -99,7 +101,8 @@ void svg_create(std::map<uint64_t, Block> &block_table)
                 }
             }
         }
-        if(1){//link2 if link2 is not empty
+        if(link2 != "0")
+        {//link2 if link2 is not empty
             svg::Polyline polyline1(svg::Stroke(.5, svg::Color::Red));
             if(nod.name.compare(nod.Link2) == 0){
                 //recursive

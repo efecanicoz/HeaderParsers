@@ -110,7 +110,7 @@ void trace_blocks(std::map<uint64_t, Block> &table, ArrayReader &desc, uint8_t a
             current_block.jump2 = desc.counter;
             break;
         }
-        else if(instruction[0].compare("RET") == 0)
+        else if(instruction[0].compare("RET") == 0 || instruction[0].compare("HLT") == 0)
         {
             break;
         }
