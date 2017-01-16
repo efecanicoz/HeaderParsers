@@ -76,6 +76,7 @@ void MainWindow::on_pushButton_clicked()
     }
     /*Fill sectionListView*/
     stringList = new QStringList();
+    stringList->append("File Header");
     sectionList = exeObj->getSectionNames();
     for(std::string section : sectionList)
     {
@@ -94,9 +95,17 @@ void MainWindow::on_sectionListView_doubleClicked(const QModelIndex &index)
     std::vector<uint8_t> hexContent;
     std::string content;
     QString itemText = index.data(Qt::DisplayRole).toString();
-    hexContent = exeObj->getHexSectionContent(itemText.toStdString());
-    content = exeObj->getSectionContent(itemText.toStdString(), ui->linearSweepButton->isChecked());
-
+    if(itemText == "File Header")
+    {
+        content = exeObj->getHeaderInfo();
+        hexContent = exeObj->getHexHeader();
+    }
+    else
+    {
+        hexContent = exeObj->getHexSectionContent(itemText.toStdString());
+        content = exeObj->getSectionContent(itemText.toStdString(), ui->linearSweepButton->isChecked());
+    }
+    /*qstringleri önce yaratsan ?*/
     ui->sectionContentBrowser->setUpdatesEnabled(false);
     ui->asciiBrowser->setUpdatesEnabled(false);
     ui->hexBrowser->setUpdatesEnabled(false);
