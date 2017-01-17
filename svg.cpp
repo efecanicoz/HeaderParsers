@@ -30,6 +30,7 @@ void svg_create(std::map<uint64_t, Block> &block_table)
 
     for (blockite = block_table.begin(); blockite!=block_table.end(); ++blockite){
         block = blockite->second;
+
         nod.name = std::to_string(block.start_address);//adresi string yap
 
         Points locCur = Location(nod.name, nodes);
@@ -147,29 +148,28 @@ void svg_create(std::map<uint64_t, Block> &block_table)
         }
 
     }
-    //doc << Circle(Point(80, 80), 20, Fill(Color(100, 200, 120)), Stroke(1, Color(200, 250, 150)));
-
-
-    //doc << (Polygon(Color(200, 160, 220), Stroke(.5, Color(150, 160, 200))) << Point(20, 70)
-    //        << Point(25, 72) << Point(33, 70) << Point(35, 60) << Point(25, 55) << Point(18, 63));
     doc.save();
 }
 
-int returnNumberofMap(std::string name, std::map<std::string, int> mymap){
-    for (it=mymap.begin(); it!=mymap.end(); ++it){
-        if(it->first.compare(name) == 0)
-            return it->second;
+int returnNumberofMap(std::string &name, std::map<std::string, int> &mymap)
+{
+    for(auto &item: mymap)
+    {
+        if(item.first.compare(name) == 0)
+            return item.second;
     }
     return -1;
 }
 
-Points Location(std::string name,  std::vector<Node> nodes){
+Points Location(std::string &name,  std::vector<Node> &nodes)
+{
     Points p;
     p.x = -1;
     p.y = -1;
-    for (n=nodes.begin(); n!=nodes.end(); ++n){
-        if(n->name.compare(name) == 0)
-            return n->location;
+    for(auto &node: nodes)
+    {
+        if(node.name.compare(name) == 0)
+            return node.location;
     }
     return p;
 }

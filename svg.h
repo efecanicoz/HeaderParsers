@@ -9,10 +9,11 @@
 #include <map>
 #include "block.h"
 
+
 void CreateRect(int width, int height, int x, int y, svg::Document doc);
 void svg_create(std::map<uint64_t, Block> &block_table);
-int returnNumberofMap(std::string name, std::map<std::string, int> mymap);
-Points Location(std::string name,  std::vector<Node> nodes);
+int returnNumberofMap(std::string &name, std::map<std::__cxx11::string, int> &mymap);
+Points Location(std::__cxx11::string &name,  std::vector<Node> &nodes);
 
 
 
