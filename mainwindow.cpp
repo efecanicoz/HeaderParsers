@@ -71,7 +71,7 @@ void MainWindow::on_pushButton_clicked()
     exeObj = readFile(exePath.toStdString());
     if(exeObj == NULL)
     {
-        /*Invalid file*/
+        ui->sectionContentBrowser->setPlainText("Invalid file format");
         return;
     }
     /*Fill sectionListView*/
